@@ -159,98 +159,6 @@
 						<label for="contest_description">Mô tả kì thi</label>
 					</div>
 				</div>
-				
-				<div class="item lr sound" data-soundhoversoft title="Hiển thị kết quả chấm, điểm và xếp hạng mỗi bài">
-					<t class="left">Công bố kết quả</t>
-					<label class="sq-checkbox pink right">
-						<input id="publish" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<t class="title small">Nộp Bài</t>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Cho phép Nộp Bài</t>
-					<label class="sq-checkbox right">
-						<input id="submit" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">
-						Các bài nộp lên phải có trong danh sách đề<br>
-						<i><b>LƯU Ý:</b> Khi cài đặt này bị tắt, tên tệp nộp lên sẽ được chuyển thành chữ HOA.</i>
-					</t>
-					<label class="sq-checkbox right">
-						<input id="submitInProblems" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<t class="title small">Xếp Hạng</t>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Bật bảng Xếp Hạng</t>
-					<label class="sq-checkbox pink right">
-						<input id="viewRank" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Hiển thị điểm các bài làm trong bảng Xếp Hạng</t>
-					<label class="sq-checkbox right">
-						<input id="viewRankTask" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Ẩn điểm của đề bài đã bị tắt</t>
-					<label class="sq-checkbox right">
-						<input id="viewRankHideDisabled" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<t class="title small">Nhật Ký</t>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Cho phép xem tệp nhật ký</t>
-					<label class="sq-checkbox pink right">
-						<input id="viewLog" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Cho phép xem tệp nhật ký của người khác</t>
-					<label class="sq-checkbox right">
-						<input id="viewLogOther" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<t class="title small">Đề Bài</t>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Cho phép Khách xem đề bài</t>
-					<label class="sq-checkbox right">
-						<input id="publicProblems" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-			</div>
-
-			<div class="group folder">
-				<t class="title">Thư mục</t>
-
-				<div class="item sound" data-soundhoversoft>
-					<div class="formGroup sound" data-color="blue" data-soundselectsoft>
-						<input id="uploadDir" type="text" class="formField" autocomplete="off" placeholder="Thư mục lưu bài làm" required>
-						<label for="uploadDir">Thư mục lưu bài làm</label>
-					</div>
-				</div>
 			</div>
 
 			<div class="group clock">
@@ -260,33 +168,6 @@
 					<div class="formGroup sound" data-color="blue" data-soundselectsoft>
 						<input id="time_zone" type="text" class="formField" autocomplete="off" placeholder="Khu vực" required>
 						<label for="time_zone">Khu vực</label>
-					</div>
-				</div>
-				<div class="item lr sound" data-soundhoversoft>
-					<div class="left formGroup sound" data-color="blue" data-soundselectsoft>
-						<input id="time_beginDate" type="date" class="formField" autocomplete="off" placeholder="Ngày bắt đầu kì thi" required>
-						<label for="time_beginDate">Ngày bắt đầu kì thi</label>
-					</div>
-					<div class="middle formGroup sound" data-color="blue" data-soundselectsoft>
-						<input id="time_beginTime" type="time" step="1" class="formField" autocomplete="off" placeholder="Thời gian bắt đầu kì thi" required>
-						<label for="time_beginTime">Thời gian bắt đầu kì thi</label>
-					</div>
-					<button type="button" id="setTimeToNow" class="right sq-btn blue sound" data-soundhover data-soundselect>Hiện tại</button>
-				</div>
-				<div class="item lr info sound" data-soundhoversoft>
-					<t class="left">Đặt thời gian làm bài lớn hơn 0 sẽ bật chế độ kì thi</t>
-					<div class="right"></div>
-				</div>
-				<div class="item sound" data-soundhoversoft>
-					<div class="formGroup sound" data-color="blue" data-soundselectsoft>
-						<input id="time_during" type="number" class="formField" autocomplete="off" placeholder="Thời gian làm bài" required>
-						<label for="time_during">Thời gian làm bài (phút)</label>
-					</div>
-				</div>
-				<div class="item sound" data-soundhoversoft>
-					<div class="formGroup sound" data-color="blue" data-soundselectsoft>
-						<input id="time_offset" type="number" class="formField" autocomplete="off" placeholder="Thời gian bù" required>
-						<label for="time_offset">Thời gian bù (giây)</label>
 					</div>
 				</div>
 			</div>
@@ -324,38 +205,6 @@
 						<input id="clientTransition" type="checkbox" class="sound" data-soundcheck>
 						<span class="checkmark"></span>
 					</label>
-				</div>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Mở đề bài trong cửa số mới</t>
-					<label class="sq-checkbox pink right">
-						<input id="clientDialogProblem" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Tự động cập nhật Xếp Hạng</t>
-					<label class="sq-checkbox blue right">
-						<input id="clientRankUpdate" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<div class="item lr sound" data-soundhoversoft>
-					<t class="left">Tự động cập nhật Nhật Kí</t>
-					<label class="sq-checkbox pink right">
-						<input id="clientLogsUpdate" type="checkbox" class="sound" data-soundcheck>
-						<span class="checkmark"></span>
-					</label>
-				</div>
-
-				<div class="item sound" data-soundhoversoft>
-					<div class="lr">
-						<t class="left">Thời gian làm mới</t>
-						<t id="clientUpdateDelayValue" class="right">0000 ms/request</t>
-					</div>
-					<input type="range" id="clientUpdateDelayInput" class="sq-slider blue sound" data-soundselectsoft data-soundchange min="1" max="10" step="1">
 				</div>
 			</div>
 

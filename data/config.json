@@ -1,7 +1,7 @@
 {
     "app": {
-        "title": "Ph\u00f2ng Thi Tr\u1eafc Nghi\u1ec7m: 12A1",
-        "description": "Tr\u01b0\u1eddng THPT L\u1ea1c Long Qu\u00e2n"
+        "title": "Ph\u00f2ng Thi Tr\u1eafc Nghi\u1ec7m",
+        "description": "L\u1edbp 12A1"
     },
     "time": {
         "zone": "Asia\/Ho_Chi_Minh"
@@ -26,5 +26,6 @@
     },
     "cache": {
         "contestRank": 1
-    }
+    },
+    "uploadDir": null
 }

@@ -98,14 +98,6 @@
 	setting("ratelimit_banTime"			, $rawConfig["ratelimit"]["banTime"]			, $TYPE_NUMBER);
 	setting("cache_contestRank"			, $rawConfig["cache"]["contestRank"]			, $TYPE_NUMBER);
 
-	if ($rawConfig["publish"] !== true) {
-		$rawConfig["viewRank"] = false;
-		$rawConfig["viewLog"] = false;
-	}
-
-	if ($rawConfig["viewRankTask"] !== true)
-		$rawConfig["viewLogOther"] = false;
-
 	if ($changed === false)
 		stop(102, "Woah nothing happened.", 200);
 

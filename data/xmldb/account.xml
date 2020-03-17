@@ -65,57 +65,6 @@
         </Cell>
       </Row>
       <Row ss:AutoFitHeight="0">
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="String">admin</Data>
-        </Cell>
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="String">admin</Data>
-        </Cell>
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="String">$2y$10$9hfa8VmsLchLCZMgp4e7QuRunj6Q80TceObyEbkPXf8GTReMCMo8m</Data>
-        </Cell>
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="String">Admin</Data>
-        </Cell>
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="Number">10</Data>
-        </Cell>
-      </Row>
-      <Row ss:AutoFitHeight="0">
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">000A001</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">hs1</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">$2y$10$sS1/k0HfVX494k69VRrdV.7x4oHzz7RQ02UH42lEmZA40Y3zhgvce</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">Th&#xED; sinh 1</Data>
-        </Cell>
-        <Cell ss:StyleID="s63">
-          <Data ss:Type="Number">0</Data>
-        </Cell>
-      </Row>
-      <Row ss:AutoFitHeight="0">
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">000A002</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">hs2</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">a</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="String">Th&#xED; Sinh 2</Data>
-        </Cell>
-        <Cell ss:StyleID="s64">
-          <Data ss:Type="Number">0</Data>
-        </Cell>
-      </Row>
-      <Row ss:AutoFitHeight="0">
         <Cell ss:StyleID="s64">
           <Data ss:Type="String">admin</Data>
         </Cell>
