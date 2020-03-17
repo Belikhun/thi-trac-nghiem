@@ -1,0 +1,10 @@
+data/logs.json
+data/problems/*
+!data/problems/problem.php
+!data/problems/thumbnail.default
+.cache
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+log.txt

@@ -1,0 +1,152 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /assets/css/input.css                                                                        |
+? |                                                                                               |
+? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.formGroup {
+    position: relative;
+    padding: 15px 0 0;
+    margin-top: 8px;
+}
+
+.formGroup .formField {
+    width: 100%;
+    border: 0;
+    outline: none;
+    border-bottom: 1px solid rgba(39, 39, 39, 0.4);
+    color: #424242;
+    font-family: "Open Sans", "Calibri", "Segoe UI", sans-serif;
+    font-size: 13px;
+    user-select: none;
+    padding: 2px 0 7px;
+    margin-top: 4px;
+    background: transparent;
+    transition: border-color 0.5s;
+}
+
+.formGroup .formField::placeholder {
+    color: transparent;
+}
+
+.formGroup .formField:placeholder-shown + label {
+    font-size: 12px;
+    top: 24px;
+}
+
+.formGroup label,
+.formGroup .formField:focus + label {
+    position: absolute;
+    top: 4px;
+    display: block;
+    transition: 0.3s;
+    font-size: 9px;
+    font-family: "Open Sans", "Calibri", "Segoe UI", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #5a5b5f;
+    user-select: none;
+    cursor: text;
+}
+
+.formGroup .formField:focus + label {
+    color: #5f5f62;
+}
+
+.formGroup .formField:focus {
+    padding: 2px 0 6px;
+    border-bottom: 2px solid rgba(39, 39, 39, 0.8);
+}
+
+.formGroup .formField:disabled {
+    color: rgb(172, 172, 172);
+    background-color: rgba(128, 128, 128, 0.05);
+    cursor: not-allowed;
+}
+
+.formGroup .formField:disabled + label {
+    cursor: not-allowed;
+}
+
+/* Light Color */
+
+.formGroup[data-color = "light"] .formField {
+    border-bottom: 1px solid rgba(130, 130, 130, 0.4);
+    color: #cecece;
+}
+
+.formGroup[data-color = "light"] label,
+.formGroup[data-color = "light"] .formField:focus + label {
+    color: #b1b3b8;
+}
+
+.formGroup[data-color = "light"] .formField:focus + label {
+    color: #b9bbbe;
+}
+
+.formGroup[data-color = "light"] .formField:focus {
+    border-bottom: 2px solid rgba(224, 224, 224, 0.8);
+}
+
+/* Blue */
+
+.formGroup[data-color = "blue"] .formField {
+    border-bottom: 1px solid rgba(130, 130, 130, 0.4);
+    color: #424242;
+}
+
+.formGroup[data-color = "blue"] label,
+.formGroup[data-color = "blue"] .formField:focus + label {
+    color: #8b8b8b;
+}
+
+.formGroup[data-color = "blue"] .formField:focus + label {
+    color: #4285f4;
+}
+
+.formGroup[data-color = "blue"] .formField:focus {
+    border-bottom: 2px solid #4285f4;
+}
+
+/* Purple */
+
+.formGroup[data-color = "purple"] .formField {
+    border-bottom: 1px solid rgba(130, 130, 130, 0.4);
+    color: #424242;
+}
+
+.formGroup[data-color = "purple"] label,
+.formGroup[data-color = "purple"] .formField:focus + label {
+    color: #b1b3b8;
+}
+
+.formGroup[data-color = "purple"] .formField:focus + label {
+    color: #512da8;
+}
+
+.formGroup[data-color = "purple"] .formField:focus {
+    border-bottom: 2px solid #512da8;
+}
+
+/* Red */
+
+.formGroup[data-color = "red"] .formField {
+    border-bottom: 1px solid rgba(255, 0, 0, 0.4);
+    color: #ff1c1c;
+}
+
+.formGroup[data-color = "red"] label,
+.formGroup[data-color = "red"] .formField:focus + label {
+    color: #ff3333;
+}
+
+.formGroup[data-color = "red"] .formField:focus + label {
+    color: #cc0101;
+}
+
+.formGroup[data-color = "red"] .formField:focus {
+    border-bottom: 2px solid #d31010;
+}

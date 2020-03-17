@@ -1,0 +1,30 @@
+{
+    "app": {
+        "title": "Ph\u00f2ng Thi Tr\u1eafc Nghi\u1ec7m: 12A1",
+        "description": "Tr\u01b0\u1eddng THPT L\u1ea1c Long Qu\u00e2n"
+    },
+    "time": {
+        "zone": "Asia\/Ho_Chi_Minh"
+    },
+    "edit": {
+        "name": true,
+        "password": true,
+        "avatar": true
+    },
+    "ratelimit": {
+        "maxRequest": 40,
+        "time": 10,
+        "banTime": 30
+    },
+    "pageTitle": "%appTitle%",
+    "allowRegister": true,
+    "clientConfig": {
+        "sounds": false,
+        "nightmode": false,
+        "showMs": false,
+        "transition": true
+    },
+    "cache": {
+        "contestRank": 1
+    }
+}

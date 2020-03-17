@@ -1,0 +1,257 @@
+/*
+? |-----------------------------------------------------------------------------------------------|
+? |  /assets/css/navbar.css                                                                       |
+? |                                                                                               |
+? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+? |-----------------------------------------------------------------------------------------------|
+*/
+
+.navBar {
+    position: relative;
+    display: flex;
+    flex-grow: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    user-select: none;
+    overflow: hidden;
+    z-index: 99;
+
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navBar > .left {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    margin-left: 10px;
+    opacity: 1;
+    overflow: hidden;
+
+    transition:
+        opacity 0.6s ease,
+        transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navBar > .left > .item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    max-height: 60px;
+
+    transition:
+        max-height 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navBar > .left > .item::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(78, 78, 78, 0.8);
+
+    transition: all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.navBar > .left > .item > .title {
+    font-family: "Nunito";
+    font-weight: 850;
+    font-size: 20px;
+    letter-spacing: .6px;
+    color: rgba(112, 112, 112, 0.4);
+    transition: all 0.3s ease;
+}
+
+.navBar > .left > .item:hover::before,
+.navBar > .left > .item.active::before {
+    width: calc(100% - 16px);
+}
+
+.navBar > .left > .item:hover > .title {
+    color: rgb(44, 44, 44);
+}
+
+.navBar > .left > .item.active > .title {
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: rgb(228, 228, 228);
+}
+
+.navBar > .left > .item.active::before {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(66, 66, 66);
+}
+
+.navBar > .right {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px;
+    cursor: pointer;
+    min-height: 42px;
+
+    z-index: 2;
+}
+
+.navBar > .right > .name {
+    font-family: "Nunito";
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.navBar > .right > .avatar {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+
+.navBar > .right > .hamburger {
+    position: relative;
+    width: 22px;
+    height: 20px;
+    -webkit-transition: all 1s cubic-bezier(0.06, 0.81, 0, 0.98);
+    -o-transition: all 1s cubic-bezier(0.06, 0.81, 0, 0.98);
+    transition: all 1s cubic-bezier(0.06, 0.81, 0, 0.98);
+    z-index: 2;
+}
+
+.navBar > .right > .hamburger span {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background-color: #2c3e50;
+    left: 0;
+    -webkit-transition-property: opacity, -webkit-transform;
+    -o-transition-property: transform, opacity;
+    transition-property: transform, opacity;
+    -webkit-transition-duration: 0.5s;
+         -o-transition-duration: 0.5s;
+            transition-duration: 0.5s;
+    -webkit-transition-timing-function: ease;
+         -o-transition-timing-function: ease;
+            transition-timing-function: ease;
+}
+
+.navBar > .right > .hamburger span:nth-child(1) {
+    top: 0;
+}
+
+.navBar > .right > .hamburger span:nth-child(2) {
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+}
+
+.navBar > .right > .hamburger span:nth-child(3) {
+    bottom: 0;
+}
+
+.navBar.activeHamburger .right > .hamburger span:nth-child(1) {
+    -webkit-transform: translateY(8px) rotate(45deg);
+        -ms-transform: translateY(8px) rotate(45deg);
+            transform: translateY(8px) rotate(45deg);
+}
+
+.navBar.activeHamburger .right > .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+.navBar.activeHamburger .right > .hamburger span:nth-child(3) {
+    -webkit-transform: translateY(-8px) rotate(-45deg);
+        -ms-transform: translateY(-8px) rotate(-45deg);
+            transform: translateY(-8px) rotate(-45deg);
+}
+
+.navBar.activeHamburger {
+    background-color: rgb(255, 255, 255);
+}
+
+.navBar > .timer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    opacity: 0;
+
+    transition:
+        opacity 0.6s ease,
+        top 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navBar.showTimer {
+    padding: 6px 0 34px;
+}
+
+.navBar.showTimer > .left {
+    transform: translateY(-50%);
+    opacity: 0;
+}
+
+.navBar.showTimer > .left .item {
+    max-height: 0;
+}
+
+.navBar.showTimer > .timer {
+    top: 0;
+    opacity: 1;
+}
+
+.navBar > .timer > .name {
+    font-family: "Nunito";
+    font-size: 18px;
+    font-weight: bold;
+    max-width: calc(100% - 100px);
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.navBar > .timer > .detail {
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+    color: #383838;
+}
+
+.navBar > .timer > .progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+}
+
+.navBar > .timer > .progressBar > .right {
+    right: 10px;
+    top: -8px;
+}
+
+@media only screen and (max-width: 700px) {
+    .navBar .right .name {
+        display: none;
+    }
+}

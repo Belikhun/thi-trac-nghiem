@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run API Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/apiTest.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/tests"
+        },
+        {
+            "name": "Run logParser Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/logParserTest.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/tests"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:80",
+            "webRoot": "${workspaceFolder}",
+            "userDataDir": false
+        }
+    ]
+}
