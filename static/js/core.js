@@ -1,5 +1,5 @@
 //? |-----------------------------------------------------------------------------------------------|
-//? |  /assets/js/core.js                                                                           |
+//? |  /static/js/core.js                                                                           |
 //? |                                                                                               |
 //? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
@@ -90,6 +90,8 @@ const core = {
 
         switch (panel) {
             case 1:
+                emptyNode(this.rankPanel);
+
                 this.problemToggler.classList.add("active");
                 this.rankingToggler.classList.remove("active");
                 break;
@@ -97,7 +99,8 @@ const core = {
             case 2:
                 this.problemToggler.classList.remove("active");
                 this.rankingToggler.classList.add("active");
-                this.fetchRank(true);
+
+                setTimeout(() => this.fetchRank(true), 400);
                 break;
 
             default:
@@ -588,6 +591,15 @@ const core = {
                 this.rankingToggler.addEventListener("mouseup", () => this.changePanel(2));
                 this.quitBtn.addEventListener("mouseup", () => this.toggle(false));
 
+                this.markBox.addEventListener("click", () => {
+                    if (!this.data || this.data.judged === true)
+                        return;
+
+                    let data = this.getCheckedList();
+                    clog("DEBG", "Saving", this.data.id, { data });
+                    localStorage.setItem(`problem.${this.data.id}`, data.join(";"));
+                });
+
                 this.submitBtn.addEventListener("mouseup", async () => {
                     let data = this.getCheckedList();
                     await this.submit(data);
@@ -610,6 +622,8 @@ const core = {
     
                 switch (panel) {
                     case 1:
+                        emptyNode(this.ranking);
+
                         this.boardToggler.classList.add("active");
                         this.rankingToggler.classList.remove("active");
                         break;
@@ -617,7 +631,8 @@ const core = {
                     case 2:
                         this.boardToggler.classList.remove("active");
                         this.rankingToggler.classList.add("active");
-                        this.fetchRank(true);
+
+                        setTimeout(() => this.fetchRank(true), 400);
                         break;
         
                     default:
@@ -691,8 +706,8 @@ const core = {
                 let rank = 0;
         
                 for (let i of data.rank) {
-                    if (ptotal !== i.total) {
-                        ptotal = i.total;
+                    if (ptotal !== i.point) {
+                        ptotal = i.point;
                         rank++;
                     }
         
@@ -754,18 +769,18 @@ const core = {
                     core.contest.list.optimize = false;
                     this.timer.time.showMs = false;
                     this.optimize(true);
-                    core.navBar.classList.remove("showTimer");
-
-                    localStorage.setItem(`problem.${this.data.id}`, this.getCheckedList().join(";"));
+                    delete this.data;
+                    this.data = null;
                     
-                    this.attachmentWrapper.removeAttribute("data-loaded");
                     this.attachmentWrapper.removeChild(this.attachment);
                     let clone = this.attachment.cloneNode();
                     clone.src = "";
                     this.attachmentWrapper.insertBefore(clone, this.attachmentWrapper.childNodes[0]);
                     this.attachment = clone;
-
+                    
+                    core.navBar.classList.remove("showTimer");
                     core.contest.list.container.classList.remove("hide");
+                    this.attachmentWrapper.removeAttribute("data-loaded");
                 }
             },
 
@@ -909,7 +924,7 @@ const core = {
 
                             this.attachmentWrapper.insertBefore(newNode, this.attachmentWrapper.childNodes[0]);
                             this.attachment = newNode;
-                        }, 500);
+                        }, 1500);
                     } else {
                         this.attachmentWrapper.dataset.display = false;
                         this.attachmentLink.style.display = "none";
@@ -987,8 +1002,8 @@ const core = {
                         additionalNode: note,
                         level: "warning",
                         buttonList: {
-                            okay: { text: "NÀO TA HÃY CỨ BẤT CHẤP HẾT NỘP BÀI ĐI~", color: "blue" },
-                            cancel: { text: "ABORT MISSION!", color: "red" },
+                            okay: { text: "OK", color: "blue" },
+                            cancel: { text: "HỦY", color: "red" },
                         }
                     });
 
@@ -1073,7 +1088,7 @@ const core = {
                                     continue;
                             }
                     }
-                }, 1000);
+                }, 600);
             }
         }
     },
@@ -1542,7 +1557,8 @@ const core = {
                 sounds.notification();
 
                 clog("okay", "Avatar changed.");
-            }, () => {
+            }, (e) => {
+                errorHandler(e);
                 sounds.warning();
                 this.reset();
             })

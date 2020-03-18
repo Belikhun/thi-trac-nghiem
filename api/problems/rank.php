@@ -92,12 +92,14 @@
 			$res[$user]["total"] += $data["point"];
 			$res[$user]["point"][$data["id"]] = $data["point"];
 
-			$res[$user]["status"][$data["id"]] =
-				($data["point"] === $problem["point"])
-					? "correct"
-					: ($data["point"] === 0)
-						? "wrong"
-						: "passed";
+			$ratio = ($data["point"] / $problem["point"]);
+			$res[$user]["status"][$data["id"]] = ($ratio >= 0.8)
+				? "correct"
+				: (($ratio >= 0.65)
+					? "passed"
+					: (($ratio >= 0.25)
+						? "accepted"
+						: "wrong"));
 
 			$_list_[$data["id"]] = null;
 			$nameList[$data["id"]] = $problem["name"];

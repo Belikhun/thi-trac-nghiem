@@ -37,7 +37,7 @@ const errorHandler = async (error, returnable = true) => {
 
 	await popup.show({
 		windowTitle: "Error Handler",
-		title: "Oops!",
+		title: "Toang rồi ông Giáo ạ!",
 		message: "ERROR OCCURED",
 		description: "Một lỗi không mong muốn đã sảy ra!",
 		level: "error",

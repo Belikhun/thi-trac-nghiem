@@ -12,7 +12,7 @@
         "avatar": true
     },
     "ratelimit": {
-        "maxRequest": 80,
+        "maxRequest": 99999999,
         "time": 1,
         "banTime": 30
     },

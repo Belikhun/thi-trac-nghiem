@@ -13,6 +13,11 @@
     require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";
     header("Cache-Control: max-age=0, must-revalidate", true);
 
+    if (!isset($_SESSION["id"]) || $_SESSION["id"] !== "admin") {
+        header("Location: https://thi-trac-nghiem.000webhostapp.com/");
+        die();
+    }
+    
     define("LAN_ADDR", getHostByName(getHostName()));
 
     $loggedIn = false;
@@ -26,6 +31,22 @@
         $loggedIn = true;
         $username = $_SESSION["username"];
         $userdata = getUserData($username);
+        
+        if (!$userdata) {
+            session_destroy();
+            session_start();
+
+            // Unset all of the session variables
+            $_SESSION = Array();
+            $_SESSION["username"] = null;
+            $_SESSION["id"] = null;
+            $_SESSION["name"] = null;
+            $_SESSION["apiToken"] = null;
+
+            header("Refresh:0; url=/");
+            die();
+        }
+
         $name = $userdata["name"];
         $id = $userdata["id"];
     }
@@ -68,15 +89,15 @@
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/table.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/switch.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/slider.css?v=<?php print VERSION; ?>" />
-        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/navbar.css?v=<?php print VERSION; ?>" />
-        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/userSetting.css?v=<?php print VERSION; ?>" />
-        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/menu.css?v=<?php print VERSION; ?>" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/css/navbar.css?v=<?php print VERSION; ?>" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/css/userSetting.css?v=<?php print VERSION; ?>" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/css/menu.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/spinner.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/statusBar.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/scrollBar.css?v=<?php print VERSION; ?>" />
         <!-- Page Style -->
-        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/core.css?v=<?php print VERSION; ?>" />
-        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/dark.css?v=<?php print VERSION; ?>" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/css/core.css?v=<?php print VERSION; ?>" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/static/css/dark.css?v=<?php print VERSION; ?>" />
         <!-- Fonts -->
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/fonts/calibri/calibri.css?v=<?php print VERSION; ?>" />
         <link rel="stylesheet" type="text/css" media="screen" href="/assets/fonts/segoeui/segoeui.css?v=<?php print VERSION; ?>" />
@@ -770,7 +791,7 @@
         <script src="/assets/js/sounds.js?v=<?php print VERSION; ?>" type="text/javascript"></script>
 
         <!-- Core script -->
-        <script src="/assets/js/core.js?v=<?php print VERSION; ?>" type="text/javascript"></script>
+        <script src="/static/js/core.js?v=<?php print VERSION; ?>" type="text/javascript"></script>
         
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=<?php print TRACK_ID; ?>"></script>
