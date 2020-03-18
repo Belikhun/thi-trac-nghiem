@@ -299,3 +299,13 @@
     background-color: rgb(217, 230, 47);
     color: rgb(44, 44, 44);
 }
+
+body.dark .circleCheckbox > .checkmark {
+    border-color: rgb(65, 65, 65);
+}
+
+body.dark .circleCheckbox > input:checked + .checkmark,
+body.dark .circleCheckbox[data-force="true"] > input + .checkmark {
+    background-color: rgb(168, 168, 168);
+    color: rgb(46, 46, 46);
+}

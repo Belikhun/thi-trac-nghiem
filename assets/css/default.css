@@ -89,7 +89,7 @@ body.dark pre {
 timer {
     position: relative;
     display: inline-block;
-    font-family: Segoe UI;
+    font-family: "Segoe UI", "Calibri";
     font-weight: bold;
     font-size: 21px;
     letter-spacing: .5px;

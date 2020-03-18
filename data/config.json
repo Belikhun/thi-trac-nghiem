@@ -12,8 +12,8 @@
         "avatar": true
     },
     "ratelimit": {
-        "maxRequest": 40,
-        "time": 10,
+        "maxRequest": 80,
+        "time": 1,
         "banTime": 30
     },
     "pageTitle": "%appTitle%",

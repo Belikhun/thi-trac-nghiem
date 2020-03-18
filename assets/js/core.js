@@ -31,9 +31,10 @@ const core = {
         this.userSettings.init(LOGGED_IN);
 
         set(35, "Initializing: sounds");
-        await sounds.init((p, t) => {
-            set(35 + p*0.5, `Initializing: sounds (${t})`);
-        });
+        if (!(/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream))
+            await sounds.init((p, t) => {
+                set(35 + p*0.5, `Initializing: sounds (${t})`);
+            });
 
         set(90, "Applying Event Handler");
         this.problemToggler.addEventListener("mouseup", () => this.changePanel(1));
@@ -543,6 +544,12 @@ const core = {
             attachmentLink: $("#problemAttachmentLink"),
             attachment: $("#problemAttachment"),
 
+            zoom: {
+                container: $("#problemZoom"),
+                in: $("#problemZoomIn"),
+                out: $("#problemZoomOut")
+            },
+
             result: {
                 correct: $("#problemResultCorrect"),
                 wrong: $("#problemResultWrong"),
@@ -866,6 +873,7 @@ const core = {
             },
 
             loadAttachment(data) {
+                this.zoom.container.style.display = "none";
                 this.attachmentWrapper.removeAttribute("data-loaded");
 
                 if (data.attachment.url) {
@@ -873,7 +881,8 @@ const core = {
                     this.attachmentLink.innerText = `${data.attachment.file} (${convertSize(data.attachment.size)})`;
                     this.attachmentLink.style.display = "block";
 
-                    let isImage = ["png", "jpg"].includes(data.attachment.extension);
+                    let isImage = ["png", "jpg", "svg"].includes(data.attachment.extension);
+                    let isHTML = data.attachment.extension === "html";
                     this.attachmentWrapper.dataset.display = true;
                     this.attachmentWrapper.dataset.type = isImage ? "image" : "document";
 
@@ -881,13 +890,23 @@ const core = {
                         this.attachmentWrapper.removeChild(this.attachment);
     
                         setTimeout(() => {
-                            let newNode = document.createElement(isImage ? "img" : "embed");
+                            let newNode = document.createElement(isImage ? "img" : (isHTML) ? "iframe" : "embed");
                             newNode.id = "problemAttachment";
 
                             newNode.style.display = "block";
-                            newNode.addEventListener("load", () => this.attachmentWrapper.dataset.loaded = 1 );
+                            newNode.addEventListener("load", () => {
+                                this.attachmentWrapper.dataset.loaded = 1;
+
+                                if (isHTML) {
+                                    newNode.contentDocument.body.style.zoom = newNode.clientWidth / 620;
+                                    this.zoom.container.style.display = "block";
+
+                                    this.zoom.in.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) + 0.5;
+                                    this.zoom.out.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) - 0.5;
+                                }
+                            });
                             newNode.src = `${data.attachment.url}&embed=true#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0&page=1&view=FitH`;
-                            
+
                             this.attachmentWrapper.insertBefore(newNode, this.attachmentWrapper.childNodes[0]);
                             this.attachment = newNode;
                         }, 500);
@@ -1885,8 +1904,14 @@ const core = {
                 this.form.id.disabled = true;
                 this.form.name.value = data.name;
                 this.form.point.value = data.point;
-                this.form.beginDate.valueAsDate = time;
-                this.form.beginTime.valueAsDate = time;
+
+                this.form.beginDate.value = [time.getFullYear(), time.getMonth() + 1, time.getDate()]
+                                                    .map(v => v < 10 ? "0" + v : v)
+                                                    .join("-");
+                this.form.beginTime.value = [time.getHours(), time.getMinutes(), time.getSeconds()]
+                                                    .map(v => v < 10 ? "0" + v : v)
+                                                    .join(":");
+
                 this.form.during.value = data.time.during / 60;
                 this.form.offset.value = data.time.offset;
                 this.form.attachment.value = "";

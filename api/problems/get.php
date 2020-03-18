@@ -36,7 +36,7 @@
 			"size" => filesize($f),
 			"extension" => $e,
             "url" => "/api/problems/attachment?id=". $id,
-            "embed" => in_array($e, ["pdf", "html", "png", "jpg"])
+            "embed" => in_array($e, ["pdf", "html", "png", "jpg", "svg"])
         );
     } else
         $problem["attachment"] = Array(

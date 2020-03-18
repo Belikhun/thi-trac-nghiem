@@ -101,8 +101,6 @@ function update() {
         ratelimit.time.value = data.ratelimit.time;
         ratelimit.banTime.value = data.ratelimit.banTime;
         cache.contestRank.value = data.cache.contestRank;
-
-        clientConfig.updateDelay.dispatchEvent(new Event("input"));
     }, error => errorHandler(error));
 }
 

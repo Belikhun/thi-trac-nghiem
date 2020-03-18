@@ -1,5 +1,8 @@
 data/logs.json
 data/problems/*
+data/avatar/*
+!data/avatar/avt.default
+!data/avatar/*.php
 !data/problems/problem.php
 !data/problems/thumbnail.default
 .cache

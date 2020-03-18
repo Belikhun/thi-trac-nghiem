@@ -186,7 +186,7 @@
     </div>
 
     <div class="footer">
-        <img src="/assets/img/icon.webp" class="icon">
+        <img src="/assets/img/icon.png" class="icon">
         <p><?php print APPNAME; ?>. Copyright (c) <?php print AUTHOR; ?>. This project is licensed under the MIT License.</p>
     </div>
 
