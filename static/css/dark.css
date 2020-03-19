@@ -76,6 +76,24 @@ body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .footer {
     background-color: rgba(54, 54, 54, 0.4);
 }
 
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="correct"] > .label,
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .correct {
+    color: rgb(104, 230, 125);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="wrong"] > .label,
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .wrong {
+    color: rgb(255, 163, 163);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row t::before {
+    color: rgb(226, 226, 226);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .point:after {
+    color: rgb(235, 235, 235);
+}
+
 /* Rank Panel */
 
 body.dark #mainContainer .rankingTable table tr td:nth-child(3) .username {
@@ -157,6 +175,10 @@ body.dark #mainContainer .rankingTable table tr td:nth-child(3) {
 
 body.dark #mainContainer .rankingTable table tr:nth-child(3) td:nth-child(2) .name {
     background-color: #2b9959;
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .attachment > iframe {
+    filter: invert(0.9);
 }
 
 /* userSettings */

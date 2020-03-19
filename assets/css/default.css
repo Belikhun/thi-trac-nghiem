@@ -157,7 +157,9 @@ tag {
 
 .lazyload {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	background-color: rgba(128, 128, 128, 0.2);
 	min-width: 26px;
 	min-height: 26px;

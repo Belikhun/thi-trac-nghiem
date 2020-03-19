@@ -12,11 +12,6 @@
     require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
     require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";
     header("Cache-Control: max-age=0, must-revalidate", true);
-
-    if (!isset($_SESSION["id"]) || $_SESSION["id"] !== "admin") {
-        header("Location: https://thi-trac-nghiem.000webhostapp.com/");
-        die();
-    }
     
     define("LAN_ADDR", getHostByName(getHostName()));
 

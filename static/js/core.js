@@ -918,6 +918,22 @@ const core = {
 
                                     this.zoom.in.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) + 0.5;
                                     this.zoom.out.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) - 0.5;
+
+                                    let injectCSS = document.createElement("style");
+                                    injectCSS.type = "text/css";
+                                    injectCSS.appendChild(document.createTextNode(`
+                                        #page-container,
+                                        #sidebar {
+                                            background-color: transparent;
+                                            background-image: unset;
+                                        }
+
+                                        .pf {
+                                            box-shadow: unset;
+                                        }
+                                    `));
+
+                                    newNode.contentDocument.head.appendChild(injectCSS);
                                 }
                             });
                             newNode.src = `${data.attachment.url}&embed=true#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0&page=1&view=FitH`;

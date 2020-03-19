@@ -715,6 +715,10 @@ body {
     content: "\f068";
 }
 
+#mainContainer > .problems > .problem .mainBox .board .attachment > iframe {
+    border: unset;
+}
+
 #mainContainer > .problems > .problem .mainBox .board .sheet {
     position: relative;
     display: flex;
@@ -732,7 +736,7 @@ body {
 
 #mainContainer > .problems > .problem .mainBox .board .attachment[data-display="false"] + .sheet {
     max-width: unset;
-    max-height: unset;
+    max-height: 100%;
 }
 
 @media only screen and (max-width: 800px) {
