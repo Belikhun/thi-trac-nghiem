@@ -6,7 +6,7 @@ Hệ thống thi trắc nghiệm tự động, tổ chức thi kiểm tra một 
 
 [![version](https://img.shields.io/github/v/tag/belivipro9x99/thi-trac-nghiem?color=brown&label=version&style=for-the-badge)](https://github.com/belivipro9x99/themis-webinterface/releases/)
 [![license](https://img.shields.io/badge/license-MIT-orange.svg?longCache=true&style=for-the-badge)](https://github.com/belivipro9x99/thi-trac-nghiem/blob/master/LICENSE)
-[![status](https://img.shields.io/badge/status-near_stable-blue.svg?longCache=true&style=for-the-badge)]()
+[![status](https://img.shields.io/badge/status-testing-blue.svg?longCache=true&style=for-the-badge)]()
 [![Travis CI Build Status](https://img.shields.io/travis/belivipro9x99/thi-trac-nghiem.svg?style=for-the-badge)](https://travis-ci.org/belivipro9x99/thi-trac-nghiem)
 
 [![codefactor](https://www.codefactor.io/repository/github/belivipro9x99/thi-trac-nghiem/badge/master?style=for-the-badge)](https://www.codefactor.io/repository/github/belivipro9x99/thi-trac-nghiem)
