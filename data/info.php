@@ -11,9 +11,9 @@
 
 	define("APPNAME", "Hệ Thống Thi Trắc Nghiệm");
 	define("AUTHOR", "Belikhun");
-	define("VERSION", "0.0.5");
+	define("VERSION", "0.1.0");
 	define("VERSION_TAG", "release");
-	define("REPO_ADDRESS", "https://github.com/belivipro9x99/corona-contest");
+	define("REPO_ADDRESS", "https://github.com/belivipro9x99/thi-trac-nghiem");
 	define("REPORT_ERROR", REPO_ADDRESS . "/issues");
 	define("CONTACT_LINK", "http://m.me/belivipro9x99");
 	define("TRACK_ID", "UA-124598427-4");
