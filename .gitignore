@@ -5,6 +5,7 @@ data/avatar/*
 !data/avatar/*.php
 !data/problems/problem.php
 !data/problems/thumbnail.default
+data/xmldb/account.xml
 .cache
 
 # Byte-compiled / optimized / DLL files
