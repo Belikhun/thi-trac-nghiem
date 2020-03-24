@@ -39,7 +39,7 @@ const core = {
         set(90, "Applying Event Handler");
         this.problemToggler.addEventListener("mouseup", () => this.changePanel(1));
         this.rankingToggler.addEventListener("mouseup", () => this.changePanel(2));
-        this.changePanel(1);
+        this.changePanel(1, false);
         
         if (LOGGED_IN) {
             if (IS_ADMIN) {
@@ -71,20 +71,44 @@ const core = {
 	},
 
 	async getServerConfigAsync() {
+        let start = new stopClock();
         const response = await myajax({
             url: "/api/server",
             method: "GET",
         }).catch(e => {
-            clog("WARN", "Error while getting server status:", {
+            errorHandler(e);
+
+            clog("ERRR", "Error while getting server status:", {
                 text: e.data.description,
                 color: flatc("red"),
             });
         });
 
+        let deltaT = (response.data.TIME + start.stop) - time();
+        clog("DEBG", "🕒 Δt = ", deltaT);
+
+        if (Math.abs(deltaT) >= 10) {
+            let note = document.createElement("div");
+            note.classList.add("note", "warning");
+            note.innerHTML = `<span class="inner">Vui lòng tiến hành cập nhật lại đồng hồ trước khi tham gia làm bài thi!</span>`;
+
+            popup.show({
+                windowTitle: "Time Validator",
+                title: "CẢNH BÁO!",
+                message: "Sai lệch thời gian",
+                description: `Thời gian trên máy bạn hiện đang <b>${deltaT > 0 ? "trễ" : "sớm"}</b> hơn so với máy chủ <b>${Math.abs(deltaT)} giây</b>!`,
+                additionalNode: note,
+                level: "warning",
+                buttonList: {
+                    close: { text: "Đã Rõ!", color: "dark" }
+                }
+            })
+        }
+
         window.SERVER = response.data;
     },
 
-    changePanel(panel) {
+    changePanel(panel, playSound = true) {
         if (this.container.dataset.layout == panel)
             return;
 
@@ -94,11 +118,17 @@ const core = {
 
                 this.problemToggler.classList.add("active");
                 this.rankingToggler.classList.remove("active");
+
+                if (playSound)
+                    sounds.toggle(1);
                 break;
         
             case 2:
                 this.problemToggler.classList.remove("active");
                 this.rankingToggler.classList.add("active");
+
+                if (playSound)
+                    sounds.toggle(0);
 
                 setTimeout(() => this.fetchRank(true), 400);
                 break;
@@ -144,6 +174,7 @@ const core = {
                         <th></th>
                         <th>Thí sinh</th>
                         <th>Tổng</th>
+                        <th>TB</th>
         `
 
         for (let i of data.list)
@@ -179,6 +210,7 @@ const core = {
                         <t class="name">${escapeHTML(i.name || "u:" + i.username)}</t>
                     </td>
                     <td class="number">${parseFloat(i.total).toFixed(2)}</td>
+                    <td class="number">${parseFloat(i.total / Object.keys(i.point).length).toFixed(2)}</td>
             `
 
             for (let j of data.list)
@@ -508,6 +540,8 @@ const core = {
                     if (this.optimize)
                         return;
 
+                    item.tree.dataset.soundhover = 1;
+                    sounds.applySound(item.tree);
                     time.showMs = (data.phase === 2 || data.phase === 3) && core.contest.showMs;
                     item.obj.detail.right.detail.innerText = ["Bắt đầu sau", "Đang thi", "Sắp kết thúc", "Đã kết thúc"][data.phase - 1]
                     item.obj.detail.right.timer.dataset.color = ["blue", "green", "yellow", "red"][data.phase - 1]
@@ -602,9 +636,11 @@ const core = {
 
                 this.submitBtn.addEventListener("mouseup", async () => {
                     let data = this.getCheckedList();
-                    await this.submit(data);
-                    await this.loadData(this.data.id);
-                    this.renderMarkBox(this.data.question, { readonly: true, data });
+
+                    if (await this.submit(data)) {
+                        await this.loadData(this.data.id);
+                        this.renderMarkBox(this.data.question, { readonly: true, data });
+                    }
                 });
 
                 this.changePanel(1);
@@ -626,11 +662,13 @@ const core = {
 
                         this.boardToggler.classList.add("active");
                         this.rankingToggler.classList.remove("active");
+                        sounds.toggle(1);
                         break;
                 
                     case 2:
                         this.boardToggler.classList.remove("active");
                         this.rankingToggler.classList.add("active");
+                        sounds.toggle(0);
 
                         setTimeout(() => this.fetchRank(true), 400);
                         break;
@@ -689,7 +727,7 @@ const core = {
                                 <th>#</th>
                                 <th></th>
                                 <th>Thí sinh</th>
-                                <th>Tổng</th>
+                                <th>TB</th>
                 `
         
                 for (let i of data.list)
@@ -763,6 +801,7 @@ const core = {
                     this.timer.time.showMs = core.contest.showMs;
                     this.optimize(false);
 
+                    sounds.toggle(0);
                     core.contest.list.container.classList.add("hide");
                 } else {
                     this.showing = false;
@@ -778,6 +817,7 @@ const core = {
                     this.attachmentWrapper.insertBefore(clone, this.attachmentWrapper.childNodes[0]);
                     this.attachment = clone;
                     
+                    sounds.toggle(1);
                     core.navBar.classList.remove("showTimer");
                     core.contest.list.container.classList.remove("hide");
                     this.attachmentWrapper.removeAttribute("data-loaded");
@@ -971,13 +1011,14 @@ const core = {
                                     type="radio" value="${item}"
                                     ${(typeof data[i-1] === "string" && data[i-1] === item) ? "checked" : ""}
                                     ${readonly ? "disabled" : ""}
+                                    class="sound" data-soundcheck
                                 >
                                 <div class="checkmark">${item}</div>
                             </label>
                         `
 
                     html += `
-                        <span class="input" data-question="${i}">
+                        <span class="input sound" data-soundhoversoft data-question="${i}">
                             <t class="label">Câu ${i}</t>
                             ${input}
                         </span>
@@ -985,6 +1026,7 @@ const core = {
                 }
 
                 this.markBox.innerHTML = html;
+                sounds.scan();
             },
 
             getCheckedList() {
@@ -1023,8 +1065,10 @@ const core = {
                         }
                     });
 
-                    if (res !== "okay")
-                        return;
+                    if (res !== "okay") {
+                        this.submitBtn.disabled = false;
+                        return false;
+                    }
                 }
 
                 try {
@@ -1039,7 +1083,7 @@ const core = {
                     })
                 } catch(e) {
                     errorHandler(e);
-                    return;
+                    return false;
                 }
 
                 this.data.judged = true;
@@ -1054,6 +1098,8 @@ const core = {
                         okay: { text: "OK", color: "rainbow" }
                     }
                 });
+
+                return true;
             },
 
             printResult(data) {
@@ -1086,7 +1132,7 @@ const core = {
                                     c.dataset.status = "wrong";
                                     r = c.querySelector(`#problemQuestion_${i+1}${item.result}`);
                                     r.checked = true;
-                                    r.parentElement.dataset.color = "yellow";
+                                    r.parentElement.dataset.color = "blue";
                                     a = c.querySelector(`#problemQuestion_${i+1}${item.answer}`);
                                     a.parentElement.dataset.color = "red";
                                     a.parentElement.dataset.force = true;
@@ -1096,7 +1142,7 @@ const core = {
                                     c.dataset.status = "skipped";
                                     r = c.querySelector(`#problemQuestion_${i+1}${item.result}`);
                                     r.checked = true;
-                                    r.parentElement.dataset.color = "blue";
+                                    r.parentElement.dataset.color = "yellow";
                                     break;
     
                                 default:

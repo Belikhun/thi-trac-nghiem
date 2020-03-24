@@ -47,7 +47,7 @@
                 <div class="simple-spinner"></div>
             </div>
             <ul class="footer">
-                <li class="title text-overflow">Hệ thống làm bài trắc nghiệm trực tuyếntuyến</li>
+                <li class="title text-overflow">Hệ thống làm bài trắc nghiệm trực tuyến</li>
                 <li class="sub text-overflow">Được rút ruột từ dự án <a href="https://github.com/belivipro9x99/themis-web-interface" target="_blank">Themis Web Interface</a></li>
                 <li class="sub2 text-overflow">background image on Google</li>
             </ul>

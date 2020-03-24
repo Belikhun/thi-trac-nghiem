@@ -32,7 +32,32 @@
 	if (problemJudged($id, $username))
 		stop(31, "Không thể nộp lại vì bài làm của bạn đã được chấm!", 403);
 
-	problemSubmit($id, $username, $data);
-	problemJudge($id, $username);
+	switch(problemSubmit($id, $username, $data)) {
+		case PROBLEM_ERROR_IDREJECT:
+			stop(44, "Không tìm thấy để của id đã cho!", 404, Array( "id" => $id ));
+			break;
 
+		case PROBLEM_OKAY:
+			break;
+
+		default:
+			stop(-1, "Lỗi không rõ đã xảy ra khi lưu bài làm vào hệ thống", 500, Array( "id" => $id ));
+	}
+
+	if (!problemSubmitted($id, $username))
+		stop(-1, "Lỗi không rõ đã xảy ra khi lưu bài làm vào hệ thống", 500, Array( "id" => $id ));
+
+	switch(problemJudge($id, $username)) {
+		case PROBLEM_ERROR_IDREJECT:
+			stop(44, "Không tìm thấy để của id đã cho!", 404, Array( "id" => $id ));
+			break;
+
+		case PROBLEM_OKAY:
+			break;
+
+		default:
+			stop(-1, "Lỗi không rõ đã xảy ra khi chấm bài làm", 500, Array( "id" => $id ));
+	}
+
+	writeLog("OKAY", "$username đã nộp bài $id");
 	stop(0, "Nộp bài thành công!", 200, Array( "id" => $id, "time" => time() ));

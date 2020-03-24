@@ -643,7 +643,7 @@
                                             <img src="/tool/badge?su=author&st=Belikhun&c=red">
                                         </div>
                                         
-                                        <t class="description"><b><?php print APPNAME; ?></b> là một dự án mã nguồn mở, phi lợi nhuận với mục đích chính nhằm biến việc quản lí và tổ chức các buổi học lập trình, ôn tập tin học và tổ chức kì thi trở nên dễ dàng hơn.</t>
+                                        <t class="description"><b><?php print APPNAME; ?></b> hiện đang trong quá trình thử nghiệm và sẽ được công khai mã nguồn trên Github trong thời gian sắp tới</t>
                                         
                                         <t class="contact">Liên hệ:</t>
                                         <ul class="contact">
@@ -684,7 +684,7 @@
                                     <t class="title">Sắp tới</t>
                                 </span>
 
-                                <button id="problemsListReload" class="sq-btn blue right">Làm mới</button>
+                                <button id="problemsListReload" class="sq-btn blue right sound" data-soundhover data-soundselect>Làm mới</button>
                             </div>
                             <div class="list" id="problemListUpComming"></div>
 
@@ -706,8 +706,8 @@
                         <div class="problem">
                             <div class="header">
                                 <a id="problemAttachmentLink"></a>
-                                <t id="problemBoardToggler" class="link">Làm Bài</t>
-                                <t id="problemRankingToggler" class="link">Xếp Hạng</t>
+                                <t id="problemBoardToggler" class="link sound" data-soundhoversoft>Làm Bài</t>
+                                <t id="problemRankingToggler" class="link sound" data-soundhoversoft>Xếp Hạng</t>
                             </div>
 
                             <div id="problemMainBox" class="mainBox">
@@ -736,8 +736,8 @@
                                         <div id="problemMarkBox" class="markBox"></div>
         
                                         <span class="footer">
-                                            <button type="button" id="problemQuit" class="sq-btn red">🏳 Thoát</button>
-                                            <button type="button" id="problemSubmit" class="sq-btn">📄 Nộp Bài</button>
+                                            <button type="button" id="problemQuit" class="sq-btn red sound" data-soundhover data-soundselect>🏳 Thoát</button>
+                                            <button type="button" id="problemSubmit" class="sq-btn sound" data-soundhover data-soundselect>📄 Nộp Bài</button>
                                         </span>
                                     </span>
                                 </div>

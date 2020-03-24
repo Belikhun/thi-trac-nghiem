@@ -11,7 +11,7 @@
 
 	define("APPNAME", "Hệ Thống Thi Trắc Nghiệm");
 	define("AUTHOR", "Belikhun");
-	define("VERSION", "0.0.4");
+	define("VERSION", "0.0.5");
 	define("VERSION_TAG", "release");
 	define("REPO_ADDRESS", "https://github.com/belivipro9x99/corona-contest");
 	define("REPORT_ERROR", REPO_ADDRESS . "/issues");
@@ -20,7 +20,7 @@
 
 	// Size Limit
 	define("MAX_UPLOAD_SIZE", 10*1024*1024);
-	define("MAX_IMAGE_SIZE", 2097153);
+	define("MAX_IMAGE_SIZE", 12582912);
 	define("MAX_ATTACHMENT_SIZE", 268435456);
 	
 	define("UPLOAD_ALLOW", Array("pas", "cpp", "c", "pp", "exe", "class", "py", "java"));

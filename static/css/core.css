@@ -75,6 +75,12 @@ body {
     animation: hide 0.6s linear 0s 1 forwards;
 }
 
+#mainContainer .globalRanking table tr td.number:nth-child(5) {
+    color: rgb(100, 62, 202);
+    font-size: 16px;
+    font-weight: bold;
+}
+
 #mainContainer[data-layout="2"] .problems {
     left: -50%;
     transform: scale(0.9);
@@ -174,7 +180,7 @@ body {
 
 #mainContainer .rankingTable table tr td.number:nth-child(4) {
     color: #3c7be7;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
 }
 
@@ -218,12 +224,10 @@ body {
 
 #mainContainer .rankingTable table tr th:first-child {
     border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
 }
 
 #mainContainer .rankingTable table tr th:last-child {
     border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
 }
 
 #mainContainer .rankingTable table tr th.problem > t {
@@ -609,7 +613,11 @@ body {
 #mainContainer > .problems > .problem .header > a {
     position: absolute;
     left: 10px;
+    max-width: calc(50% - 90px);
     font-size: 12px;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
 }
 
 #mainContainer > .problems > .problem .header > .link {
@@ -962,6 +970,18 @@ body {
     box-sizing: border-box;
 
     transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.link,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.correct,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.passed,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.accepted,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.wrong,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.skipped {
+    text-align: center;
+    font-family: "Consolas";
+    font-size: 16px;
+    font-weight: bold;
 }
 
 #mainContainer > .problems > .problem .mainBox .ranking.contestNotEnded:empty::before {

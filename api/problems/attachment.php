@@ -28,9 +28,7 @@
 
             require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/logs.php";
 
-            if (problemGetAttachment($id, !getQuery("embed", false)) === PROBLEM_OKAY)
-                writeLog("INFO", "Đã tải tệp đính kèm của bài \"". $_GET["id"] ."\"");
-            else
+            if (problemGetAttachment($id, !getQuery("embed", false)) !== PROBLEM_OKAY)
                 stop(44, "Không tìm thấy tệp đính kèm", 404);
 
             break;

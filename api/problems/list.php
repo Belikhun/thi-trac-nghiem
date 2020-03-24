@@ -13,5 +13,17 @@
     require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
     require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php"; 
 	require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
-	
-    stop(0, "Thành công!", 200, problemList(), true);
+    
+    $list = problemList();
+
+    usort($list, function($a, $b) {
+        $a = $a["time"]["begin"];
+        $b = $b["time"]["begin"];
+    
+        if ($a === $b)
+            return 0;
+
+        return ($a > $b) ? -1 : 1;
+    });
+
+    stop(0, "Thành công!", 200, $list, true);
