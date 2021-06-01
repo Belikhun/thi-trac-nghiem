@@ -1,7 +1,7 @@
 //? |-----------------------------------------------------------------------------------------------|
 //? |  /assets/js/belibrary.js                                                                      |
 //? |                                                                                               |
-//? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+//? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
@@ -15,11 +15,11 @@
 function myajax({
 	url = "/",
 	method = "GET",
-	query = Array(),
-	form = Array(),
+	query = {},
+	form = {},
 	json = {},
 	raw = null,
-	header = Array(),
+	header = {},
 	type = "json",
 	onUpload = () => {},
 	onDownload = () => {},
@@ -27,12 +27,15 @@ function myajax({
 	changeState = true,
 	reRequest = true,
 	withCredentials = false,
+	timeout = 0,
+	formEncodeURL = false
 }, callout = () => {}, error = () => {}) {
-	var argumentsList = arguments;
+	let argumentsList = arguments;
 
 	return new Promise((resolve, reject) => {
 		if (__connection__.onlineState !== "online" && force === false) {
 			let errorObj = {}
+
 			switch (__connection__.onlineState) {
 				case "offline":
 					errorObj = { code: 106, description: "Mất kết nối tới máy chủ" }
@@ -48,11 +51,24 @@ function myajax({
 			return;
 		}
 
-		var xhr = new XMLHttpRequest();
-		let formData = new FormData();
+		let xhr = new XMLHttpRequest();
+		let formData = null;
 
-		for (let key of Object.keys(form))
-			formData.append(key, form[key]);
+		if (method.toUpperCase() === "POST") {
+			if (formEncodeURL) {
+				formData = Array();
+
+				for (let key of Object.keys(form))
+					formData.push(`${key}=${encodeURIComponent(form[key])}`);
+
+				formData = formData.join("&");
+			} else {
+				formData = new FormData();
+				
+				for (let key of Object.keys(form))
+					formData.append(key, form[key]);
+			}
+		}
 
 		let queryKey = Object.keys(query);
 		for (let key of queryKey)
@@ -77,29 +93,31 @@ function myajax({
 				}
 
 				if ((this.responseText === "" || !this.responseText) && this.status >= 400) {
-					clog("errr", {
-						color: flatc("red"),
-						text: `HTTP ${this.status}:`
-					}, this.statusText, {
+					clog("ERRR", {
 						color: flatc("magenta"),
 						text: method
 					}, {
 						color: flatc("pink"),
 						text: url
-					});
+					}, {
+						color: flatc("red"),
+						text: `HTTP ${this.status}:`
+					}, this.statusText);
 
-					let errorObj = { code: 1, description: `HTTP ${this.status}: ${this.statusText}` }
+					let errorObj = { code: 1, description: `HTTP ${this.status}: ${this.statusText} (${method} ${url})`, data: { status: this.status, method, url } }
 					error(errorObj);
 					reject(errorObj);
 
 					return;
 				}
 
+				let response = null;
+
 				if (type === "json") {
 					try {
-						var res = JSON.parse(this.responseText);
+						response = JSON.parse(this.responseText);
 					} catch (data) {
-						clog("errr", "Lỗi phân tích JSON");
+						clog("ERRR", "Lỗi phân tích JSON");
 
 						let errorObj = { code: 2, description: `Lỗi phân tích JSON`, data: data }
 						error(errorObj);
@@ -108,50 +126,59 @@ function myajax({
 						return;
 					}
 
-					if (this.status >= 400 && (res.code !== 0 && res.code < 100)) {
-						clog("ERRR", {
-							color: flatc("magenta"),
-							text: method
-						}, {
-							color: flatc("pink"),
-							text: url
-						}, {
-							color: flatc("red"),
-							text: "HTTP " + this.status
-						}, this.statusText, ` >>> ${res.description}`);
-
-						if (this.status === 429 && res.code === 32 && reRequest === true) {
-							// Waiting for :?unratelimited:?
-							await __connection__.stateChange("ratelimited", res);
-
-							clog("debg", "resending request", argumentsList);
-							// Resend previous ajax request
-							let r = await myajax(...argumentsList)
-								.catch(d => {
-									reject(d);
-									return;
-								})
-							// Resolve promise
-							resolve(r);
-
-							return;
-						} else {
-							let errorObj = { code: 3, description: `HTTP ${this.status}: ${this.statusText}`, data: res }
-							error(errorObj);
-							reject(errorObj);
-
-							return;
-						}
-					}
-
-					data = res;
-				} else {
-					var res = this.responseText;
+					if (!response.status)
+						response.status = this.status;
 
 					if (this.status >= 400) {
-						let code = "HTTP" + this.status;
-						let text = (this.statusText === "") ? "!Unknown statusText" : this.statusText;
-						let resData = res;
+						if (typeof response.code === "number" && response.code !== 0 && response.code < 100) {
+							clog("ERRR", {
+								color: flatc("magenta"),
+								text: method
+							}, {
+								color: flatc("pink"),
+								text: url
+							}, {
+								color: flatc("red"),
+								text: `HTTP ${this.status}:`
+							}, this.statusText, ` >>> ${response.description}`);
+	
+							if (this.status === 429 && response.code === 32 && reRequest === true) {
+								// Wait for :?unratelimited:?
+								await __connection__.stateChange("ratelimited", response);
+								
+								// Resend previous ajax request
+								clog("DEBG", "Resending Request", argumentsList);
+								let r = null;
+	
+								try {
+									r = await myajax(...argumentsList);
+								} catch(e) {
+									reject(e);
+									return;
+								}
+	
+								// Resolve promise
+								resolve(r);
+	
+								return;
+							}
+						}
+
+						let errorObj = { code: 3, description: `HTTP ${this.status}: ${this.statusText} (${method} ${url})`, data: response }
+						error(errorObj);
+						reject(errorObj);
+
+						return;
+					}
+
+					data = response;
+				} else {
+					response = this.responseText;
+
+					if (this.status >= 400) {
+						let code = `HTTP ${this.status}`;
+						let text = (this.statusText === "") ? "?Unknown statusText" : this.statusText;
+						let resData = response;
 
 						let header = this.getResponseHeader("output-json");
 
@@ -165,25 +192,25 @@ function myajax({
 							text = headerJSON.description;
 						}
 
-						clog("errr", {
-							color: flatc("red"),
-							text: code
-						}, text, {
+						clog("ERRR", {
 							color: flatc("magenta"),
 							text: method
 						}, {
 							color: flatc("pink"),
 							text: url
-						});
+						}, {
+							color: flatc("red"),
+							text: `${code}:`
+						}, text, ` >>> ${response.description}`);
 
-						let errorObj = { code: 3, description: `${code}: ${text}`, data: resData }
+						let errorObj = { code: 3, description: `${code}: ${text} (${method} ${url})`, data: resData }
 						error(errorObj);
 						reject(errorObj);
 
 						return;
 					}
 
-					data = res;
+					data = response;
 				}
 
 				callout(data);
@@ -193,37 +220,51 @@ function myajax({
 
 		xhr.open(method, url);
 		xhr.withCredentials = withCredentials;
+		xhr.timeout = timeout;
 
-		let sendData = (raw !== null) ? raw : formData;
+		let sendData = (raw !== null)
+			? raw
+			: formData;
 
 		for (let key of Object.keys(header))
 			xhr.setRequestHeader(key, header[key]);
 
-		if (Object.keys(json).length !== 0) {
-			sendData = JSON.stringify(json);
-			xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		if (method === "POST") {
+			if (formEncodeURL)
+				xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	
+			if (Object.keys(json).length !== 0) {
+				sendData = JSON.stringify(json);
+				xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+			}
 		}
 
-		xhr.setRequestHeader("Accept", `${type === "json" ? "application/json" : "text/plain"};charset=UTF-8`);
+		if (typeof header["Accept"] !== "string")
+			xhr.setRequestHeader("Accept", `${type === "json" ? "application/json" : "text/plain"};charset=UTF-8`);
+
 		xhr.send(sendData);
-	})
+	});
 }
 
 function delayAsync(time) {
 	return new Promise((resolve, reject) => {
-		setTimeout(e => {
-			resolve();
-		}, time);
+		setTimeout(() => resolve(), time);
+	});
+}
+
+function nextFrameAsync() {
+	return new Promise((resolve, reject) => {
+		requestAnimationFrame(() =>  resolve());
 	});
 }
 
 function waitFor(checker = async () => {}, handler = () => {}, retry = 10, timeout = 1000, onFail = () => {}) {
 	return new Promise((resolve, reject) => {
-		var retryNth = 0;
-		var doCheck = true;
+		let retryNth = 0;
+		let doCheck = true;
 
 		const __check = async () => {
-			var result = false;
+			let result = false;
 
 			try {
 				result = await checker(retryNth + 1).catch();
@@ -263,23 +304,41 @@ function waitFor(checker = async () => {}, handler = () => {}, retry = 10, timeo
 	})
 }
 
-function escapeHTML(str) {
-	if ((str === null) || (str === ""))
-		return "";
-	else
-		str = str.toString();
+/**
+ * Replace some special character with printable
+ * character in html. Mainly use to avoid code
+ * execution
+ * 
+ * @param 	{*} 	string	Input String
+ * @returns	New String
+ */
+function escapeHTML(string) {
+	if (typeof string !== "string")
+		string = String(string);
 
-	var map = {
+	let map = {
 		"&": "&amp;",
 		"<": "&lt;",
 		">": "&gt;",
 		"\"": "&quot;",
 		"'": "&#039;"
-	};
+	}
 
-	return str.replace(/[&<>"']/g, function (m) {
-		return map[m];
-	});
+	return string.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+/**
+ * Truncate String if String's length is too large
+ * @param {String}	string	String to truncate 
+ * @param {Number}	length	Maximum length of string
+ * @returns {String}
+ */
+function truncateString(string, length = 20, {
+	surfix = "..."
+} = {}) {
+	return (string.length > length)
+		? string.substr(0, length - surfix.length - 1) + surfix
+		: string;
 }
 
 /**
@@ -292,33 +351,86 @@ function fcfn(node, className) {
 	return node.getElementsByClassName(className)[0];
 }
 
+/**
+ * @param	{String}	HTML representing a single element
+ * @return	{Element}
+ */
+function htmlToElement(html) {
+	let template = document.createElement("template");
+	template.innerHTML = html.trim();
+	
+	return template.content.firstChild;
+}
+
+/**
+ * This function is Deprecated!. We should avoid using
+ * this function as much as possible.
+ * 
+ * Please use `makeTree()` instead!
+ * 
+ * @param {*} type 
+ * @param {*} __class 
+ * @param {*} data 
+ * @param {*} __keypath 
+ */
 function buildElementTree(type = "div", __class = [], data = new Array(), __keypath = "") {
-	var tree = document.createElement(type);
+	let svgTag = ["svg", "g", "path", "line", "circle", "polyline"]
+
+	/** @type {HTMLElement|SVGElement} */
+	let tree = (svgTag.includes(type))
+		? document.createElementNS("http://www.w3.org/2000/svg", type)
+		: document.createElement(type);
+	
 	if (typeof __class == "string")
 		__class = new Array([__class]);
 	tree.classList.add.apply(tree.classList, __class);
-	var objtree = tree;
+
+	/** @type {HTMLElement} */
+	let objtree = tree;
 
 	for (let i = 0; i < data.length; i++) {
 		let d = data[i];
+		let k = __keypath + (__keypath === "" ? "" : ".") + d.name;
 
-		if (typeof d.list == "object") {
-			let k = __keypath + (__keypath === "" ? "" : ".") + d.name;
-			var t = buildElementTree(d.type, d.class, d.list, k);
+		if (typeof d.list === "object") {
+			let t = buildElementTree(d.type, d.class, d.list, k);
 
 			t.tree.dataset.name = d.name;
 			t.tree.dataset.path = k;
 			(d.id) ? t.tree.id = d.id : 0;
 			(d.for) ? t.tree.htmlFor = d.for : 0;
 			(d.inpType) ? t.tree.type = d.inpType : 0;
+			(d.html) ? t.tree.innerHTML = d.html : 0;
 			(d.text) ? t.tree.innerText = d.text : 0;
+
+			if (typeof d.data === "object")
+				for (let key of Object.keys(d.data))
+					t.tree.dataset[key] = d.data[key];
+			
 			tree.appendChild(t.tree);
 
 			objtree[d.name] = t.tree;
-			Object.assign(objtree[d.name], t.obj);
-		} else {
-			let k = __keypath + (__keypath === "" ? "" : ".") + d.name;
-			var t = document.createElement(d.type);
+		} else if (typeof d === "object") {
+			if (typeof d.node === "object") {
+				let node = (d.node.group && d.node.group.classList)
+					? d.node.group
+					: (d.node.container && d.node.container.classList)
+						? d.node.container
+						: d.node;
+
+				node.dataset.name = d.name;
+				node.dataset.path = k;
+
+				tree.appendChild(node);
+				objtree[d.name] = d.node;
+
+				continue;
+			}
+
+			let t = (svgTag.includes(d.type))
+				? document.createElementNS("http://www.w3.org/2000/svg", d.type)
+				: document.createElement(d.type);
+
 			if (typeof d.class == "string")
 				d.class = new Array([d.class]);
 
@@ -328,7 +440,12 @@ function buildElementTree(type = "div", __class = [], data = new Array(), __keyp
 			(d.id) ? t.id = d.id : 0;
 			(d.for) ? t.htmlFor = d.for : 0;
 			(d.inpType) ? t.type = d.inpType : 0;
+			(d.html) ? t.innerHTML = d.html : 0;
 			(d.text) ? t.innerText = d.text : 0;
+
+			if (typeof d.data === "object")
+				for (let key of Object.keys(d.data))
+					t.dataset[key] = d.data[key];
 
 			tree.appendChild(t);
 			objtree[d.name] = t;
@@ -341,10 +458,117 @@ function buildElementTree(type = "div", __class = [], data = new Array(), __keyp
 	}
 }
 
+/**
+ * This is the replacement of `buildElementTree()`
+ * 
+ * @param	{String}		tag			Tag Name
+ * @param	{String|Array}	classes		Classes
+ * @param	{Object}		child		Child List
+ * @param	{String}		path		Path (optional)
+ * @returns	{HTMLElement}
+ */
+function makeTree(tag, classes, child = {}, path = "") {
+	let container = document.createElement(tag);
+	
+	switch (typeof classes) {
+		case "string":
+			container.classList.add(classes);
+			break;
+		
+		case "object":
+			if (classes.length && classes.length > 0)
+				container.classList.add(...classes);
+			else
+				throw { code: -1, description: `makeTree(${path}): Invalid or empty "classes" type: ${typeof classes}` }
+
+			break;
+	}
+
+	// If child list is invalid, we can just stop parsing
+	// now
+	if (typeof child !== "object")
+		return container;
+
+	let keys = Object.keys(child);
+
+	for (let key of keys) {
+		let item = child[key];
+		let currentPath = (path === "")
+			? key
+			: `${path}.${key}`
+
+		if (typeof container[key] !== "undefined")
+			throw { code: -1, description: `makeTree(${currentPath}): Illegal key name: "${key}"` }
+
+		/**
+		 * If node key is defined and is an object, this is
+		 * possibility a custom element data
+		 * 
+		 * Example: `createInput()`
+		 */
+		let customNode;
+
+		try {
+			customNode = (item.group && item.group.classList)
+				? item.group
+				: (item.container && item.container.classList)
+					? item.container
+					: (item.classList)
+						? item
+						: null;
+		} catch(e) {
+			throw { code: -1, description: `makeTree(${currentPath}): Custom node parse failed!`, data: e }
+		}
+
+		if (customNode) {
+			customNode.setAttribute("key", key);
+			customNode.dataset.path = currentPath;
+			container.appendChild(customNode);
+			container[key] = item;
+			continue;
+		}
+
+		// Normal Building
+		if (typeof item.tag !== "string")
+			throw { code: -1, description: `makeTree(${currentPath}): Invalid or undefined "tag" value` }
+
+		/** @type {HTMLElement} */
+		let node = makeTree(item.tag, item.class, item.child, currentPath);
+		node.dataset.path = currentPath;
+
+		if (typeof item.html === "string")
+			node.innerHTML = item.html;
+
+		if (typeof item.text !== "undefined")
+			node.innerText = item.text;
+
+		if (typeof item.for === "string")
+			node.htmlFor = item.for;
+
+		if (typeof item.data === "object")
+			for (let key of Object.keys(item.data))
+				node.dataset[key] = item.data[key];
+
+		if (typeof item.attribute === "object")
+			for (let key of Object.keys(item.attribute))
+				node.setAttribute(key, item.attribute[key]);
+
+		for (let key of Object.keys(item))
+			if (!["tag", "class", "child", "html", "for", "text", "data", "attribute"].includes(key) && typeof node[key] !== "undefined")
+				node[key] = item[key];
+
+		node.setAttribute("key", key);
+		container.appendChild(node);
+		container[key] = node;
+	}
+
+	return container;
+}
+
 function checkServer(ip, callback = () => {}) {
 	return new Promise((resolve, reject) => {
-		var xhr = new XMLHttpRequest();
-		var pon = {};
+		let xhr = new XMLHttpRequest();
+		let pon = {};
 
 		xhr.addEventListener("readystatechange", function() {
 			if (this.readyState === this.DONE) {
@@ -381,10 +605,23 @@ function time(date = new Date()) {
 	return date.getTime() / 1000;
 }
 
+/**
+ * Get current Week in a year
+ * @returns {Number}	Current Week
+ */
+Date.prototype.getWeek = function() {
+	let date = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+	let dayNum = date.getUTCDay() || 7;
+	date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+	let yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+	return Math.ceil((((date - yearStart) / 86400000) + 1) / 7)
+}
+
 function parseTime(t = 0, {
 	forceShowHours = false,
 	msDigit = 3,
-	showPlus = false
+	showPlus = false,
+	strVal = true,
 } = {}) {
 	let d = showPlus ? "+" : "";
 	
@@ -399,19 +636,23 @@ function parseTime(t = 0, {
 	let ms = pleft(parseInt(t.toFixed(msDigit).split(".")[1]), msDigit);
 
 	return {
-		h: h,
-		m: m,
-		s: s,
-		ms: ms,
-		str: d + [h, m, s]
-			.map(v => v < 10 ? "0" + v : v)
-			.filter((v, i) => i > 0 || forceShowHours || v !== "00")
-			.join(":")
+		h, m, s, ms, d,
+		str: (strVal)
+			? d + [h, m, s]
+				.map(v => v < 10 ? "0" + v : v)
+				.filter((v, i) => i > 0 || forceShowHours || v !== "00")
+				.join(":")
+			: null
 	}
 }
 
-function formatTime(seconds, { ended = "Đã kết thúc", endedCallback = () => {} } = {}) {
-	var time = { năm: 31536000, ngày: 86400, giờ: 3600, phút: 60, giây: 1 },
+function formatTime(seconds, {
+	ended = "Đã kết thúc",
+	surfix = "",
+	minimal = false,
+	endedCallback = () => {}
+} = {}) {
+	let time = { năm: 31536000, ngày: 86400, giờ: 3600, phút: 60, giây: 1 },
 		res = [];
 
 	if (seconds === 0)
@@ -422,23 +663,38 @@ function formatTime(seconds, { ended = "Đã kết thúc", endedCallback = () =>
 		return ended;
 	}
 
-	for (var key in time)
-		if (seconds >= time[key]) {
-			var val = Math.floor(seconds / time[key]);
-			res.push(val += " " + key);
-			seconds = seconds % time[key];
+	for (let key in time)
+		if (minimal) {
+			if (seconds > time[key]) {
+				res[0] = `${Math.floor(seconds / time[key])} ${key}${surfix}`
+				break;
+			}
+		} else {
+			if (seconds >= time[key]) {
+				let val = Math.floor(seconds / time[key]);
+				res.push(`${val} ${key}${surfix}`);
+				seconds = seconds % time[key];
+			}
 		}
 
-	return res.length > 1 ? res.join(", ").replace(/,([^,]*)$/, " và" + "$1") : res[0];
+	return (res.length > 1)
+		? res.join(", ").replace(/,([^,]*)$/, " và" + "$1")
+		: res[0];
 }
 
-function liveTime(element, start = time(new Date()), { type = "full", count = "up", prefix = "", surfix = "", ended = "Đã kết thúc", endedCallback = () => {}, interval = 1000 } = {}) {
-	var updateInterval = setInterval(e => {
+function liveTime(element, start = time(new Date()), {
+	type = "full",
+	count = "up",
+	prefix = "",
+	surfix = "",
+	ended = "Đã kết thúc",
+	endedCallback = () => {},
+	interval = 1000
+} = {}) {
+	let updateInterval = setInterval(() => {
 		if (!document.body.contains(element)) {
 			clog("DEBG", "Live Time Element does not exist in document. Clearing...");
 			clearInterval(updateInterval);
-			delete element;
-			delete updateInterval;
 		}
 
 		let t = 0;
@@ -462,7 +718,7 @@ function liveTime(element, start = time(new Date()), { type = "full", count = "u
 					break;
 				}
 
-				parsed = parseTime(t % 86400, { showPlus: true });
+				parsed = parseTime(t % 86400, { forceShowHours: true, showPlus: true });
 				ts = `<timer><days>${Math.floor(t / 86400)}</days>${parsed.str}<ms>${parsed.ms}</ms></timer>`;
 				break;
 
@@ -473,7 +729,7 @@ function liveTime(element, start = time(new Date()), { type = "full", count = "u
 					break;
 				}
 				
-				parsed = parseTime(t % 86400, { showPlus: true });
+				parsed = parseTime(t % 86400, { forceShowHours: true, showPlus: true });
 				ts = `<timer><days>${Math.floor(t / 86400)}</days>${parsed.str}</timer>`;
 				break;
 		
@@ -489,6 +745,16 @@ function liveTime(element, start = time(new Date()), { type = "full", count = "u
 	}, interval);
 }
 
+function setDateTimeValue(dateNode, timeNode, value = time()) {
+	let date = new Date(value * 1000);
+	dateNode.value = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(i => pleft(i, 2)).join("-");
+	timeNode.value = [date.getHours(), date.getMinutes(), date.getSeconds()].map(i => pleft(i, 2)).join(":");
+}
+
+function getDateTimeValue(dateNode, timeNode) {
+	return time(new Date(`${dateNode.value}T${timeNode.value}`));
+}
+
 function convertSize(bytes) {
 	let sizes = ["B", "KB", "MB", "GB", "TB"];
 	for (var i = 0; bytes >= 1024 && i < (sizes.length -1 ); i++)
@@ -497,22 +763,587 @@ function convertSize(bytes) {
 	return `${round(bytes, 2)} ${sizes[i]}`;
 }
 
+/**
+ * Compare Version
+ * @param	{String}			localVersion
+ * @param	{String}			remoteVersion
+ * @returns {String}	"major", "minor", "patch", "latest"
+ */
+function versionCompare(localVersion, remoteVersion, {
+	ignoreTest = false
+} = {}) {
+	const regex = /^(?:v|)(\d)\.(\d)\.(\d)\-(.+)$/gm;
+	let testTags = ["beta", "indev", "debug", "test"]
+	let value = "latest";
+
+	let localRe = regex.exec(localVersion); regex.lastIndex = 0;
+	let remoteRe = regex.exec(remoteVersion);
+
+	if (!localRe || !remoteRe)
+		throw { code: -1, description: `versionCompare(${localVersion}, ${remoteVersion}): Invalid version string` }
+
+	let local = { major: parseInt(localRe[1]), minor: parseInt(localRe[2]), patch: parseInt(localRe[3]), tag: localRe[4] }
+	let remote = { major: parseInt(remoteRe[1]), minor: parseInt(remoteRe[2]), patch: parseInt(remoteRe[3]), tag: remoteRe[4] }
+
+	for (let key of ["major", "minor", "patch"])
+		if (remote[key] > local[key]) {
+			value = key;
+			break;
+		} else if (local[key] > remote[key])
+			break;
+
+	if (!ignoreTest && testTags.includes(remote.tag))
+		return "latest";
+
+	return value;
+}
+
+function priceFormat(num) {
+	return num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
+
+function numberFormat(num) {
+	return new Intl.NumberFormat().format(num);
+}
+
 function round(number, to = 2) {
 	const d = Math.pow(10, to);
 	return Math.round(number * d) / d;
 }
 
-class stopClock {
-	__time(date = new Date()) {
-		return date.getTime();
+/**
+ * Returns a number whose value is limited to the given range.
+ *
+ * Example: limit the output of this computation to between 0 and 255
+ * (x * 255).clamp(0, 255)
+ *
+ * @param		{Number}	value	The input value
+ * @param		{Number}	min		The lower boundary of the output range
+ * @param		{Number}	max		The upper boundary of the output range
+ * @returns		{Number}	A number in the range [min, max]
+ */
+function clamp(value, min, max) {
+	return Math.min(Math.max(value, min), max);
+}
+
+class StopClock {
+	__time(date) {
+		return (typeof date !== "undefined")
+			? date.getTime()
+			: performance.now();
 	}
 
-	constructor(date = new Date()) {
+	/**
+	 * Create a new StopClock instance
+	 * @param {Date} date 
+	 */
+	constructor(date) {
 		this.start = this.__time(date);
 	}
 
 	get stop() {
 		return (this.__time() - this.start) / 1000;
+	}
+
+	tick() {
+		return this.stop;
+	}
+}
+
+class Pager {
+	constructor(container, showCount = 20) {
+		if (!container.classList)
+			throw { code: -1, description: `Pager: container is not a valid node` }
+
+		this.container = container;
+		this.listData = []
+		this.renderItemHandler = () => {}
+		this.updateHandler = () => {}
+		this.filterHandler = null;
+		this.showCount = showCount;
+		this.apiEndpoint = null;
+		this.apiToken = null;
+		this.__currentPage = 1;
+		this.__maxPage = 1;
+	}
+
+	/**
+	 * @param {array} list
+	 */
+	set list(list) {
+		if (typeof list !== "object" || typeof list.length !== "number")
+			throw { code: -1, description: `(set) Pager.list: not a valid array` }
+
+		this.listData = list;
+		this.render();
+	}
+
+	/**
+	 * @param {String|Object} api
+	 */
+	set api(api) {
+		if ((typeof api !== "string" && typeof api !== "object") || !api.url || !api.token || api === null)
+			throw { code: -1, description: `(set) Pager.api: not a valid string|data` }
+
+		this.apiEndpoint = api.url || api;
+		if (api.token)
+			this.apiToken = api.token;
+	}
+
+	renderItem(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `Pager.renderItem(): not a valid function` }
+
+		this.renderItemHandler = f;
+	}
+
+	onUpdate(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `Pager.onUpdate(): not a valid function` }
+
+		this.updateHandler = f;
+	}
+
+	setFilter(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `Pager.setFilter(): not a valid function` }
+
+		this.filterHandler = f;
+	}
+
+	async next() {
+		this.__currentPage++;
+		await this.render();
+	}
+
+	async back() {
+		this.__currentPage--;
+		await this.render();
+	}
+
+	async setPage(page) {
+		if (typeof page !== "number" && !["first", "last"].includes(page))
+			throw { code: -1, description: `Pager.setPage(${page}): not a valid number/command` }
+
+		this.__currentPage = page;
+		await this.render();
+	}
+
+	async render() {
+		if (this.__currentPage < 1 || this.__currentPage === "first")
+			this.__currentPage = 1;
+
+		if (this.apiEndpoint) {
+			if (this.__currentPage > this.__maxPage || this.__currentPage === "last")
+				this.__currentPage = this.__maxPage;
+
+			let response = {}
+			try {
+				response = await myajax({
+					url: this.apiEndpoint,
+					method: "POST",
+					form: {
+						action: "getData",
+						token: this.apiToken,
+						show: this.showCount,
+						page: this.__currentPage
+					}
+				});
+			} catch(e) {
+				if (e.data.code === 6) {
+					clog("WARN", `Không tồn tại trang ${this.currentPage} của nhật ký hệ thống.`, e.data.data);
+					this.__currentPage = 1;
+					this.__maxPage = e.data.data.maxPage;
+					await this.render();
+
+					return;
+				}
+
+				throw e;
+			}
+
+			this.__maxPage = response.data.maxPage
+			this.updateHandler({
+				total: response.data.total,
+				maxPage: this.__maxPage,
+				currentPage: this.__currentPage,
+				from: response.data.from,
+				to: response.data.to
+			});
+
+			emptyNode(this.container);
+	
+			for (let i = 0; i <= response.data.lists.length; i++)
+				if (response.data.lists[i]) {
+					let node = null;
+
+					try {
+						node = this.renderItemHandler(response.data.lists[i], this.container);
+					} catch(e) {
+						clog("ERRR", `Pager.render(): An error occured while processing handler for item`, response.data.lists[i], e);
+						continue;
+					}
+
+					if (typeof node === "object" && node.classList && node.tagName)
+						this.container.appendChild(node);
+				} else
+					clog("DEBG", `Pager.render(): listData does not contain data at index`, { text: i, color: flatc("red") });
+		} else {
+			let listData = (typeof this.filterHandler === "function")
+				? this.listData.filter(this.filterHandler)
+				: this.listData;
+
+			let total = Math.max(listData.length, 1);
+			let showCount = (this.showCount > 0)
+				? this.showCount
+				: total;
+
+			let maxPage = parseInt(Math.floor(total / showCount) + ((total % showCount === 0) ? 0 : 1));
+	
+			if (this.__currentPage > maxPage || this.__currentPage === "last")
+				this.__currentPage = maxPage;
+	
+			let from = (this.__currentPage - 1) * showCount;
+			let to = Math.min(this.__currentPage * showCount - 1, total - 1);
+	
+			this.updateHandler({ total, maxPage, currentPage: this.__currentPage, from, to });
+			emptyNode(this.container);
+	
+			for (let i = from; i <= to; i++)
+				if (listData[i]) {
+					let node = null;
+
+					try {
+						node = this.renderItemHandler(listData[i], this.container);
+					} catch(e) {
+						clog("ERRR", `Pager.render(): An error occured while processing handler for item`, listData[i], e);
+						continue;
+					}
+
+					if (typeof node === "object" && node.classList && node.tagName)
+						this.container.appendChild(node);
+				} else
+					clog("DEBG", `Pager.render(): listData does not contain data at index`, { text: i, color: flatc("red") });
+		}
+	}
+}
+
+class lazyload {
+	constructor({
+		container,
+		source,
+		classes,
+		tagName = "div",
+		doLoad = true
+	} = {}) {
+		/** @type {HTMLElement} */
+		this.container
+
+		if (container && container.classList)
+			this.container = container;
+		else
+			this.container = document.createElement(tagName);
+
+		/** @type	{String}	Source */
+		this._src = null;
+		this.isLoaded = false;
+		this.isErrored = false;
+		this.onLoadedHandler = []
+		this.onErroredHandler = null;
+
+		this.container.classList.add("lazyload");
+
+		if (classes)
+			switch (typeof classes) {
+				case "object":
+					if (!Array.isArray(classes))
+						throw { code: -1, description: `lazyload: classes is not a valid array` }
+
+					this.container.classList.add(...classes);
+					break;
+					
+				case "string":
+					this.container.classList.add(classes);
+					break;
+			}
+
+		this.source = source;
+		this.spinner = document.createElement("div");
+		this.spinner.classList.add("simpleSpinner");
+		this.container.append(this.spinner);
+
+		if (doLoad)
+			this.load();
+	}
+
+	load(src) {
+		if (!this._src)
+			return false;
+
+		if (src)
+			this._src = src;
+
+		this.src = this._src;
+		return true;
+	}
+
+	/**
+	 * @param {String|Object} source
+	 */
+	set source(source) {
+		let node;
+
+		switch (typeof source) {
+			case "string":
+				// Assume as Image Src
+				node = document.createElement("img");
+				this._src = source;
+				break;
+		
+			case "object":
+				if (source.classList)
+					// Source is a Node. We just need to append it in container
+					node = source;
+				else if (source.type && source.src) {
+					switch (source.type) {
+						case "image":
+						case "iframe":
+							node = document.createElement(source.type);
+							this._src = source.src;
+							break;
+
+						case "document":
+							node = document.createElement("embed");
+							this._src = source.src;
+							break;
+
+						default:
+							throw { code: -1, description: `lazyload: source.type >>> ${source.type} is not a valid type` }
+					}
+				} else
+					throw { code: -1, description: `lazyload: source is not a valid node/object` }
+				break;
+
+			default:
+				break;
+		}
+
+		if (node) {
+			node.addEventListener("load", () => this.loaded = true);
+			node.addEventListener("error", () => this.errored = true);
+
+			if (this.sourceNode) {
+				this.container.replaceChild(node, this.sourceNode);
+				this.sourceNode = node;
+			} else {
+				this.container.insertBefore(node, this.container.firstChild);
+				this.sourceNode = node;
+			}
+		}
+	}
+
+	/**
+	 * @param {String} src
+	 */
+	set src(src) {
+		if (!this.sourceNode)
+			throw { code: -1, description: `lazyload: cannot load source because sourceNode hasn't been initialized properly` }
+
+		this.loaded = false;
+		this.errored = false;
+		this.sourceNode.src = src;
+	}
+
+	/**
+	 * @returns {String}
+	 */
+	get src() {
+		return this.sourceNode.src;
+	}
+
+	/**
+	 * @param {Boolean} val
+	 */
+	set loaded(val) {
+		if (typeof val !== "boolean")
+			throw { code: -1, description: `lazyload.loaded: not a valid boolean` }
+
+		this.isLoaded = val;
+		this.container.removeAttribute("data-errored");
+
+		this.isLoaded
+			? this.container.dataset.loaded = true
+			: this.container.removeAttribute("data-loaded");
+
+		for (let f of this.onLoadedHandler)
+			f();
+	}
+
+	get loaded() {
+		return this.isLoaded;
+	}
+
+	/**
+	 * @param {Boolean} val
+	 */
+	set errored(val) {
+		if (typeof val !== "boolean")
+			throw { code: -1, description: `lazyload.errored: not a valid boolean` }
+
+		this.isErrored = val;
+		this.container.removeAttribute("data-loaded");
+
+		this.isErrored
+			? this.container.dataset.errored = true
+			: this.container.removeAttribute("data-errored");
+	}
+
+	/** @returns {Boolean} */
+	get errored() {
+		return this.isErrored;
+	}
+
+	/**
+	 * @param {Function}	f	Handler
+	 */
+	onLoaded(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `lazyload.onLoaded: not a valid function` }
+
+		this.onLoadedHandler.push(f);
+	}
+
+	wait() {
+		return new Promise((resolve, reject) => {
+			if (this.loaded) {
+				resolve();
+				return;
+			}
+
+			this.onLoaded(() => resolve());
+		});
+	}
+
+	/**
+	 * @param {Function}	f	Handler
+	 */
+	onErrored(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `lazyload.onErrored: not a valid function` }
+
+		this.onErroredHandler = f;
+	}
+}
+
+class Queue {
+	/**
+	 * 
+	 * @param {Array}	list 
+	 */
+	constructor(list) {
+		this.queueList = []
+		this.handlers = []
+		this.completeHandlers = []
+		this.queuePos = 0;
+		this.handlerPos = 0;
+	
+		/**
+		 * @type {Boolean}
+		 */
+		this.isLooping = true;
+
+		/**
+		 * @type {Boolean}	Running state of Queue
+		 */
+		this.running = false;
+
+		this.list = list;
+	}
+
+	/**
+	 * @param {Array}	list
+	 */
+	set list(list) {
+		if (typeof list !== "object" || !list.length)
+			throw { code: -1, description: `Queue.list: not a valid array` }
+
+		this.queueList = list;
+
+		if (this.queuePos > list.length - 1)
+			this.queuePos = list.length - 1;
+	}
+
+	addHandler(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `Queue.addHandler(): not a valid function` }
+
+		let insPos = this.handlers.push({
+			free: true,
+			handler: f
+		});
+
+		this.assign();
+		return insPos;
+	}
+
+	removeHandler(pos) {
+		if (typeof pos !== "number" || !this.queueList[pos])
+			throw { code: -1, description: `Queue.removeHandler(${pos}): not a valid number or hander does not exist` }
+
+		this.handlers = this.handlers.splice(pos, 1);
+	}
+
+	start() {
+		if (this.running)
+			throw { code: -1, description: `Queue.start(): Queue is still running` }
+
+		this.running = true;
+		this.assign();
+	}
+
+	stop() {
+		this.running = false;
+		this.queuePos = 0;
+		this.handlerPos = 0;
+	}
+
+	assign() {
+		if (!this.running)
+			return { code: 0, description: `Queue: Stopped` }
+
+		let assigned = 0;
+
+		for (let item of this.handlers)
+			if (item.free && this.queuePos < this.queueList.length) {
+				item.free = false;
+				item.handler(this.queueList[this.queuePos++])
+					.then(() => {
+						item.free = true;
+						this.assign();
+					})
+					.catch((error) => {
+						clog("ERRR", `Queue.assign(): handler returned an error:`, error);
+						item.free = true;
+						this.assign();
+					});
+
+				assigned++;
+
+				if (this.queuePos >= this.queueList.length - 1 && this.isLooping)
+					this.queuePos = 0;
+			}
+
+		if (!this.isLooping && assigned === 0 && this.handlers.length > 0) {
+			this.stop();
+			this.completeHandlers.forEach(f => f());
+		}
+	}
+
+	onComplete(f) {
+		if (typeof f !== "function")
+			throw { code: -1, description: `Queue.onComplete(): not a valid function` }
+
+		this.completeHandlers.push(f);
 	}
 }
 
@@ -558,21 +1389,26 @@ class ClassWatcher {
 }
 
 function currentScript() {
-	var url = (document.currentScript) ? document.currentScript.src : "unknown";
+	let url = (document.currentScript) ? document.currentScript.src : "unknown";
 	return url.substring(url.lastIndexOf("/") + 1);
 }
 
 /**
- * Add padding in the left of input if input length is smaller than function length arg.
+ * Add padding to the left of input
+ * 
+ * Example:
+ * 
+ * + 21 with length 3: 021
+ * + "sample" with length 8: "  sample"
  *
- * @param {string} inp Input in String
- * @param {number} inp Input in Number
- * @param {number} length Length
+ * @param	{string/number}		input Input
+ * @param	{number}			length Length
  */
 function pleft(inp, length = 0, right = false) {
-	type = typeof inp;
+	let type = typeof inp;
+	let padd = "";
+
 	inp = (type === "number") ? inp.toString() : inp;
-	padd = "";
 
 	switch (type) {
 		case "number":
@@ -588,14 +1424,14 @@ function pleft(inp, length = 0, right = false) {
 			return false;
 	}
 
-	padd = padd.repeat((length - inp.length < 0) ? 0 : length - inp.length);
+	padd = padd.repeat(Math.max(0, length - inp.length));
 	return (right) ? inp + padd : padd + inp;
 }
 
 /**
  * My color template
  * 
- * Return HEX string color code
+ * Return color in HEX string
  *
  * @param	{string}	color
  * @returns	{String}
@@ -620,20 +1456,28 @@ function flatc(color) {
 /**
  * Color template from OSC package
  * 
- * Return HEX string color code
+ * Return color in HEX string
  *
  * @param	{string}	color
  * @returns	{String}
  */
 function oscColor(color) {
 	const clist = {
-		pink: "#ff66aa",
-		green: "#88b400",
-		blue: "#44aadd",
-		yellow: "#f6c21c",
-		brown: "#231B22",
-		gray: "#485e74",
-		dark: "#042430"
+		pink:			"#ff66aa",
+		green:			"#88b400",
+		blue:			"#44aadd",
+		yellow:			"#f6c21c",
+		orange:			"#ffa502",
+		red:			"#dd2d44",
+		brown:			"#3f313d",
+		gray:			"#485e74",
+		dark:			"#1E1E1E",
+		purple:			"#593790",
+		darkGreen:		"#0c4207",
+		darkBlue:		"#053242",
+		darkYellow:		"#444304",
+		darkRed:		"#440505",
+		navyBlue:		"#333D79",
 	}
 
 	return (clist[color]) ? clist[color] : clist.dark;
@@ -648,16 +1492,18 @@ function oscColor(color) {
  * @param	{String}	color	Color
  */
 function triBg(element, {
-	speed = 26,
+	speed = 34,
 	color = "gray",
 	scale = 2,
 	triangleCount = 38
 } = {}) {
-	let current = element.querySelector(".triBgContainer");
+	const DARKCOLOR = ["brown", "dark", "darkRed", "darkGreen", "darkBlue"]
+	const LIGHTCOLOR = ["lightBlue"]
+
+	let current = element.querySelector(":scope > .triBgContainer");
+
 	if (current)
 		element.removeChild(current);
-
-	delete current;
 
 	element.classList.add("triBg");
 	element.dataset.triColor = color;
@@ -666,19 +1512,39 @@ function triBg(element, {
 	container.classList.add("triBgContainer");
 	container.dataset.count = triangleCount;
 
+	const updateSize = () => {
+		let scaleStep = [50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000]
+
+		for (let i = 0; i < scaleStep.length; i++)
+			if (scaleStep[i] >= (container.offsetHeight + (0.866 * 30 * 2 * scale))) {
+				container.dataset.anim = scaleStep[i];
+				return;
+			}
+
+		container.dataset.anim = "full";
+	}
+
+	(new ResizeObserver(() => updateSize())).observe(container);
+	updateSize();
+
 	for (let i = 0; i < triangleCount; i++) {
-		let randScale = randBetween(0.4, 2.0, false);
-		let randBright = ["brown", "dark"].indexOf(color) !== -1
+		let randScale = randBetween(0.4, 2.0, false) * scale;
+		let width = 15 * randScale;
+		let height = 0.866 * (30 * randScale);
+
+		let randBright = DARKCOLOR.includes(color)
 			? randBetween(1.1, 1.3, false)
-			: randBetween(0.9, 1.2, false)
+			: LIGHTCOLOR.includes(color)
+				? randBetween(0.95, 1.05, false)
+				: randBetween(0.9, 1.2, false)
 
 		let randLeftPos = randBetween(0, 98, false);
-		let delay = randBetween(- speed / 2, speed / 2, false);
+		let delay = randBetween(-speed / 2, speed / 2, false);
 
 		let triangle = document.createElement("span");
 		triangle.style.filter = `brightness(${randBright})`;
-		triangle.style.transform = `scale(${randScale * scale})`;
-		triangle.style.left = `${randLeftPos}%`;
+		triangle.style.borderWidth = `0 ${width}px ${height}px`;
+		triangle.style.left = `calc(${randLeftPos}% - ${width}px)`;
 		triangle.style.animationDelay = `${delay}s`;
 		triangle.style.animationDuration = `${speed / randScale}s`;
 
@@ -686,6 +1552,20 @@ function triBg(element, {
 	}
 
 	element.insertBefore(container, element.firstChild);
+
+	return {
+		setColor(color) {
+			element.dataset.triColor = color;
+
+			for (let triangle of container.childNodes) {
+				let randBright = DARKCOLOR.includes(color)
+					? randBetween(1.1, 1.3, false)
+					: randBetween(0.9, 1.2, false)
+
+				triangle.style.filter = `brightness(${randBright})`;
+			}
+		}
+	}
 }
 
 /**
@@ -710,7 +1590,7 @@ function randBetween(min, max, toInt = true) {
 function randString(len = 16, charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 	let randomString = "";
 
-	for (var i = 0; i < len; i++) {
+	for (let i = 0; i < len; i++) {
 		let p = Math.floor(Math.random() * charSet.length);
 		randomString += charSet.substring(p, p + 1);
 	}
@@ -718,11 +1598,221 @@ function randString(len = 16, charSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 	return randomString;
 }
 
+/**
+ * Pick a random item in an Array
+ * @param {Array} array 
+ */
+function randItem(array) {
+	if (typeof array.length !== "number")
+		throw { code: -1, description: `randItem(): not a valid array` }
+
+	return array[randBetween(0, array.length - 1, true)];
+}
+
+const Easing = {
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	Linear: t => t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InSine: t => 1 - Math.cos((t * Math.PI) / 2),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutSine: t => Math.sin((t * Math.PI) / 2),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InQuad: t => t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutQuad: t => t*(2-t),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutQuad: t => (t < .5) ? 2*t*t : -1+(4-2*t)*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InCubic: t => t*t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutCubic: t => (--t)*t*t+1,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutCubic: t => (t < .5) ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InExpo: t => t === 0 ? 0 : Math.pow(2, 10 * t - 10),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutExpo: t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutExpo: t => t === 0
+				? 0
+				: t === 1
+					? 1
+					: t < 0.5
+						? Math.pow(2, 20 * t - 10) / 2
+						: (2 - Math.pow(2, -20 * t + 10)) / 2,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InQuart: t => t*t*t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutQuart: t => 1-(--t)*t*t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutQuart: t => (t < .5) ? 8*t*t*t*t : 1-8*(--t)*t*t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InQuint: t => t*t*t*t*t,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutQuint: t => 1 - Math.pow(1 - t, 5),
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InOutQuint: t => (t < 0.5) ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2,
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	InElastic: t => {
+		const c4 = (2 * Math.PI) / 3;
+		
+		return t === 0
+			? 0
+			: t === 1
+				? 1
+				: -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+	},
+
+	/**
+	 * @param	{Number}	t	Point [0, 1]
+	 * @return	{Number}		Point [0, 1]
+	 */
+	OutElastic: t => {
+		const c4 = (2 * Math.PI) / 3;
+
+		return t === 0
+			? 0
+			: t === 1
+				? 1
+				: Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+	}
+}
+
+/**
+ * Animate a value
+ * @param {Number}		duration 			Animation Duration
+ * @param {Function}	timingFunction 		Animation Timing Function
+ * @param {Function}	animate 			Function To Animate
+ */
+function Animator(duration, timingFunction, animate) {
+	let completeHandlers = []
+	let start = time();
+	let rAID = null;
+
+	let update = () => {
+		let tPoint = (time() - start) / duration;
+
+		// Safe executing update function to prevent stopping
+		// animation entirely
+		try {
+			if (animate(Math.min(timingFunction(tPoint), 1)) === false)
+				// Stop Animator
+				tPoint = 1.1;
+		} catch (e) {
+			let error = parseException(e);
+			clog("WARN", `Animator().update(): [${error.code}] ${error.description}`);
+		}
+
+		if (tPoint <= 1)
+			rAID = requestAnimationFrame(update);
+		else {
+			animate(1);
+			completeHandlers.forEach(f => f());
+		}
+	}
+
+	rAID = requestAnimationFrame(() => update());
+
+	return {
+		cancel() {
+			cancelAnimationFrame(rAID);
+		},
+
+		onComplete(f) {
+			if (!f || typeof f !== "function")
+				throw { code: -1, description: "Animator().onComplete(): not a valid function" }
+
+			completeHandlers.push(f);
+		}
+	}
+}
+
 if (typeof $ !== "function")
 	/**
 	 * A shorthand of querySelector
 	 * @param	{String}	selector	Selector
-	 * @returns	{Element}
+	 * @returns	{HTMLElement}
 	 */
 	function $(query) {
 		let r = document.querySelector(query);
@@ -734,9 +1824,7 @@ if (typeof $ !== "function")
 	}
 
 /**
- * Remove all child in a Node
- * 
- * eq: node.innerHTML = ""
+ * Remove all childs in a Node
  * @param	{Element}	node	Node to empty
  */
 function emptyNode(node) {
@@ -744,8 +1832,15 @@ function emptyNode(node) {
 		node.firstChild.remove();
 }
 
+function sanitizeHTML(html) {
+	let decoder = document.createElement("div");
+	decoder.innerHTML = html;
+	
+	return decoder.textContent;
+}
+
 /**
- * Create Input Element, require input.css
+ * Create Input Element, require `input.css`
  * @param	{Object}
  */
 function createInput({
@@ -753,60 +1848,143 @@ function createInput({
 	id = randString(6),
 	label = "Sample Input",
 	value = "",
-	color = "default",
-	required = false
+	color = "blue",
+	required = false,
+	autofill = true,
+	spellcheck = false,
+	options = {}
 } = {}) {
-	let formGroup = document.createElement("div");
-	formGroup.classList.add("formGroup");
-	formGroup.dataset.color = color;
-	formGroup.dataset.soundhoversoft = "";
-	formGroup.dataset.soundselectsoft = "";
+	// Check valid input type can be used in this api. Will throw an error when input type is invalid
+	// Some types are not included because there are api to create that specific input
+	//
+	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types
+	if (!["text", "textarea", "email", "password", "color", "number", "date", "time", "select", "file", "datetime-local", "month", "week", "tel", "url"].includes(type))
+		throw { code: -1, description: `createInput(${type}): Invalid type: ${type}` }
 
-	if (sounds)
-		sounds.applySound(formGroup);
+	let container = makeTree("span", "sq-input", {
+		input: {
+			tag: ["textarea", "select"].includes(type) ? type : "input",
+			class: "input",
+			type,
+			id,
+			placeholder: label,
+			autocomplete: autofill ? "on" : "off",
+			spellcheck: !!spellcheck,
+			required
+		},
 
-	let formField = document.createElement(type === "textarea" ? type : "input");
-	formField.type = type;
-	formField.id = id;
-	formField.classList.add("formField");
-	formField.placeholder = label;
-	formField.value = value;
+		outline: { tag: "div", class: "outline", child: {
+			leading: { tag: "span", class: ["notch", "leading"] },
 
-	if (required)
-		formField.required = true;
+			label: { tag: "span", class: ["notch", "label"], child: {
+				label: { tag: "label", htmlFor: id, text: label }
+			}},
 
-	if (type === "textarea") {
-		formField.style.fontFamily = "Consolas";
-		formField.style.fontWeight = "bold";
-		formField.style.fontSize = "15px";
+			trailing: { tag: "span", class: ["notch", "trailing"] }
+		}}
+	});
+
+	container.dataset.color = color;
+	container.dataset.soundhoversoft = "";
+	container.dataset.soundselectsoft = "";
+
+	if (typeof sounds === "object")
+		sounds.applySound(container, ["soundhoversoft", "soundselectsoft"]);
+
+	switch(type) {
+		case "textarea":
+			container.input.style.fontFamily = "Consolas";
+			container.input.style.fontWeight = "bold";
+			container.input.style.fontSize = "15px";
+			break;
+
+		case "select": {
+			for (let key of Object.keys(options)) {
+				let option = document.createElement("option");
+				option.value = key;
+				option.innerHTML = options[key];
+
+				container.input.appendChild(option);
+			}
+
+			break;
+		}
 	}
 
-	let formLabel = document.createElement("label");
-	formLabel.htmlFor = id;
-	formLabel.classList.add("formLabel");
-	formLabel.innerText = label;
+	// Events
+	let onInputHandlers = [];
+	let onChangeHandlers = [];
 
-	formGroup.appendChild(formField);
-	formGroup.appendChild(formLabel);
+	container.input.addEventListener("input", (e) => onInputHandlers.forEach(f => f(container.input.value, e)));
+	container.input.addEventListener("change", (e) => onChangeHandlers.forEach(f => f(container.input.value, e)));
+	container.input.value = value;
 
-	return { group: formGroup, input: formField }
+	return {
+		group: container,
+		input: container.input,
+
+		set({
+			value,
+			label,
+			options
+		}) {
+			if (typeof options === "object" && container.input.tagName.toLowerCase() === "select") {
+				emptyNode(container.input);
+
+				for (let key of Object.keys(options)) {
+					let option = document.createElement("option");
+					option.value = key;
+					option.innerHTML = options[key];
+
+					container.input.appendChild(option);
+				}
+			}
+
+			if (typeof value !== "undefined") {
+				container.input.value = value;
+				container.input.dispatchEvent(new Event("input"));
+				container.input.dispatchEvent(new Event("change"));
+			}
+
+			if (label)
+				container.input.innerText = label;
+		},
+
+		/**
+		 * @param {function} f
+		 */
+		onInput: (f) => {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createInput(${type}).onInput(): Not a valid function` }
+
+			onInputHandlers.push(f);
+			f(container.input.value, null);
+		},
+
+		/**
+		 * @param {function} f
+		 */
+		onChange: (f) => {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createInput(${type}).onChange(): Not a valid function` }
+
+			onChangeHandlers.push(f);
+			f(container.input.value, null);
+		}
+	}
 }
 
 /**
- * Create Switch Element, require switch.css
- * @param	{String}	text		Switch Label
- * @param	{String}	color		Switch Color
- * @param	{String}	value		Switch Value
- * @param	{String}	type		Switch Type
+ * Create Checkbox Element, require switch.css
  */
-function createSwitch({
-	label = "Sample Switch",
+function createCheckbox({
+	label = "Sample Checkbox",
 	color = "pink",
 	value = false,
 	type = "checkbox"
 } = {}) {
 	let container = document.createElement("div");
-	container.classList.add("switchContainer");
+	container.classList.add("checkboxContainer");
 	container.dataset.soundhoversoft = "";
 	sounds.applySound(container);
 
@@ -814,14 +1992,15 @@ function createSwitch({
 	title.innerHTML = label;
 
 	let switchLabel = document.createElement("label");
-	switchLabel.classList.add("sq-checkbox", color);
+	switchLabel.classList.add("sq-checkbox");
+	switchLabel.dataset.color = color;
 
 	let input = document.createElement("input");
 	input.type = type;
 	input.checked = value;
 	input.dataset.soundcheck = "";
 
-	if (sounds)
+	if (typeof sounds === "object")
 		sounds.applySound(input);
 
 	let mark = document.createElement("span");
@@ -832,7 +2011,290 @@ function createSwitch({
 	container.appendChild(title);
 	container.appendChild(switchLabel);
 
-	return { group: container, input: input }
+	return {
+		group: container,
+		input,
+		title,
+		label: switchLabel
+	}
+}
+
+/**
+ * Create Switch Element, require switch.css
+ */
+ function createSwitch({
+	label = "Sample Switch",
+	value = false,
+	color = "blue",
+	type = "checkbox",
+	id = `switch_${randString(8)}`
+} = {}) {
+	let container = document.createElement("div");
+	container.classList.add("checkboxContainer");
+	sounds.applySound(container, ["soundhoversoft"]);
+
+	let title = document.createElement("span");
+	title.innerHTML = label;
+
+	let switchLabel = document.createElement("div");
+	switchLabel.classList.add("sq-switch");
+	switchLabel.dataset.color = color;
+
+	let input = document.createElement("input");
+	input.classList.add("checkbox");
+	input.id = id;
+	input.type = type;
+	input.checked = value;
+
+	if (typeof sounds === "object")
+		sounds.applySound(input, ["soundcheck"]);
+
+	let track = document.createElement("label");
+	track.classList.add("track");
+	track.htmlFor = id;
+
+	switchLabel.appendChild(input);
+	switchLabel.appendChild(track);
+	container.appendChild(title);
+	container.appendChild(switchLabel);
+
+	return {
+		group: container,
+		input,
+		title,
+		label: switchLabel
+	}
+}
+
+function createSelectInput({
+	icon,
+	color = "blue",
+	options = {},
+	value
+} = {}) {
+	let container = makeTree("div", "sq-selector", {
+		current: { tag: "div", class: "current", child: {
+			icon: { tag: "icon", class: "icon" },
+			value: { tag: "t", class: "value" },
+			arrow: { tag: "icon", class: "arrow", data: { icon: "arrowDown" } }
+		}},
+
+		select: { tag: "div", class: "select", child: {
+			list: { tag: "div", class: "list" }
+		}}
+	});
+
+	container.current.icon.style.display = "none";
+
+	if (typeof sounds === "object")
+		sounds.applySound(container.current, ["soundhover"]);
+
+	if (typeof Scrollable === "function")
+		new Scrollable(container.select, {
+			content: container.select.list,
+			scrollbar: false
+		});
+
+	/** @type {HTMLDivElement} */
+	let activeNode = undefined;
+	let activeValue = undefined;
+	let currentOptions = {}
+	let changeHandlers = []
+	let showing = false;
+
+	const show = () => {
+		if (typeof sounds === "object")
+			sounds.select(1);
+
+		showing = true;
+		container.classList.add("show");
+		container.select.style.height = `${container.select.list.offsetHeight}px`;
+	}
+
+	const hide = (isSelected = false) => {
+		if (typeof sounds === "object" && !isSelected)
+			sounds.select(1);
+		
+		showing = false;
+		container.classList.remove("show");
+		container.select.style.height = null;
+	}
+
+	const toggle = () => {
+		if (showing)
+			hide();
+		else
+			show();
+	}
+
+	const set = ({
+		icon,
+		color,
+		options,
+		value
+	} = {}) => {
+		if (typeof color === "string")
+			container.dataset.color = color;
+
+		if (typeof icon === "string") {
+			container.current.icon.style.display = null;
+			container.current.icon.dataset.icon = icon;
+		} else if (typeof icon !== "undefined")
+			container.current.icon.style.display = "none";
+
+		if (typeof options === "object") {
+			emptyNode(container.select.list);
+			activeNode = undefined;
+			activeValue = undefined;
+			currentOptions = {}
+
+			for (let key of Object.keys(options)) {
+				let item = document.createElement("div");
+				item.classList.add("item");
+				item.dataset.value = key;
+				item.innerText = options[key];
+				options[key] = item;
+
+				if (typeof sounds === "object")
+					sounds.applySound(item, ["soundhoversoft"]);
+
+				item.addEventListener("click", () => {
+					if (activeNode)
+						activeNode.classList.remove("active");
+					
+					activeNode = item;
+					item.classList.add("active");
+					container.current.value.innerText = item.innerText;
+					changeHandlers.forEach(f => f(item.dataset.value));
+
+					if (typeof sounds === "object")
+						sounds.soundToggle(sounds.sounds.valueChange);
+
+					hide(true);
+				});
+
+				container.select.list.appendChild(item);
+			}
+
+			currentOptions = options;
+		}
+
+		if (typeof value === "string" && currentOptions[value]) {
+			if (activeNode)
+				activeNode.classList.remove("active");
+
+			activeNode = currentOptions[value];
+			activeNode.classList.add("active");
+			activeValue = value;
+			container.current.value.innerText = activeNode.innerText;
+			changeHandlers.forEach(f => f(activeValue));
+		}
+	}
+
+	set({ icon, color, options, value });
+
+	container.current.addEventListener("click", () => toggle());
+
+	return {
+		group: container,
+		showing,
+		value: activeValue,
+		show,
+		hide,
+		set,
+
+		onChange: (f) => {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createSelectInput().onChange(): not a valid function` }
+
+			changeHandlers.push(f);
+
+			if (activeValue)
+				f(activeValue);
+		}
+	}
+}
+
+function createSlider({
+	color = "pink",
+	value = 0,
+	min = 0,
+	max = 10,
+	step = 1
+} = {}) {
+	let container = buildElementTree("div", "osc-slider", [
+		{ type: "input", name: "input" },
+		{ type: "span", class: "leftTrack", name: "left" },
+		{ type: "span", class: "thumb", name: "thumb" },
+		{ type: "span", class: "rightTrack", name: "right" }
+	]);
+
+	let o = container.obj;
+	o.dataset.color = color;
+	o.dataset.soundhover = true;
+
+	if (typeof sounds === "object")
+		sounds.applySound(o);
+
+	o.input.type = "range";
+	o.input.min = min;
+	o.input.max = max;
+	o.input.step = step;
+	o.input.value = value;
+
+	const update = (e) => {
+		let valP = (e.target.value - min) / (max - min);
+
+		o.thumb.style.left = `calc(20px + (100% - 40px) * ${valP})`;
+		o.left.style.width = `calc((100% - 40px) * ${valP})`;
+		o.right.style.width = `calc(100% - (100% - 40px) * ${valP} - 40px)`;
+
+		if (e.isTrusted && sounds)
+			if (valP === 0)
+				sounds.slider(2);
+			else if (valP === 1)
+				sounds.slider(1);
+			else
+				sounds.slider(0);
+	}
+
+	requestAnimationFrame(() => update({ target: o.input }));
+
+	let inputHandlers = []
+	let changeHandlers = []
+
+	o.input.addEventListener("input", (e) => {
+		inputHandlers.forEach(f => f(parseFloat(e.target.value), e));
+		update(e);
+	});
+
+	o.input.addEventListener("change", (e) => changeHandlers.forEach(f => f(parseFloat(e.target.value), e)));
+
+	return {
+		group: container.tree,
+		input: o.input,
+
+		setValue(value) {
+			o.input.value = value;
+			o.input.dispatchEvent(new Event("input"));
+		},
+
+		onInput(f) {
+			if (!f || typeof f !== "function")
+				throw { code: -1, description: "createSlider().onInput(): not a valid function" }
+
+			inputHandlers.push(f);
+			f(parseFloat(o.input.value));
+		},
+
+		onChange(f) {
+			if (!f || typeof f !== "function")
+				throw { code: -1, description: "createSlider().onChange(): not a valid function" }
+
+			changeHandlers.push(f);
+			f(parseFloat(o.input.value));
+		}
+	}
 }
 
 /**
@@ -841,29 +2303,185 @@ function createSwitch({
  * @param	{String}	color		Button Color
  * @returns	{HTMLButtonElement}		Button Element
  */
-function createBtn(text, color = "blue") {
-	let btn = document.createElement("button");
-	btn.type = "button";
-	btn.innerText = text;
-	btn.classList.add("sq-btn", color);
-	btn.dataset.soundhover = "";
-	btn.dataset.soundselect = "";
+function createButton(text, {
+	color = "blue",
+	element = "button",
+	type = "button",
+	style = "flat",
+	classes,
+	icon = null,
+	align = "left",
+	complex = false,
+	disabled = false
+} = {}) {
+	let button = document.createElement(element);
+	button.type = type;
+	button.dataset.style = style;
+	button.dataset.color = color;
+	button.disabled = disabled;
+	button.classList.add("sq-btn");
 
-	if (sounds)
-		sounds.applySound(btn);
+	switch (typeof classes) {
+		case "string":
+			button.classList.add(classes);
+			break;
+		
+		case "object":
+			if (classes.length && classes.length > 0)
+				button.classList.add(...classes);
+			else
+				throw { code: -1, description: `createButton(): Invalid or empty "classes" type: ${typeof classes}` }
 
-	return btn;
+			break;
+	}
+
+	if (icon)
+		button.innerHTML = `<icon class="${align}" data-icon="${icon}"></icon>`;
+
+	let textNode = document.createElement("span");
+	textNode.classList.add("text");
+	button.changeText = (text) => textNode.innerText = text;
+
+	if (typeof text === "undefined" || text === null || text === "icon") {
+		button.classList.add("empty");
+	} else {
+		textNode.innerText = text;
+
+		if (align === "left")
+			button.appendChild(textNode);
+		else
+			button.insertBefore(textNode, button.firstChild);
+	}
+
+	if (complex)
+		triBg(button, {
+			scale: 1.6,
+			speed: 8,
+			color: color,
+			triangleCount: 16
+		});
+
+	if (typeof sounds === "object")
+		sounds.applySound(button, ["soundhover", "soundselect"]);
+
+	return button;
 }
 
-cookie = {
+function createImageInput({
+	id = randString(6),
+	resetText = "Đặt Lại",
+	accept = "image/*",
+	src = "//:0"
+} = {}) {
+	if (!src)
+		src = "//:0";
+
+	let container = makeTree("div", "imageInput", {
+		input: { tag: "input", type: "file", id, accept },
+		image: { tag: "label", htmlFor: id, title: "Chọn Ảnh" },
+
+		clear: { tag: "icon", class: "clear", title: "Loại Bỏ Ảnh", data: { icon: "close" } },
+		reset: createButton(resetText, { color: "pink", complex: true })
+	});
+
+	let resetHandlers = []
+	let image = new lazyload({
+		container: container.image,
+		source: src,
+		classes: ["imageBox", item.display || "square"]
+	});
+
+	container.input.addEventListener("change", (e) => {
+		let file = e.target.files[0];
+
+		if (file) {
+			image.src = URL.createObjectURL(file);
+			container.clear.classList.add("show");
+		} else
+			container.clear.classList.remove("show");
+	});
+
+	container.clear.addEventListener("click", () => {
+		container.clear.classList.remove("show");
+		container.input.value = null;
+		image.src = src;
+	});
+
+	container.reset.addEventListener("click", async (e) => {
+		container.reset.disabled = true;
+
+		for (let f of resetHandlers)
+			await f(e);
+
+		container.reset.disabled = false;
+	});
+
+	container.input.dispatchEvent(new Event("change"));
+
+	return {
+		group: container,
+		input: container.input,
+		image,
+
+		src(src = "//:0") {
+			if (!src)
+				src = "//:0";
+
+			image.src = src;
+			container.reset.disabled = (src === "//:0");
+		},
+
+		clear() {
+			container.clear.classList.remove("show");
+			container.input.value = null;
+			image.src = src;
+		},
+
+		onReset(f) {
+			if (typeof f !== "function")
+				throw { code: -1, description: `createImageInput().onReset(): not a valid function` }
+
+			resetHandlers.push(f);
+		}
+	}
+}
+
+function createNote({
+	level = "info",
+	message = "Smaple Note"
+} = {}) {
+	let container = document.createElement("div");
+	container.classList.add("note");
+	container.dataset.level = level;
+
+	let inner = document.createElement("span");
+	inner.classList.add("inner");
+	inner.innerHTML = message;
+
+	container.appendChild(inner);
+
+	return {
+		group: container,
+
+		set({ level, message } = {}) {
+			if (level)
+				container.dataset.level = level;
+
+			if (message)
+				inner.innerHTML = message;
+		}
+	}
+}
+
+const cookie = {
 	cookie: null,
 
 	getAll() {
 		const mycookie = document.cookie.split("; ");
-		var dacookie = {};
+		let dacookie = {};
 
-		for (var i = 0; i < mycookie.length; i++) {
-			var t = mycookie[i].split("=");
+		for (let i = 0; i < mycookie.length; i++) {
+			let t = mycookie[i].split("=");
 			dacookie[t[0]] = t[1];
 		}
 
@@ -882,9 +2500,9 @@ cookie = {
 	},
 
 	set(key, value = "", days = 0, path = "/") {
-		var exp = "";
+		let exp = "";
 		if (days !== 0 && typeof days === "number") {
-			var date = new Date();
+			let date = new Date();
 			date.setTime(date.getTime() + (days*24*60*60*1000));
 			exp = `; expires=${date.toUTCString()}`;
 		}
@@ -899,16 +2517,16 @@ cookie = {
 //? |-----------------------------------------------------------------------------------------------|
 //? |  from web-clog.js                                                                             |
 //? |                                                                                               |
-//? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+//? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
 function clog(level, ...args) {
-	const font = "Calibri";
+	const font = "Consolas";
 	const size = "12";
-	var date = new Date();
+	let date = new Date();
 	const rtime = round(sc.stop, 3).toFixed(3);
-	var str = "";
+	let str = "";
 
 	level = level.toUpperCase();
 	lc = flatc({
@@ -920,56 +2538,55 @@ function clog(level, ...args) {
 		CRIT: "gray",
 	}[level])
 
-	text = [
+	let text = [
 		{
 			color: flatc("aqua"),
 			text: `${pleft(date.getHours(), 2)}:${pleft(date.getMinutes(), 2)}:${pleft(date.getSeconds(), 2)}`,
 			padding: 8,
-			seperate: true
+			separate: true
 		}, {
 			color: flatc("blue"),
 			text: rtime,
 			padding: 8,
-			seperate: true
+			separate: true
 		}, {
 			color: flatc("red"),
 			text: window.location.pathname,
 			padding: 16,
-			seperate: true
+			separate: true
 		}, {
 			color: lc,
 			text: level,
 			padding: 6,
-			seperate: true
+			separate: true
 		}
 	]
 
 	text = text.concat(args);
-	var n = 2;
-	var out = new Array();
-	out[0] = "%c";
-	out[1] = "padding-left: 10px";
+	let n = 2;
+	let out = new Array();
+
+	out[0] = "%c ";
+	out[1] = `padding-left: ${["INFO", "OKAY", "DEBG"].includes(level) ? 10 : 0}px`;
+
 	// i | 1   2   3   4   5     6
 	// j | 0   1   2   3   4     5
 	// n | 1 2 3 4 5 6 7 8 9 10 11
-
 	for (let i = 1; i <= text.length; i++) {
-		item = text[i-1];
+		item = text[i - 1];
 		if (typeof item === "string" || typeof item === "number") {
 			if (i > 4)
 				str += `${item} `;
 
 			out[0] += `%c${item} `;
-			out[n] = `font-size: ${size}px; font-family: ${font}; color: ${flatc("black")}`;
-			n += 1;
+			out[n++] = `font-size: ${size}px; font-family: ${font}; color: ${flatc("black")}`;
 		} else if (typeof item === "object") {
-			if (typeof item.text === "undefined") {
-				out[n] = item;
-				n += 1;
+			if (item === null || item === undefined || typeof item.text === "undefined") {
+				out[n++] = item;
 
-				if (item.code && item.description)
+				if (item && item.code && item.description)
 					str += `[${item.code}] ${item.description} `;
-				else if (item.name && item.message)
+				else if (item && item.name && item.message)
 					str += `${item.name} >>> ${item.message} `;
 				else
 					str += JSON.stringify(item) + " ";
@@ -983,22 +2600,18 @@ function clog(level, ...args) {
 
 			out[0] += `%c${t}`;
 
-			if (item.seperate) {
+			if (item.separate) {
 				out[0] += "%c| ";
-				out[n] = `font-size: ${size}px; color: ${item.color};`;
-				out[n+1] = `font-size: ${size}px; color: ${item.color}; font-weight: bold;`;
-				n += 2;
+				out[n++] = out[n++] = `font-size: ${size}px; color: ${item.color}; font-weight: bold;`;
 			} else {
 				out[0] += " ";
-				out[n] = `font-size: ${size}px; font-family: ${font}; color: ${item.color}`;
-				n += 1;
+				out[n++] = `font-size: ${size}px; font-family: ${font}; color: ${item.color}`;
 			}
 		} else
-			console.error(`error: type ${typeof item}`)
+			console.error(`clog(): unknown type ${typeof item}`, item);
 	}
 
 	document.__onclog(level, rtime, str);
-
 	switch (level) {
 		case "DEBG":
 			console.debug.apply(this, out);
@@ -1049,19 +2662,18 @@ const popup = {
 	},
 
 	init() {
-		const tree=[{type:"div",class:"popupWindow",name:"popup",list:[{type:"div",class:"header",name:"header",list:[{type:"span",class:"top",name:"top",list:[{type:"t",class:["windowTitle","text-overflow"],name:"windowTitle"},{type:"span",class:"close",name:"close"}]},{type:"span",class:"icon",name:"icon"},{type:"t",class:"text",name:"text"}]},{type:"div",class:"body",name:"body",list:[{type:"div",class:"top",name:"top",list:[{type:"t",class:"message",name:"message"},{type:"t",class:"description",name:"description"}]},{type:"div",class:"note",name:"note",list:[{type:"span",class:"inner",name:"inner"}]},{type:"div",class:"customNode",name:"customNode"},{type:"div",class:"buttonGroup",name:"button"}]}]}];
+		const tree = [{type:"div",class:"popupWindow",name:"popup",list:[{type:"div",class:"header",name:"header",list:[{type:"span",class:"top",name:"top",list:[{type:"t",class:["windowTitle","text-overflow"],name:"windowTitle"},{type:"span",class:"close",name:"close"}]},{type:"icon",name:"icon"},{type:"t",class:"text",name:"text"}]},{type:"div",class:"body",name:"body",list:[{type:"div",class:"top",name:"top",list:[{type:"t",class:"message",name:"message"},{type:"t",class:"description",name:"description"}]},{type:"div",class:"note",name:"note",list:[{type:"span",class:"inner",name:"inner"}]},{type:"div",class:"customNode",name:"customNode"},{type:"div",class:"buttonGroup",name:"button"}]}]}];
 
 		this.tree = buildElementTree("div", "popupContainer", tree);
 		this.popupNode = this.tree.tree;
 		this.popup = this.tree.obj.popup;
 		document.body.insertBefore(this.popupNode, document.body.childNodes[0]);
 
-		this.popup.header.top.close.dataset.soundhover = "";
-		this.popup.header.top.close.dataset.soundselect = "";
+		this.popup.header.top.close.title = "Đóng";
 		this.popup.body.note.style.display = "none";
 
 		if (typeof sounds !== "undefined")
-			sounds.applySound(this.popup.header.top.close);
+			sounds.applySound(this.popup.header.top.close, ["soundhover", "soundselect"]);
 
 		this.initialized = true;
 	},
@@ -1078,7 +2690,7 @@ const popup = {
 		bgColor = null,
 		headerTheme = null,
 		bodyTheme = null,
-		additionalNode = document.createElement("div"),
+		customNode = null,
 		buttonList = {}
 	} = {}) {
 		return new Promise((resolve, reject) => {
@@ -1097,12 +2709,15 @@ const popup = {
 			else
 				reject({ code: -1, description: `Unknown level: ${level}` })
 
-			triBg(this.popup.header, { color: (typeof bgColor === "string") ? bgColor : template.bg });
+			triBg(this.popup.header, {
+				scale: 4,
+				speed: 64,
+				color: (typeof bgColor === "string") ? bgColor : template.bg
+			});
+
 			this.popup.header.icon.dataset.icon = (typeof icon === "string") ? icon : template.icon;
 			this.popup.header.setAttribute("theme", (typeof headerTheme === "string") ? headerTheme : template.h);
 			this.popup.body.setAttribute("theme", (typeof bodyTheme === "string") ? bodyTheme : template.b);
-
-			delete template;
 
 			//* HEADER
 			this.popup.header.top.windowTitle.innerText = windowTitle;
@@ -1119,9 +2734,12 @@ const popup = {
 			} else
 				this.popup.body.note.style.display = "none";
 
-			additionalNode.classList.add("customNode");
-			this.popup.body.replaceChild(additionalNode, this.popup.body.customNode);
-			this.popup.body.customNode = additionalNode;
+			if (customNode && customNode.classList) {
+				customNode.classList.add("customNode");
+				this.popup.body.replaceChild(customNode, this.popup.body.customNode);
+				this.popup.body.customNode = customNode;
+			} else
+				this.popup.body.customNode.style.display = "none";
 
 			//* BODY BUTTON
 
@@ -1132,29 +2750,27 @@ const popup = {
 
 			emptyNode(this.popup.body.button);
 			let buttonKeyList = Object.keys(buttonList);
-			if (buttonKeyList.length) {
-				for (let key of buttonKeyList) {
-					let item = buttonList[key];
-					let button = document.createElement("button");
+			
+			for (let key of buttonKeyList) {
+				let item = buttonList[key];
 
-					button.classList.add("sq-btn", item.color || "blue");
-					button.innerText = item.text || "Text";
-					button.onclick = item.onClick || null;
-					button.returnValue = key;
-					button.dataset.soundhover = "";
-					button.dataset.soundselect = "";
+				let button = createButton(item.text || "Text", {
+					color: item.color,
+					icon: item.icon || null,
+					complex: !!item.complex
+				});
 
-					if (typeof sounds !== "undefined")
-						sounds.applySound(button);
+				button.classList.add(item.full ? "full" : "normal");
+				button.onclick = item.onClick || null;
+				button.returnValue = key;
 
-					if (!(typeof item.resolve === "boolean") || item.resolve !== false)
-						button.addEventListener("mouseup", e => {
-							resolve(e.target.returnValue);
-							this.hide();
-						});
+				if (!(typeof item.resolve === "boolean") || item.resolve !== false)
+					button.addEventListener("mouseup", e => {
+						resolve(e.target.returnValue);
+						this.hide();
+					});
 
-						this.popup.body.button.appendChild(button);
-				}
+				this.popup.body.button.appendChild(button);
 			}
 
 			this.popupNode.classList.add("show");
@@ -1222,7 +2838,7 @@ const __connection__ = {
 				case "offline":
 					let checkerHandler = () => {}
 					let checkTimeout = null;
-					var doCheck = true;
+					let doCheck = true;
 
 					clog("lcnt", "Mất kết nối tới máy chủ.");
 					this.checkCount = 0;
@@ -1255,7 +2871,7 @@ const __connection__ = {
 							return;
 
 						// Start time
-						let timer = new stopClock();
+						let timer = new StopClock();
 
 						try {
 							await checker();
@@ -1291,7 +2907,7 @@ const __connection__ = {
 							resolve();
 						}
 					}, 1000);
-				break;
+					break;
 			}
 		});
 	},
@@ -1302,7 +2918,7 @@ const __connection__ = {
 	},
 
 	__triggerOnStateChange(state) {
-		for (var i of this.__listeners)
+		for (let i of this.__listeners)
 			i(state);
 	}
 
@@ -1312,25 +2928,42 @@ const __connection__ = {
 //?    SCRIPT INIT
 
 if (typeof document.__onclog === "undefined")
-	document.__onclog = (lv, t, m) => {};
+	document.__onclog = (lv, t, m) => {}
 
-var sc = new stopClock();
+let sc = new StopClock();
 clog("info", "Log started at:", {
 	color: flatc("green"),
 	text: (new Date()).toString()
 })
 
 // Error handling
-
 window.addEventListener("error", e => {
-	clog("crit", {
+	clog("CRIT", {
 		color: flatc("red"),
 		text: e.message
 	}, "at", {
 		color: flatc("aqua"),
 		text: `${e.filename}:${e.lineno}:${e.colno}`
 	})
-})
+});
+
+if (typeof String.prototype.replaceAll !== "function")
+	/**
+	 * Returns a new string with all matches
+	 * of a `search` replaced by a `replacement`
+	 * 
+	 * @param	{String}	search
+	 * A String that is to be replaced by replacement.
+	 * It is treated as a literal string and is not
+	 * interpreted as a regular expression.
+	 * 
+	 * @param	{String}	replacement
+	 * The String that replaces the substring specified
+	 * by the specified search parameter.
+	 */
+	String.prototype.replaceAll = function(search, replacement) {
+		return this.replace(new RegExp(search, "g"), replacement);
+	}
 
 // window.addEventListener("unhandledrejection", (e) => {
 //      promise: e.promise; reason: e.reason

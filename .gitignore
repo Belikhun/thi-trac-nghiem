@@ -1,14 +1,18 @@
-data/logs.json
-data/problems/*
+# Data
+data/log.json
 data/avatar/*
-!data/avatar/avt.default
-!data/avatar/*.php
-!data/problems/problem.php
+data/accounts/*
+data/config.json
+data/images/*
+data/problems/*
+!data/avatar/avatar.default
 !data/problems/thumbnail.default
+playground.php
+
+# Cache Folder
 .cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 log.txt
-data/xmldb/account.xml

@@ -1,31 +1,78 @@
 {
-    "app": {
-        "title": "Ph\u00f2ng Thi Tr\u1eafc Nghi\u1ec7m",
-        "description": "L\u1edbp 12A1"
+    "system": {
+        "title": "%contestName% | %name% v%version%",
+        "image": [],
+        "allowRegister": true,
+        "edit": {
+            "name": true,
+            "password": true,
+            "avatar": true
+        }
+    },
+    "contest": {
+        "name": "Development",
+        "description": "<div align=\"center\">\n\n# Themis Web Interface\n\nAn **beautiful** and **easy-to-use** Web Interface for **[Themis](https:\/\/dsapblog.wordpress.com)**\n\n<img src=\"https:\/\/lh3.googleusercontent.com\/SYT2hlU7_rxmCgHz0kt6089Md1V-j-ePWUUQBFtUVF5DTlcSjmGhr14J7Qsgx262KBZuhGKZ4eZD3ChYzdBaFMytEw0aBD3dRLi0bZskyK3-6MQ7rMkDMfcED18JgPyfeZEee50h8g=w2400\" width=\"500px\">\n\n![version](https:\/\/img.shields.io\/github\/v\/tag\/belivipro9x99\/themis-web-interface?color=brown&label=version&style=for-the-badge)\n![license](https:\/\/img.shields.io\/badge\/license-MIT-orange.svg?longCache=true&style=for-the-badge)\n![status](https:\/\/img.shields.io\/badge\/status-near_stable-blue.svg?longCache=true&style=for-the-badge)\n![Travis CI Build Status](https:\/\/img.shields.io\/travis\/belivipro9x99\/themis-web-interface.svg?style=for-the-badge)\n\n![codefactor](https:\/\/www.codefactor.io\/repository\/github\/belivipro9x99\/themis-web-interface\/badge\/master?style=for-the-badge)\n![codefactor](https:\/\/www.codefactor.io\/repository\/github\/belivipro9x99\/themis-web-interface\/badge\/indev?style=for-the-badge)\n\n![Travis CI Build Status](https:\/\/img.shields.io\/travis\/belivipro9x99\/themis-web-interface\/master.svg?label=master&style=for-the-badge)\n![Travis CI Build Status](https:\/\/img.shields.io\/travis\/belivipro9x99\/themis-web-interface\/indev.svg?label=indev&style=for-the-badge)\n\n<\/div>\n\n---\n\n## Hi!\n\nCh\u00e0o m\u1eebng b\u1ea1n \u0111\u1ebfn v\u1edbi **Themis Web Interface**! \u0110\u00e2y l\u00e0 trang gi\u1edbi thi\u1ec7u m\u1eb7c \u0111\u1ecbnh, b\u1ea1n\nc\u00f3 th\u1ec3 thay \u0111\u1ed5i trang n\u00e0y trong ph\u1ea7n **c\u00e0i \u0111\u1eb7t**\n\n> Powered by `belivipro9x99\/md2html`",
+        "result": {
+            "publish": true,
+            "enableSP": true,
+            "spRanking": false,
+            "spNoTimeWeighting": false
+        },
+        "submit": {
+            "enabled": true,
+            "inProblemsList": true
+        },
+        "ranking": {
+            "enabled": true,
+            "viewTask": true,
+            "hideDisabled": true,
+            "showAllUsers": false
+        },
+        "log": {
+            "enabled": true,
+            "viewOther": true
+        },
+        "problem": {
+            "public": true,
+            "sortByName": true
+        }
+    },
+    "folders": {
+        "submit": "D:\\Themis\\data\\uploadDir",
+        "submitLogs": "%submitFolder%\/Logs",
+        "submissions": "%submitFolder%\/submissions"
     },
     "time": {
-        "zone": "Asia\/Ho_Chi_Minh"
+        "zone": "Asia\/Ho_Chi_Minh",
+        "contest": {
+            "begin": 1620800363,
+            "during": 1,
+            "offset": 30
+        }
     },
-    "edit": {
-        "name": true,
-        "password": true,
-        "avatar": true
+    "announcement": {
+        "enabled": false,
+        "level": "info",
+        "message": "This is a sample Announcement <i>(with HTML!)<\/i>"
     },
-    "ratelimit": {
-        "maxRequest": 99999999,
-        "time": 1,
-        "banTime": 30
-    },
-    "pageTitle": "%appTitle%",
-    "allowRegister": true,
-    "clientConfig": {
+    "clientSettings": {
         "sounds": false,
         "nightmode": false,
         "showMs": false,
-        "transition": true
+        "transition": true,
+        "dialogProblem": false,
+        "rankUpdate": 3,
+        "logsUpdate": 3,
+        "hashUpdate": 3
+    },
+    "ratelimit": {
+        "enabled": true,
+        "useIP": true,
+        "maxRequest": 40,
+        "requestTime": 10,
+        "banTime": 30
     },
     "cache": {
         "contestRank": 1
-    },
-    "uploadDir": null
+    }
 }

@@ -2,92 +2,12 @@
 ? |-----------------------------------------------------------------------------------------------|
 ? |  /assets/css/button.css                                                                       |
 ? |                                                                                               |
-? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 ? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 ? |-----------------------------------------------------------------------------------------------|
 */
 
-.btn {
-	color: rgb(250, 250, 250);
-	background-color: rgb(33, 187, 98);
-	font-size: 12px;
-	font-family: "Segoe UI", sans-serif;
-	font-weight: 600;
-	letter-spacing: 0.5px;
-	padding: 7.2px 18px;
-	border-width: 0;
-	border-style: solid;
-	border-color: rgb(0, 0, 0);
-	border-image: initial;
-	border-radius: 5px;
-	box-sizing: border-box;
-	text-decoration: none;
-	cursor: pointer;
-	transition: all 1s cubic-bezier(0.06, 0.81, 0, 0.98);
-}
-
-.btn:hover {
-	background-color: #2ECC71;
-}
-
-.btn:active {
-	background-color: #208B4E;
-}
-
-.btn.gray {
-	background-color: #34495e;
-}
-
-.btn.gray:hover {
-	background-color: #3c5a79;
-}
-
-.btn.gray:active {
-	background-color: #2a3a4b;
-}
-
-.btn.red {
-	background-color: #e74c3c;
-}
-
-.btn.red:hover {
-	background-color: #f74734;
-}
-
-.btn.red:active {
-	background-color: #be5044;
-}
-
-.btn.yellow {
-	background-color: #f1c40f;
-}
-
-.btn.yellow:hover {
-	background-color: #f8c809;
-}
-
-.btn.yellow:active {
-	background-color: #ddb619;
-}
-
-.btn.blue {
-	background-color: #4285f4;
-}
-
-.btn.blue:hover {
-	background-color: #5694f6;
-}
-
-.btn.blue:active {
-	background-color: #2d76eb;
-}
-
-.btn:disabled {
-	background-color: #3b4249;
-	color: rgb(119, 119, 119);
-	cursor: default;
-}
-
+/** Microsoft Style Button */
 .ms-btn {
 	position: relative;
 	display: flex;
@@ -130,31 +50,34 @@
 	transform: scale(0.96);
 }
 
+/** Square Button(?) */
 .sq-btn {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
 	flex-shrink: 0;
-	color: rgb(250, 250, 250);
+	align-items: center;
+	justify-content: center;
+	
+	padding: 8px 20px;
+	box-sizing: border-box;
 	background-color: rgb(68, 170, 221);
+	
+	color: white;
 	font-size: 12px;
 	font-family: "Open Sans", "Segoe UI", sans-serif;
-	font-weight: 650;
+	font-weight: 700;
 	text-align: center;
 	letter-spacing: 0.6px;
-	padding: 8px 20px;
-	border-width: 0;
-	border-style: solid;
-	border-color: rgb(0, 0, 0);
-	border-image: initial;
-	border-radius: 0;
-	box-sizing: border-box;
+	text-decoration: none;
+
+	border: unset;
 	cursor: pointer;
 	overflow: hidden;
 	z-index: 0;
 
 	transition:
 		filter 1s cubic-bezier(0.06, 0.81, 0, 0.98),
-		transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform 1.2s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .sq-btn::before,
@@ -162,14 +85,18 @@
 	content: "";
 	position: absolute;
 	display: block;
+
 	width: 0;
 	height: 0;
-	right: 5%;
 	top: 100%;
+	right: 5%;
+
 	border-style: solid;
 	border-width: 0 50px 100px;
 	border-color: transparent transparent rgb(102, 204, 255);
 	z-index: -1;
+
+	will-change: transform;
 
 	animation:
 		sq-btn-trig-anim 8s linear 0s infinite;
@@ -183,18 +110,63 @@
 	animation-delay: 0.8s;
 }
 
+.sq-btn.triBg::before,
+.sq-btn.triBg::after {
+	content: unset;
+	display: none;
+}
+
+.sq-btn.triBg > .triBgContainer {
+	z-index: -1;
+}
+
+.sq-btn > icon {
+	display: flex;
+	justify-content: flex-end;
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	margin: 0 0 0 10px;
+	line-height: 20px;
+}
+
+.sq-btn > icon.left {
+	justify-content: flex-start;
+
+	margin: 0 10px 0 0;
+	order: -1;
+}
+
+.sq-btn > icon::after,
+body.dark .sq-btn > icon::after {
+	color: white;
+}
+
+.sq-btn.empty > icon {
+	margin: unset;
+}
+
+.sq-btn[data-style="round"] {
+	padding: 14px;
+	border-radius: 4px;
+}
+
+.sq-btn[data-style="round"]:focus {
+	outline: none;
+}
+
 @keyframes sq-btn-trig-anim {
 	0% {
-		top: 100%;
+		transform: translateY(0);
 	}
 
 	100% {
-		top: -120px;
+		transform: translateY(-160px);
 	}
 }
 
 .sq-btn:hover {
-	filter: brightness(1.15);
+	filter: brightness(1.2);
 }
 
 .sq-btn:active {
@@ -202,8 +174,11 @@
 }
 
 .sq-btn:focus {
-	outline: none;
-	text-decoration: underline;
+	outline: solid rgba(36, 36, 36, 0.6) 1px;
+}
+
+body.dark .sq-btn:focus {
+	outline: solid rgba(228, 228, 228, 0.6) 1px;
 }
 
 .sq-btn:disabled {
@@ -211,89 +186,118 @@
 	cursor: not-allowed;
 }
 
-.sq-btn.pink {
-	background-color: rgb(255, 102, 170);
+.sq-btn.pink,
+.sq-btn[data-color="pink"] {
+	background-color: #ff66aa;
 }
 
-.sq-btn.pink::before {
+.sq-btn.pink::before,
+.sq-btn[data-color="pink"]::before {
 	border-color: transparent transparent rgb(255, 152, 204);
 	animation-duration: 7.6s;
+	animation-delay: -1s;
 }
 
-.sq-btn.pink::after {
+.sq-btn.pink::after,
+.sq-btn[data-color="pink"]::after {
 	border-color: transparent transparent rgb(202, 96, 146);
 	animation-duration: 7.8s;
+	animation-delay: +0.6s;
 }
 
-.sq-btn.green {
-	background-color: rgb(136, 180, 0);
+.sq-btn.green,
+.sq-btn[data-color="green"] {
+	background-color: #88b400;
 }
 
-.sq-btn.green::before {
-	border-color: transparent transparent rgb(156, 204, 0);
+.sq-btn.green::before,
+.sq-btn[data-color="green"]::before {
+	border-color: transparent transparent #a1d408;
 	animation-duration: 8.2s;
+	animation-delay: -1s;
 }
 
-.sq-btn.green::after {
-	border-color: transparent transparent rgb(124, 162, 0);
+.sq-btn.green::after,
+.sq-btn[data-color="green"]::after {
+	border-color: transparent transparent #6d8f00;
 	animation-duration: 7.7s;
+	animation-delay: -2.3s;
 }
 
-.sq-btn.yellow {
-	background-color: rgb(246, 194, 28);
+.sq-btn.yellow,
+.sq-btn[data-color="yellow"] {
+	background-color: #f6c21c;
 }
 
-.sq-btn.yellow::before {
-	border-color: transparent transparent rgb(254, 204, 34);
+.sq-btn.yellow::before,
+.sq-btn[data-color="yellow"]::before {
+	border-color: transparent transparent #ffd13a;
 	animation-duration: 7.9s;
+	animation-delay: +0.6s;
 }
 
-.sq-btn.yellow::after {
-	border-color: transparent transparent rgb(240, 178, 14);
+.sq-btn.yellow::after,
+.sq-btn[data-color="yellow"]::after {
+	border-color: transparent transparent #ecb913;
 	animation-duration: 8.1s;
+	animation-delay: -2s;
 }
 
-.sq-btn.dark {
+.sq-btn.dark,
+.sq-btn[data-color="dark"] {
 	background-color: #042430;
 }
 
-.sq-btn.dark::before {
+.sq-btn.dark::before,
+.sq-btn[data-color="dark"]::before {
 	border-color: transparent transparent #133947;
 	animation-duration: 7.6s;
+	animation-delay: +0.2s;
 }
 
-.sq-btn.dark::after {
+.sq-btn.dark::after,
+.sq-btn[data-color="dark"]::after {
 	border-color: transparent transparent #0b2e3d;
 	animation-duration: 7.8s;
+	animation-delay: -1.3s;
 }
 
-.sq-btn.brown {
+.sq-btn.brown,
+.sq-btn[data-color="brown"] {
 	background-color: #231B22;
 }
 
-.sq-btn.brown::before {
+.sq-btn.brown::before,
+.sq-btn[data-color="brown"]::before {
 	border-color: transparent transparent rgb(58, 47, 57);
 	animation-duration: 8.3s;
+	animation-delay: -1.6s;
 }
 
-.sq-btn.brown::after {
+.sq-btn.brown::after,
+.sq-btn[data-color="brown"]::after {
 	border-color: transparent transparent rgb(20, 16, 20);
 	animation-duration: 8.1s;
+	animation-delay: -0.2s;
 }
 
-.sq-btn.red {
+.sq-btn.red,
+.sq-btn[data-color="red"] {
 	background-color: rgb(221, 45, 68);
 }
 
-.sq-btn.red::before {
+.sq-btn.red::before,
+.sq-btn[data-color="red"]::before {
 	border-color: transparent transparent rgb(240, 62, 86);
 	animation-duration: 8.1s;
 	animation-delay: 0.3s;
 }
 
-.sq-btn.red::after {
+.sq-btn.red::after,
+.sq-btn[data-color="red"]::after {
 	border-color: transparent transparent rgb(197, 36, 57);
 	animation-duration: 7.7s;
+	animation-delay: -0.3s;
 }
 
 @keyframes sq-btn-bgRainbow {
@@ -323,22 +327,26 @@
 	100%    { border-color: transparent transparent rgb(197, 36, 57);       }
 }
 
-.sq-btn.rainbow {
+.sq-btn.rainbow,
+.sq-btn[data-color="rainbow"] {
 	animation: sq-btn-bgRainbow 10s linear 0s infinite;
 }
 
-.sq-btn.rainbow::before {
+.sq-btn.rainbow::before,
+.sq-btn[data-color="rainbow"]::before {
 	animation:
 		sq-btn-trig-anim 8.2s linear 0s infinite,
 		sq-btn-triRainbow1 10s linear 0s infinite;
 }
 
-.sq-btn.rainbow::after {
+.sq-btn.rainbow::after,
+.sq-btn[data-color="rainbow"]::after {
 	animation:
 		sq-btn-trig-anim 7.6s linear 0s infinite,
 		sq-btn-triRainbow2 10s linear 0s infinite;
 }
 
+/** Simple Text Button */
 .text-btn {
 	position: relative;
 	background-color: transparent;

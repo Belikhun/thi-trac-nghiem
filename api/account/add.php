@@ -1,82 +1,79 @@
 <?php
-    //? |-----------------------------------------------------------------------------------------------|
-    //? |  /api/account/add.php                                                                         |
-    //? |                                                                                               |
-    //? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
-    //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
-    //? |-----------------------------------------------------------------------------------------------|
+	//? |-----------------------------------------------------------------------------------------------|
+	//? |  /api/account/add.php                                                                         |
+	//? |                                                                                               |
+	//? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
+	//? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
+	//? |-----------------------------------------------------------------------------------------------|
 
-    // SET PAGE TYPE
-    define("PAGE_TYPE", "API");
-    
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/logs.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";
+	// SET PAGE TYPE
+	define("PAGE_TYPE", "API");
+	
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/logger.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php";
 
-    if (!isLoggedIn())
-        stop(11, "Bạn chưa đăng nhập.", 401);
-        
-    checkToken();
+	if (!isLoggedIn())
+		stop(11, "Bạn chưa đăng nhập", 401);
+		
+	checkToken();
 
-    $id = htmlspecialchars(strip_tags(reqForm("id")));
-    $username = preg_replace("/[^a-zA-Z0-9]+/", "", strip_tags(reqForm("u")));
-    $password = password_hash(reqForm("p"), PASSWORD_DEFAULT);
-    $name = htmlspecialchars(strip_tags(reqForm("n")));
+	$id = htmlspecialchars(strip_tags(reqForm("id")));
+	$username = preg_replace("/[^a-zA-Z0-9]+/", "", strip_tags(reqForm("username")));
+	$password = password_hash(reqForm("password"), PASSWORD_DEFAULT);
+	$name = htmlspecialchars(strip_tags(reqForm("name")));
 
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/data/xmldb/account.php";
-    if (getUserData($_SESSION["username"])["id"] !== "admin")
-        stop(31, "Access Denied!", 403);
+	if ($_SESSION["id"] !== "admin")
+		stop(31, "Access Denied!", 403);
 
-    // Avatar file process
-    if (isset($_FILES["avatar"]) && !isset($accountData[$username])) {
-        $file = strtolower($_FILES["avatar"]["name"]);
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/account.php";
+	$acc = new Account($username);
 
-        if (!in_array($extension, IMAGE_ALLOW))
-            stop(43, "Không chấp nhận loại ảnh!", 400, Array( "allow" => IMAGE_ALLOW ));
+	if ($acc -> dataExist())
+		stop(17, "Tài khoản với tên người dùng \"$username\" đã tồn tại!", 400, Array( "username" => $username ));
 
-        if ($_FILES["avatar"]["size"] > MAX_IMAGE_SIZE)
-            stop(42, "Ảnh quá lớn!", 400, Array(
-                "size" => $_FILES["avatar"]["size"],
-                "max" => MAX_IMAGE_SIZE
-            ));
+	// Avatar file process
+	if (isset($_FILES["avatar"])) {
+		$file = strtolower($_FILES["avatar"]["name"]);
+		$extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        if ($_FILES["avatar"]["error"] > 0)
-            stop(-1, "Lỗi không rõ!", 500);
+		if (!in_array($extension, IMAGE_ALLOW))
+			stop(43, "Không chấp nhận loại ảnh!", 400, Array( "allow" => IMAGE_ALLOW ));
 
-        $imagePath = AVATAR_DIR ."/". $username;
-        $oldFiles = glob($imagePath .".{". join(",", IMAGE_ALLOW) ."}", GLOB_BRACE);
+		if ($_FILES["avatar"]["size"] > MAX_IMAGE_SIZE)
+			stop(42, "Ảnh quá lớn!", 400, Array(
+				"size" => $_FILES["avatar"]["size"],
+				"max" => MAX_IMAGE_SIZE
+			));
 
-        // Find old avatar files and remove them
-        if (count($oldFiles) > 0)
-            foreach ($oldFiles as $oldFile) {
-                $ext = pathinfo($oldFile, PATHINFO_EXTENSION);
-                unlink($imagePath .".". $ext);
-            }
+		if ($_FILES["avatar"]["error"] > 0)
+			stop(-1, "Lỗi không rõ!", 500);
 
-        // Move new avatar
-        move_uploaded_file($_FILES["avatar"]["tmp_name"], $imagePath .".". $extension);
-    }
+		$imagePath = AVATAR_DIR ."/". $username;
+		$oldFiles = glob($imagePath .".{". join(",", IMAGE_ALLOW) ."}", GLOB_BRACE);
 
-    $res = addUser($id, $username, $password, $name);
-    $data = Array(
-        "id" => $id,
-        "username" => $username,
-        "password" => $password,
-        "name" => $name
-    );
+		// Find old avatar files and remove them
+		if (count($oldFiles) > 0)
+			foreach ($oldFiles as $oldFile) {
+				$ext = pathinfo($oldFile, PATHINFO_EXTENSION);
+				unlink($imagePath .".". $ext);
+			}
 
-    switch ($res) {
-        case USER_ADD_SUCCESS:
-            writeLog("OKAY", "Đã thêm tài khoản [$id] \"$username\"");
-            stop(0, "Tạo tài khoản thành công!", 200, $data);
-            break;
-        case USER_ADD_USEREXIST:
-            stop(17, "Tài khoản với tên người dùng \"$username\" đã tồn tại!", 400, Array( "username" => $username ));
-            break;
-        case USER_ADD_ERROR:
-            writeLog("ERRR", "Lỗi khi lưu thông tin tài khoản [$id] \"$username\"");
-            stop(-1, "Lỗi không rõ.", 500);
-            break;
-    }
+		// Move new avatar
+		move_uploaded_file($_FILES["avatar"]["tmp_name"], $imagePath .".". $extension);
+	}
+
+	$acc -> init($password);
+	$res = $acc -> update(Array(
+		"id" => $id,
+		"name" => $name
+	));
+
+	writeLog("OKAY", "Đã thêm tài khoản [$id] \"$username\"");
+	stop(0, "Tạo tài khoản thành công!", 200, Array(
+		"id" => $id,
+		"username" => $username,
+		"password" => $password,
+		"name" => $name
+	));

@@ -2,17 +2,20 @@
 	//? |-----------------------------------------------------------------------------------------------|
 	//? |  /api/images/landing.php                                                                      |
 	//? |                                                                                               |
-	//? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+	//? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 	//? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 	//? |-----------------------------------------------------------------------------------------------|
 	
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
 	
-	define("DEFAULT_IMAGE", $_SERVER["DOCUMENT_ROOT"] ."/assets/img/login-bg.png");
+	define("DEFAULT_IMAGE", $_SERVER["DOCUMENT_ROOT"] ."/assets/img/landing.webp");
 	define("MODIFIED_IMAGE_PATH", $_SERVER["DOCUMENT_ROOT"] ."/data/images");
 	define("MODIFIED_IMAGE_NAME", "landing");
 	define("MODIFIED_IMAGE", MODIFIED_IMAGE_PATH ."/". MODIFIED_IMAGE_NAME);
+
+	if (!file_exists(MODIFIED_IMAGE_PATH))
+		mkdir(MODIFIED_IMAGE_PATH);
 
 	switch ($_SERVER["REQUEST_METHOD"]) {
 		case "GET":
@@ -93,7 +96,7 @@
             define("PAGE_TYPE", "API");
 
             if (!isLoggedIn())
-                stop(11, "Bạn chưa đăng nhập.", 401);
+                stop(11, "Bạn chưa đăng nhập", 401);
             
             checkToken();
             

@@ -7,9 +7,10 @@
 03  variable type mismatch
 04  missing token
 05  wrong token
-06  error
+06  range error
 07  unknown request method
 08	wrong captcha
+09	invalid data
 
 // 1x: account
 11  not logged in
@@ -37,8 +38,18 @@
 43  file not accepted
 44  file not found
 45  file exist
+46  file timeout
+47	file parse error
+48	upload limit reached
 
-// 1xx: info (IGNORED)
+// 5x: server
+50	undefined/missing values
+51	invalid/corrupted data
+
+// 6x: request
+60	invalid values
+
+// 10x: info (IGNORED)
 101 not in contest mode
 102 modified nothing
 103 contest not started
@@ -48,4 +59,3 @@
 107 disabled
 108 not published
 109 problems unpublicized
-110	result not found

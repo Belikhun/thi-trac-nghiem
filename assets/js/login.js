@@ -1,11 +1,11 @@
 //? |-----------------------------------------------------------------------------------------------|
 //? |  /assets/js/login.js                                                                          |
 //? |                                                                                               |
-//? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+//? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 //? |-----------------------------------------------------------------------------------------------|
 
-if (cookie.get("__darkMode") === "true")
+if (localStorage.getItem("display.nightmode") === "true")
 	document.body.classList.add("dark");
 
 const login = {
@@ -58,21 +58,9 @@ const login = {
 	},
 
 	errored(error) {
-		let e = (error.code && error.data.code)
-			?	`[${error.code} ${error.data.code}]`
-			:	error.code ? `[${error.code}]`
-			:	error.name
-			||	error.data.name
-			||	`${error.data.data.file}:${error.data.data.line}`
+		let e = parseException(error);
 
-		let d = (error.description && error.data.description)
-			?	`${error.description} (${error.data.description}) ${(error.data.data.file) ? `${error.data.data.file}:${error.data.data.line}` : ""}`
-			:	error.message
-			||	error.data.message
-			||	error.data.description
-			||	error.description
-	
-		this.form.message.innerHTML = `<b>${e}</b> >>> ${d}`;
+		this.form.message.innerHTML = `<b>${e.code}</b> >>> ${e.description}`;
 		clog("ERRR", error);
 	},
 
@@ -108,7 +96,7 @@ const login = {
 
 			this.password.avatar.addEventListener("load", e => e.target.parentElement.dataset.loaded = 1);
 			this.container.addEventListener("submit", () => this.login(), false);
-			this.password.profile.addEventListener("click", () => this.reset(false), false);
+			this.password.profile.addEventListener("mouseup", () => this.reset(), false);
 			this.username.input.disabled = false;
 			this.username.submit.disabled = false;
 			this.innerText = "Đăng nhập";
@@ -202,6 +190,7 @@ const login = {
 			this.username.input.disabled = false;
 			this.username.submit.disabled = false;
 			this.password.input.value = "";
+			sounds.select(1);
 
 			if (!keepUsername) {
 				this.username.input.value = "";
@@ -331,7 +320,7 @@ const login = {
 
 		renewCaptcha() {
 			this.password.captcha.parentElement.removeAttribute("data-loaded");
-			this.password.captcha.src = "/tool/captcha?generate";
+			this.password.captcha.src = "/tools/captcha?generate";
 		},
 
 		async showPasswordForm() {

@@ -2,14 +2,15 @@
 ? |-----------------------------------------------------------------------------------------------|
 ? |  /assets/css/progressBar.css                                                                  |
 ? |                                                                                               |
-? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 ? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 ? |-----------------------------------------------------------------------------------------------|
 */
 
 .progressBar {
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: row;
     height: 2px;
     margin-top: 20px;
     background-color: rgba(90, 90, 90, 0.2);
@@ -17,14 +18,19 @@
 
 .progressBar > .bar {
     position: absolute;
+    display: inline-block;
     top: 0;
     left: 0;
     width: 0;
     height: 100%;
-    background-color: #16dfb6;
+    background-color: #737877;
     transition:
         width 0.4s ease,
         background-color 0.4s ease;
+}
+
+.progressBar.stackable > .bar {
+    position: relative;
 }
 
 .progressBar > .bar.noTransition {
@@ -140,7 +146,7 @@
 }
 
 .progressBar > .bar[data-color="yellow"] {
-    background-color: #c7c545;
+    background-color: #d3a200;
 }
 
 .progressBar > .bar[data-color="pink"] {
@@ -150,43 +156,43 @@
 /*? Dark */
 
 body.dark .progressBar:not(.light),
-.progressBar.dark {
+.progressBar.light {
     background-color: rgba(160, 160, 160, 0.2);
 }
 
 body.dark .progressBar:not(.light) > .bar,
-.progressBar.dark > .bar {
+.progressBar.light > .bar {
     background-color: #4ff8d6;
 }
 
 body.dark .progressBar:not(.light) > .left,
 body.dark .progressBar:not(.light) > .right,
-.progressBar.dark > .left,
-.progressBar.dark > .right {
+.progressBar.light > .left,
+.progressBar.light > .right {
     color: rgba(218, 218, 218, 0.8);
 }
 
 body.dark .progressBar:not(.light) > .bar[data-color="blue"],
-.progressBar.dark > .bar[data-color="blue"] {
+.progressBar.light > .bar[data-color="blue"] {
     background-color: #5fbfff;
 }
 
 body.dark .progressBar:not(.light) > .bar[data-color="green"],
-.progressBar.dark > .bar[data-color="green"] {
+.progressBar.light > .bar[data-color="green"] {
     background-color: #3fd865;
 }
 
 body.dark .progressBar:not(.light) > .bar[data-color="red"],
-.progressBar.dark > .bar[data-color="red"] {
+.progressBar.light > .bar[data-color="red"] {
     background-color: #ff6d5c;
 }
 
 body.dark .progressBar:not(.light) > .bar[data-color="yellow"],
-.progressBar.dark > .bar[data-color="yellow"] {
+.progressBar.light > .bar[data-color="yellow"] {
     background-color: #f1ef50;
 }
 
 body.dark .progressBar:not(.light) > .bar[data-color="pink"],
-.progressBar.dark > .bar[data-color="pink"] {
+.progressBar.light > .bar[data-color="pink"] {
     background-color: #ff9ef8;
 }

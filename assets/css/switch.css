@@ -2,10 +2,12 @@
 ? |-----------------------------------------------------------------------------------------------|
 ? |  /assets/css/switch.css                                                                       |
 ? |                                                                                               |
-? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 ? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 ? |-----------------------------------------------------------------------------------------------|
 */
+
+/** IOS SWITCH */
 
 .iosSwitch {
     display: inline-block;
@@ -94,6 +96,8 @@
     }
 }
 
+/** MATERIAL SWITCH */
+
 .materialSwitch {
     display: inline-block;
     position: relative;
@@ -161,44 +165,70 @@
     background-color: #1e53a8;
 }
 
+/** CHECKBOX FROM OSC PACKAGE */
+
 .sq-checkbox {
     position: relative;
     display: block;
-    width: 24px;
+    width: 20px;
     height: 12px;
     cursor: pointer;
     user-select: none;
 
-    transition: width 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: width 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
-.sq-checkbox input {
+.sq-checkbox > input {
     position: absolute;
     display: none;
     height: 0;
     width: 0;
 }
 
-.sq-checkbox .checkmark {
+.sq-checkbox > .checkmark {
     position: absolute;
+
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
-    border: 3px solid rgb(68, 170, 221);
+    border: 2px solid rgb(68, 170, 221);
     border-radius: 10px;
     box-sizing: border-box;
 
-    transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition:
+        all 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.sq-checkbox::before {
+    content: "";
+    position: absolute;
+    display: block;
+
+    width: calc(100% - 4px);
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 10px;
+
+    background-color: rgba(160, 220, 250, 0.5);
+    box-shadow: 0 0 14px 0 rgba(160, 220, 250, 0.5);
+    opacity: 0;
+
+    transition:
+        opacity 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .sq-checkbox:hover {
-    width: 42px;
+    width: 36px;
 }
 
-.sq-checkbox:hover > input ~ .checkmark {
-    background-color: rgba(68, 170, 221, 0.4);
-    border-color: rgb(160, 220, 250);
+.sq-checkbox:hover::before {
+    opacity: 1;
+}
+
+.sq-checkbox:hover > .checkmark {
+    border-color: rgb(134, 215, 255);
 }
 
 .sq-checkbox > input:checked ~ .checkmark {
@@ -206,30 +236,209 @@
 }
 
 .sq-checkbox:hover > input:checked ~ .checkmark {
-    background-color: rgb(160, 220, 250);
+    background-color: rgb(134, 215, 255);
 }
 
 .sq-checkbox > input:disabled ~ .checkmark {
-    filter: brightness(0.8);
+    filter: brightness(0.6);
     cursor: not-allowed;
 }
 
-.sq-checkbox.pink .checkmark {
-    border-color: rgb(255, 102, 170);
+/* BLUE LIGHTER */
+
+body.dark .sq-checkbox::before,
+body.dark .sq-checkbox[data-color="blue"]::before {
+    background-color: rgba(95, 202, 255, 0.5);
+    box-shadow: 0 0 14px 0 rgba(95, 202, 255, 0.5);
 }
 
-.sq-checkbox.pink:hover > input ~ .checkmark {
-    background-color: rgba(255, 102, 171, 0.4);
-    border-color: rgb(255, 194, 214);
+body.dark .sq-checkbox > .checkmark,
+body.dark .sq-checkbox[data-color="blue"] > .checkmark {
+    border-color: rgb(68, 170, 221);
 }
 
-.sq-checkbox.pink > input:checked ~ .checkmark {
-    background-color: rgb(255, 102, 170);
+body.dark .sq-checkbox:hover > input ~ .checkmark,
+body.dark .sq-checkbox[data-color="blue"]:hover > input ~ .checkmark {
+    border-color: rgb(150, 220, 255);
 }
 
-.sq-checkbox.pink:hover > input:checked ~ .checkmark {
-    background-color: rgb(255, 194, 214);
+body.dark .sq-checkbox > input:checked ~ .checkmark,
+body.dark .sq-checkbox[data-color="blue"] > input:checked ~ .checkmark {
+    background-color: rgb(68, 170, 221);
 }
+
+body.dark .sq-checkbox:hover > input:checked ~ .checkmark,
+body.dark .sq-checkbox[data-color="blue"]:hover > input:checked ~ .checkmark {
+    background-color: rgb(150, 220, 255);
+}
+
+/* PINK */
+
+.sq-checkbox.pink::before,
+.sq-checkbox[data-color="pink"]::before {
+    background-color: rgba(255, 168, 232, 0.6);
+    box-shadow: 0 0 14px 0 rgba(255, 168, 232, 0.6);
+}
+
+.sq-checkbox.pink > .checkmark,
+.sq-checkbox[data-color="pink"] > .checkmark {
+    border-color: #FF66AA;
+}
+
+.sq-checkbox.pink:hover > input ~ .checkmark,
+.sq-checkbox[data-color="pink"]:hover > input ~ .checkmark {
+    border-color: rgb(255, 164, 210);
+}
+
+.sq-checkbox.pink > input:checked ~ .checkmark,
+.sq-checkbox[data-color="pink"] > input:checked ~ .checkmark {
+    background-color: #FF66AA;
+}
+
+.sq-checkbox.pink:hover > input:checked ~ .checkmark,
+.sq-checkbox[data-color="pink"]:hover > input:checked ~ .checkmark {
+    background-color: rgb(255, 164, 210);
+}
+
+/* PINK LIGHTER */
+
+body.dark .sq-checkbox.pink::before,
+body.dark .sq-checkbox[data-color="pink"]::before {
+    background-color: rgba(253, 105, 214, 0.6);
+    box-shadow: 0 0 14px 0 rgba(253, 105, 214, 0.6);
+}
+
+body.dark .sq-checkbox.pink > .checkmark,
+body.dark .sq-checkbox[data-color="pink"] > .checkmark {
+    border-color: #FF66AA;
+}
+
+body.dark .sq-checkbox.pink:hover > input ~ .checkmark,
+body.dark .sq-checkbox[data-color="pink"]:hover > input ~ .checkmark {
+    border-color: #FFDDEE;
+}
+
+body.dark .sq-checkbox.pink > input:checked ~ .checkmark,
+body.dark .sq-checkbox[data-color="pink"] > input:checked ~ .checkmark {
+    background-color: #FF66AA;
+}
+
+body.dark .sq-checkbox.pink:hover > input:checked ~ .checkmark,
+body.dark .sq-checkbox[data-color="pink"]:hover > input:checked ~ .checkmark {
+    background-color: #FFDDEE;
+}
+
+/** SWITCH FROM OSC PACKAGE */
+
+.sq-switch {
+    position: relative;
+    display: inline-block;
+
+    width: 50px;
+    height: 22px;
+
+    user-select: none;
+}
+
+.sq-switch > input {
+    position: absolute;
+    display: none;
+}
+
+.sq-switch > .track {
+    position: relative;
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+    border: 4px solid rgba(138, 138, 138, 0.6);
+    border-radius: 15px;
+    cursor: pointer;
+
+    transition: border 0.1s ease-out;
+}
+
+.sq-switch > .track::before {
+    content: "";
+    position: absolute;
+    display: block;
+
+    top: 50%;
+    left: 3px;
+    width: 10px;
+    height: 10px;
+    transform: translateY(-50%);
+    
+    border-radius: 50%;
+    background-color: rgb(68, 170, 221);
+
+    transition: left 0.1s cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+.sq-switch > .track:hover {
+    border-color: rgba(48, 48, 48, 0.6);
+}
+
+.sq-switch > input:checked + .track {
+    border-color: rgb(68, 170, 221);
+}
+
+.sq-switch > input:checked + .track:hover {
+    border-color: rgb(35, 135, 186);
+}
+
+.sq-switch > input:checked + .track::before {
+    left: calc(100% - 13px);
+}
+
+.sq-switch > input:disabled + .track {
+    cursor: not-allowed;
+    border-color: rgb(208, 208, 208);
+}
+
+.sq-switch > input:disabled + .track::before {
+    background-color: rgb(208, 208, 208);
+}
+
+/* BLUE LIGHTER */
+
+body.dark .sq-switch > .track {
+    border: 4px solid rgb(46, 46, 46);
+}
+
+body.dark .sq-switch > .track::before {
+    background-color: #4cb8ee;
+}
+
+body.dark .sq-switch > .track:hover {
+    border-color: rgb(95, 95, 95);
+}
+
+body.dark .sq-switch > input:checked + .track {
+    border-color: #4cb8ee;
+}
+
+body.dark .sq-switch > input:checked + .track:hover {
+    border-color: #86d7ff;
+}
+
+/* PINK */
+
+.sq-switch[data-color="pink"] > .track::before {
+    background-color: #FF66AA;
+}
+
+.sq-switch[data-color="pink"] > input:checked + .track {
+    border-color: #FF66AA;
+}
+
+.sq-switch[data-color="pink"] > input:checked + .track:hover {
+    border-color: #eb4a93;
+}
+
+/** CIRCLE CHECKBOX */
 
 .circleCheckbox {
     position: relative;

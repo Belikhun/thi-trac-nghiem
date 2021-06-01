@@ -15,7 +15,7 @@
         case "GET":
             // SET PAGE TYPE
             define("PAGE_TYPE", "NORMAL");
-            
+
             $id = reqQuery("id");
             
             require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";

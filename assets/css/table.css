@@ -2,7 +2,7 @@
 ? |-----------------------------------------------------------------------------------------------|
 ? |  /assets/css/table.css                                                                        |
 ? |                                                                                               |
-? |  Copyright (c) 2018-2020 Belikhun. All right reserved                                         |
+? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 ? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
 ? |-----------------------------------------------------------------------------------------------|
 */
@@ -20,8 +20,8 @@
 
 .simpleTable {
     position: relative;
-    border-collapse: collapse;
     width: auto;
+    border-collapse: collapse;
 }
 
 .simpleTable tbody tr th,
@@ -33,13 +33,13 @@
 .simpleTable tbody tr th {
     border-bottom: 2px solid rgb(80, 80, 80);
     color: rgb(58, 58, 58);
-    font-size: 13px;
+    font-size: 16px;
     font-weight: bold;
 }
 
 .simpleTable tbody tr td {
     color: rgb(78, 78, 78);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: normal;
 }
 
