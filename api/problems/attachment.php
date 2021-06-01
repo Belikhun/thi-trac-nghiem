@@ -6,8 +6,8 @@
     //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
     //? |-----------------------------------------------------------------------------------------------|
     
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
 
     $requestMethod = $_SERVER["REQUEST_METHOD"];
 
@@ -18,15 +18,15 @@
 
             $id = reqQuery("id");
             
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";
-			require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php";
+			require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
 
 			problemTimeRequire($id, [CONTEST_STARTED], false);
 
             if (!problemExist($id))
                 stop(45, "Không tìm thấy đề của id đã cho!", 404, Array( "id" => $id ));
 
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/logs.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/logger.php";
 
             if (problemGetAttachment($id, !getQuery("embed", false)) !== PROBLEM_OKAY)
                 stop(44, "Không tìm thấy tệp đính kèm", 404);
@@ -46,7 +46,7 @@
             if ($_SESSION["id"] !== "admin")
                 stop(31, "Access Denied!", 403);
 
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
             $code = problemRemoveFile("attachment", $id);
             
             switch ($code) {

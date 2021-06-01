@@ -6,8 +6,8 @@
     //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
     //? |-----------------------------------------------------------------------------------------------|
 
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
     
     function showImage(string $path) {
         contentType(pathinfo($path, PATHINFO_EXTENSION))
@@ -27,19 +27,19 @@
 
             $id = preg_replace("/[.\/\\\\]/m", "", reqQuery("id"));
 
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php";
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
         
             if (!problemExist($id))
-                showImage(PROBLEM_DIR ."/thumbnail.default");
+                showImage(PROBLEMS_DIR ."/thumbnail.default");
         
             if (isset($problemList[$id]["thumbnail"])) {
                 $i = $problemList[$id]["thumbnail"];
-                $f = PROBLEM_DIR ."/". $id ."/". $i;
+                $f = PROBLEMS_DIR ."/". $id ."/". $i;
                 showImage($f);
             }
         
-            showImage(PROBLEM_DIR ."/thumbnail.default");
+            showImage(PROBLEMS_DIR ."/thumbnail.default");
             break;
 
         case "DELETE":
@@ -55,7 +55,7 @@
             if ($_SESSION["id"] !== "admin")
                 stop(31, "Access Denied!", 403);
 
-            require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+            require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
             $code = problemRemoveFile("thumbnail", $id);
             
             switch ($code) {

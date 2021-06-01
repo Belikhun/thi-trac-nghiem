@@ -9,11 +9,11 @@
 	// SET PAGE TYPE
     define("PAGE_TYPE", "API");
     
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php"; 
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/data/xmldb/account.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php"; 
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/account.php";
 
 	$id = getQuery("id");
 	$res = Array();
@@ -28,14 +28,14 @@
 			stop(44, "Không tìm thấy để của id đã cho!", 404, Array( "id" => $id ));
 
 		problemTimeRequire($id, [CONTEST_ENDED], false);
-		$resultList = glob(PROBLEM_DIR ."/$id/*.result");
+		$resultList = glob(PROBLEMS_DIR ."/$id/*.result");
 
 		foreach ($resultList as $file) {
 			$data = unserialize((new fip($file, "a:0:{}")) -> read());
 			$user = $data["username"];
 
 			if (!isset($res[$user])) {
-				$userData = getUserData($user);
+				$userData = (new Account($user)) -> getDetails();
 				$res[$user] = $data;
 
 				$res[$user]["name"] = ($userData && isset($userData["name"])) ? $userData["name"] : null;
@@ -66,7 +66,7 @@
 			$overall += $total[$value["username"]];
 		}
 	} else {
-		$resultList = glob(PROBLEM_DIR ."/*/*.result", GLOB_BRACE);
+		$resultList = glob(PROBLEMS_DIR ."/*/*.result", GLOB_BRACE);
 
 		foreach ($resultList as $file) {
 			$data = unserialize((new fip($file, "a:0:{}")) -> read());
@@ -78,7 +78,7 @@
 			$problem = problemGet($data["id"]);
 
 			if (!isset($res[$user])) {
-				$userData = getUserData($user);
+				$userData = (new Account($user)) -> getDetails();
 
 				$res[$user] = Array(
 					"username" => $user,

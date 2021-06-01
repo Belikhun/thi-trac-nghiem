@@ -9,10 +9,10 @@
 	// SET PAGE TYPE
     define("PAGE_TYPE", "API");
     
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/data/config.php"; 
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php"; 
+	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
     
     $list = problemList();
 

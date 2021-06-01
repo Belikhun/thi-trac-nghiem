@@ -376,7 +376,165 @@ const ttn = {
 		}
 	},
 
+	rank: {
+		priority: 3,
+		container: $("#globalRanking"),
+		refreshButton: $("#rankingRefresh"),
+		heartbeatDot: $("#rankingUpdateHeartbeat"),
+		heartbeatAnm: null,
 
+		folding: {},
+		timeout: null,
+		hash: null,
+
+		enabled: true,
+		updateDelay: 2,
+
+		async init() {
+			this.refreshButton.addEventListener("click", () => this.update(true));
+			new Scrollable(this.container.parentElement, { content: this.container });
+
+			await this.updater();
+			this.update();
+		},
+
+		beat({ color = "green", beat = true } = {}) {
+			if (color && typeof color === "string")
+				this.heartbeatDot.dataset.color = color;
+			
+			if (!this.heartbeatAnm)
+				this.heartbeatAnm = this.heartbeatDot.getAnimations()[0];
+
+			if (this.heartbeatAnm && beat)
+				this.heartbeatAnm.play();
+		},
+
+		async updater() {
+			clearTimeout(this.timeout);
+			let start = time();
+
+			try {
+				if (ttn.initialized && this.enabled)
+					await this.update();
+			} catch(e) {
+				//? IGNORE ERROR
+				this.log("ERRR", e);
+			}
+			
+			this.timeout = setTimeout(() => this.updater(), (this.updateDelay - (time() - start)) * 1000);
+		},
+
+		async update(hard = false) {
+			let response = await myajax({
+				url: "/api/problems/rank",
+				method: "GET",
+			});
+	
+			let data = response.data;
+			let hash = response.hash;
+
+			if (hash === this.hash && !hard) {
+				this.beat({ color: "blue" });
+				return false;
+			}
+	
+			this.log("DEBG", "Updating Rank", `[${hash}]`);
+			this.beat({ color: "green" });
+			let timer = new StopClock();
+	
+			if (data.list.length === 0 && data.rank.length === 0) {
+				emptyNode(this.container);
+				
+				this.hash = hash;
+				this.log("DEBG", "Rank Is Empty. Took", {
+					color: flatc("blue"),
+					text: timer.stop + "s"
+				});
+	
+				return false;
+			}
+	
+			let out = `
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th></th>
+							<th>Thí sinh</th>
+							<th>Tổng</th>
+							<th>TB</th>
+			`
+
+			for (let i of data.list)
+				out += `
+					<th
+						class="problem"
+						title="${data.nameList[i] || i}"
+					>
+						${data.nameList[i] || i}
+					</th>`;
+
+			out += "</tr></thead><tbody>";
+			let ptotal = 0;
+			let rank = 0;
+
+			for (let i of data.rank) {
+				if (ptotal !== i.total) {
+					ptotal = i.total;
+					rank++;
+				}
+
+				out += `
+					<tr data-rank=${rank}>
+						<td>${rank}</td>
+						<td>
+							<div class="lazyload avt">
+								<img onload="this.parentNode.dataset.loaded = 1" src="/api/avatar?u=${i.username}"/>
+								<div class="simple-spinner"></div>
+							</div>
+						</td>
+						<td>
+							<t class="username">${i.username}</t>
+							<t class="name">${escapeHTML(i.name || "u:" + i.username)}</t>
+						</td>
+						<td class="number">${parseFloat(i.total).toFixed(2)}</td>
+						<td class="number">${parseFloat(i.total / Object.keys(i.point).length).toFixed(2)}</td>
+				`
+
+				for (let j of data.list)
+					out += `<td class="number ${i.status[j] || "unknown"}">${(typeof i.point[j] !== "undefined") ? parseFloat(i.point[j]).toFixed(2) : "X"}</td>`;
+				
+				out += "</tr>";
+			}
+
+			out += "</tbody></table>";
+			this.container.innerHTML = out;
+			this.hash = hash;
+	
+			this.log("DEBG", "Rank Updated. Took", {
+				color: flatc("blue"),
+				text: timer.stop + "s"
+			});
+		},
+
+		foldRankCol(target) {
+			let f = (target.dataset.folding === "true");
+			let i = target.getAttribute("problem-id");
+	
+			target.dataset.folding = !f;
+			this.folding[i] = !f;
+
+			//* 👀 💥
+			let pointList = target
+				.parentElement
+				.parentElement
+				.parentElement
+				.querySelectorAll(`tbody > tr > td[problem-id="${i}"]`);
+	
+			for (let item of pointList)
+				item.dataset.folding = !f;
+		}
+	},
 
 	userSettings: {
 		priority: 2,

@@ -938,7 +938,7 @@
 		if ($redirect)
 			header("Location: /error.php?redirect=true");
 		else
-			require $_SERVER["DOCUMENT_ROOT"]. "/lib/error.php";
+			require $_SERVER["DOCUMENT_ROOT"]. "/libs/error.php";
 	}
 
 	//! Error Handler

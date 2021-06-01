@@ -9,9 +9,9 @@
 	// SET PAGE TYPE
     define("PAGE_TYPE", "API");
     
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/ratelimit.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/belibrary.php";
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/lib/logs.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/ratelimit.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/logger.php";
     
     if (!isLoggedIn())
         stop(11, "Bạn chưa đăng nhập.", 401);
@@ -21,7 +21,7 @@
     if ($_SESSION["id"] !== "admin")
         stop(31, "Access Denied!", 403);
 
-    require_once $_SERVER["DOCUMENT_ROOT"] ."/data/problems/problem.php";
+    require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
 
     $id = preg_replace("/[^a-zA-Z0-9]/m", "", reqForm("id"));
     $name = reqForm("name");

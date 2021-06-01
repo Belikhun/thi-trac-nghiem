@@ -1,5 +1,5 @@
 #? |-----------------------------------------------------------------------------------------------|
-#? |  /tests/lib/log.py                                                                            |
+#? |  /tests/libs/log.py                                                                            |
 #? |                                                                                               |
 #? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 #? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |

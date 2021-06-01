@@ -41,77 +41,6 @@ input:-webkit-autofill {
     overflow: hidden;
 }
 
-/*? =================== COMPONENTS =================== **/
-
-.judgeStatus {
-	position: relative;
-	display: inline-block;
-
-	padding: 2px 10px 0;
-	border-radius: 22px;
-	
-	font-family: Nunito;
-    font-weight: 900;
-    font-size: 11px;
-    font-style: normal;
-    line-height: 16px;
-	color: #131415;
-
-	text-transform: uppercase;
-	text-align: right;
-	white-space: nowrap;
-	word-break: keep-all;
-	
-	background-color: var(--status-skipped);
-}
-
-.judgeStatus[data-status="correct"] {
-	background-color: var(--status-correct);
-}
-
-.judgeStatus[data-status="passed"] {
-	background-color: var(--status-passed);
-}
-
-.judgeStatus[data-status="accepted"] {
-	background-color: var(--status-accepted);
-}
-
-.judgeStatus[data-status="failed"] {
-	background-color: var(--status-failed);
-}
-
-.judgeStatus[data-status="skipped"] {
-	background-color: var(--status-skipped);
-}
-
-.progressBar.judgeStatusBar {
-	margin: unset;
-	height: 20px;
-}
-
-.progressBar.judgeStatusBar > .bar[data-color="green"] {
-	background-color: var(--status-correct);
-}
-
-.progressBar.judgeStatusBar > .bar[data-color="blue"] {
-	background-color: var(--status-passed);
-}
-
-.progressBar.judgeStatusBar > .bar[data-color="yellow"] {
-	background-color: var(--status-accepted);
-}
-
-.progressBar.judgeStatusBar > .bar[data-color="red"] {
-	background-color: var(--status-failed);
-}
-
-.progressBar.judgeStatusBar > .bar[data-color="gray"] {
-	background-color: var(--status-skipped);
-}
-
-/*? =================== COMPONENTS =================== **/
-
 #superContainer {
 	position: absolute;
 	display: block;
@@ -135,7 +64,7 @@ input:-webkit-autofill {
 	display: none;
 }
 
-#content {
+#mainContainer {
 	position: relative;
 	display: flex;
 	flex-direction: row;
@@ -147,11 +76,11 @@ input:-webkit-autofill {
 	transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-#content.parallax {
+#mainContainer.parallax {
 	transform: translateX(-20px);
 }
 
-#content > div {
+#mainContainer > div {
 	position: relative;
 	display: none;
 
@@ -163,13 +92,13 @@ input:-webkit-autofill {
 	overflow-y: auto;
 }
 
-#content[data-layout = "1"] > div:nth-child(1),
-#content[data-layout = "2"] > div:nth-child(2) {
+#mainContainer[data-layout = "1"] > div:nth-child(1),
+#mainContainer[data-layout = "2"] > div:nth-child(2) {
 	display: flex;
 }
 
-#content > div:empty::before,
-#content > div .showEmpty:empty::before {
+#mainContainer > div:empty::before,
+#mainContainer > div .showEmpty:empty::before {
 	content: "\f51b";
 	position: absolute;
 	left: 50%;
@@ -181,8 +110,8 @@ input:-webkit-autofill {
 	color: rgb(192, 192, 192);
 }
 
-#content > div:empty::after,
-#content > div .showEmpty:empty::after {
+#mainContainer > div:empty::after,
+#mainContainer > div .showEmpty:empty::after {
 	content: "Không có dữ liệu";
 	position: absolute;
 	display: block;
@@ -195,1758 +124,960 @@ input:-webkit-autofill {
 	color: rgb(192, 192, 192);
 }
 
-/*? =================== LAYOUT =================== **/
-
-#mainContainer {
-	padding: 5px;
-}
-
-#mainContainer > .flexColumn {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-#mainContainer > .flexColumn > .flexRow {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-}
-
-#mainContainer > .flexColumn.large,
-#mainContainer > .flexColumn > .flexRow.large {
-	flex-grow: 1;
-}
-
-/*? =================== PANEL =================== **/
-
-panel {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-shrink: 1;
-
-	width: 360px;
-	height: calc(100% - 20px);
-	margin: 15px 5px 5px;
-	padding-top: 15px;
-	box-sizing: border-box;
-	
-	overflow: visible;
-	background-color: white;
-	border: 1px solid rgba(85, 85, 85, 0.4);
-}
-
-panel > .header {
-	position: absolute;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	top: 0;
-	width: 100%;
-	height: 30px;
-	transform: translateY(-50%);
-
-	overflow: hidden;
-}
-
-panel > .header > .title {
-	position: relative;
-	display: inline-block;
-	flex-grow: 0;
-	flex-shrink: 1;
-
-	height: 26px;
-	margin-left: 10px;
-	padding: 0 10px;
-	border: 1px solid rgba(85, 85, 85, 0.4);
-
-	font-family: Calibri;
-	font-size: 16px;
-	font-weight: bold;
-	color: black;
-	text-overflow: ellipsis;
-	line-height: 26px;
-	white-space: nowrap;
-	
-	background-color: #ffffff;
-	overflow: hidden;
-}
-
-panel > .header > .buttons {
-	position: absolute;
-	display: flex;
-	flex-direction: row-reverse;
-	align-items: center;
-
-	right: 10px;
-}
-
-panel > .header > .buttons > icon {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-
-	width: 36px;
-	height: 26px;
-	margin-left: 5px;
-	border: 1px solid rgba(85, 85, 85, 0.4);
-
-	background-color: #ffffff;
-	cursor: pointer;
-
-	transition: background-color 0.2s ease-out;
-}
-
-panel > .header > .buttons > icon::after {
-	font-size: 13px;
-	transition: color 0.2s ease-out;
-}
-
-panel > .header > .buttons > icon:hover {
-	background-color: rgb(82, 82, 82);
-}
-
-panel > .header > .buttons > icon:hover::after {
-	color: rgb(255, 255, 255);
-}
-
-panel > .header > .buttons > icon[data-icon="reload"]:hover {
-	background-color: rgb(38, 131, 218);
-}
-
-panel > .header > .buttons > icon[data-icon="close"]::after {
-	font-size: 17px;
-}
-
-panel > .header > .buttons > icon[data-icon="close"]:hover {
-	background-color: rgb(232, 55, 94);
-}
-
-panel > .main {
-	position: relative;
-	display: inline-block;
-	flex-grow: 1;
-
-	width: 100%;
-	margin: unset;
-	padding: unset;
-
-	overflow: auto;
-	box-sizing: border-box;
-}
-
-panel > .main > .loadingWrapper {
-	position: absolute;
-	display: none;
-	align-items: center;
-	justify-content: center;
-
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-
-	background-color: rgba(245, 245, 245, 0.8);
-	z-index: 10;
-}
-
-panel > .main > .loadingWrapper.show {
-	display: flex;
-}
-
-/** =================== PROBLEMSLIST =================== **/
-
-#problemsPanel {
-	width: calc(100% - 10px);
-}
-
-#problemsPanel > .problemsContainer {
-	overflow: hidden;
-}
-
-#problemsPanel > .problemsContainer > .listContainer {
-	position: relative;
-	display: inline-flex;
-	flex-direction: column;
-
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
-	padding: 10px;
-
-	animation: problemsListShow 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
-}
-
-#problemsPanel > .problemsContainer > .listContainer.hide {
-	animation: problemsListHide 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox {
-	position: sticky;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
+#mainContainer > .panel {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
     top: 0;
-	margin: 0 10px 5px;
-	padding: 10px 5px;
-	border-radius: 12px;
-    z-index: 1;
+    left: 0;
 
-    background-color: white;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .searchBox.typing {
-    background-color: rgb(240, 240, 240);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > input {
-	flex-grow: 1;
-	height: auto;
-	font-size: 28px;
-	font-weight: 800;
-
-	padding: 0 80px 0 0;
-	background-color: unset;
-
-    transition:
-        padding 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > input::placeholder {
-	color: rgba(145, 145, 145, 0.5);
-	transition: color 0.2s ease-out;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox:hover > input::placeholder {
-	color: rgba(145, 145, 145, 0.7);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > icon::after {
-	font-size: 36px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > icon {
-	position: absolute;
-	right: 0;
-
-	opacity: 0;
-    cursor: pointer;
-	transition:
-        right 0.2s cubic-bezier(0.25, 1, 0.5, 1),
-        opacity 0.2s ease-out;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > .search {
-	opacity: 1;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox > .search::after {
-	font-size: 30px;
-	color: rgba(145, 145, 145, 0.5);
-	transition: color 0.2s ease-out;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox:hover > .search::after {
-	color: rgb(148, 148, 148);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox.typing > input {
-    padding-left: 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox.typing > icon {
-    right: 15px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .searchBox.typing > .search {
+#mainContainer > .rankingContainer {
+    left: 50%;
+    transform: scale(0.9);
     opacity: 0;
-    z-index: -1;
+
+    animation: hide 0.6s linear 0s 1 forwards;
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .searchBox.typing > .clear {
+#mainContainer[data-layout="2"] > .problems {
+    left: -50%;
+    transform: scale(0.9);
+    opacity: 0;
+
+    animation: hide 0.6s linear 0s 1 forwards;
+}
+
+#mainContainer[data-layout="2"] > .rankingContainer {
+    left: 0;
+    transform: unset;
     opacity: 1;
+
+    animation: unset;
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .list {
+/** ============================ MAIN STYLE ============================ */
+
+#mainContainer > .rankingContainer {
 	position: relative;
-	display: block;
-	flex-grow: 1;
-	flex-shrink: 1;
-
-	width: 100%;
-	padding: 5px;
-	padding-bottom: 40vh;
-	box-sizing: border-box;
-
-	overflow: auto;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list:empty {
-	height: 100%;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list:empty::before {
-	content: "\f51b";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list:empty::after {
-	content: "Không tìm thấy đề hoặc chưa bắt đầu kì thi";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item {
-	position: relative;
-    display: inline-block;
-
-	width: calc(25% - 10px);
-	min-width: 304px;
-	height: 180px;
-	margin: 5px;
-	user-select: none;
-
-	cursor: pointer;
-	z-index: 0;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item.active {
-	z-index: 1;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content {
-	position: relative;
-    display: inline-block;
-
-	width: 100%;
-	height: 100%;
-
-	padding-bottom: 66px;
-	border-radius: 12px;
-	box-sizing: border-box;
-
-	background-color: rgb(245, 245, 245);
-	overflow: hidden;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .thumbnail {
 	display: flex;
-	width: 100%;
-	height: 100%;
-
-	border-radius: 12px;
+	flex-direction: column;
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .thumbnail::after {
+#mainContainer > .rankingContainer > .header {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding: 50px 50px 10px;
+}
+
+#mainContainer > .rankingContainer > .header::before {
 	content: "";
 	position: absolute;
-	display: inline-block;
 
 	top: 0;
 	left: 0;
-	bottom: 0;
-	right: 0;
-	box-shadow: inset 0 -100px 35px -65px rgba(0, 0, 0, 0.4);
-
-	transition: box-shadow 0.1s ease-out;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item:hover > .content > .thumbnail::after {
-	box-shadow: inset 0 -180px 80px -85px rgba(0, 0, 0, 0.6);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .icons {
-	position: absolute;
-	display: flex;
-	flex-direction: row;
-	
-	top: 10px;
-	left: 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .icons > icon {
-	width: 20px;
-	height: 20px;
-	margin-right: 5px;
-	background-color: rgba(26, 26, 26, 0.6);
-	border-radius: 50%;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .icons > icon::after {
-	font-size: 9px;
-	color: white;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .tags {
-	position: absolute;
-	display: block;
-	top: 10px;
-	right: 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .tags > .tag {
-	position: relative;
-	display: inline-block;
-	padding: 4px 10px;
-	border-radius: 22px;
-	margin-left: 5px;
-
-	font-size: 14px;
-	font-weight: 700;
-	letter-spacing: .4px;
-
-	color: rgb(26, 26, 26);
-	background-color: rgb(240, 240, 240);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .tags > .tag.blue {
-	background-color: var(--osc-color-blue);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .tags > .tag.green {
-	background-color: var(--osc-color-green);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .tags > .tag.red {
-	background-color: var(--osc-color-red);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .name {
-	position: absolute;
-
-	bottom: 72px;
-	left: 10px;
-
-	font-size: 17px;
-	font-weight: 700;
-	letter-spacing: .4px;
-
-	max-width: 260px;
-	color: white;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .point {
-	position: absolute;
-	display: block;
-
-	bottom: 76px;
-	right: 10px;
-
-	padding: 1px 10px;
-	border-radius: 22px;
-	background-color: rgb(255, 255, 255);
-
-	font-size: 12px;
-	font-weight: 800;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .point::after {
-	content: " điểm";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail {
-	position: absolute;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	bottom: 0;
-	left: 0;
 	width: 100%;
-	height: 66px;
-	padding-bottom: 20px;
-	box-sizing: border-box;
+	height: 140px;
 
-	overflow: hidden;
+	background: #7f7fd5;
+	background: linear-gradient(to left, #7f7fd5, #86a8e7, #91eae4);
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .progressBar {
-	position: absolute;
-
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 20px;
-	margin-top: 0;
+#mainContainer > .rankingContainer > .header > icon::after {
+	font-size: 28px;
 }
 
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .progressBar > .right {
-	top: 1px;
-	right: 20px;
-	transform: unset;
-
-	font-family: "Consolas";
-	font-size: 15px;
-	color: black;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > span {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > span > t {
-	font-size: 13px;
-	font-weight: bold;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > span > t::before {
-	content: "\f111";
-	position: relative;
-
-	margin-right: 5px;
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 13px;
-	font-weight: 600;
-	color: rgb(55, 55, 55);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .left {
-	flex-grow: 0;
-	flex-shrink: 1;
-	flex-basis: 0;
-	margin-left: 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .left > .id::before {
-	content: "\f70e";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .left > .submitted::before {
-	content: "\f0c0";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .middle {
+#mainContainer > .rankingContainer > .header > .title {
 	flex-grow: 1;
-	flex-shrink: 1;
-	flex-basis: 0;
-	margin: 0 20px;
-}
+	margin-left: 20px;
 
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .middle > .modify::before {
-	content: "\f017";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .middle > .author::before {
-	content: "\f4ff";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .right {
-	align-items: flex-end;
-	margin-right: 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .content > .detail > .right > .loved::before {
-	content: "\f004";
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background {
-	position: absolute;
-	display: block;
-
-	top: -3px;
-	left: -3px;
-	width: 100%;
-	
-	padding: 183px 0 3px 0;
-	border: 3px solid rgb(14, 105, 165);
-	border-radius: 16px;
-
-	background-color: rgb(245, 245, 245);
-	z-index: -1;
-	overflow: hidden;
-	opacity: 0;
-
-	transition:
-		display 0s linear 0.2s,
-		opacity 0.2s ease-out;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background:empty::before {
-	content: "KHÔNG CÓ HOẠT ĐỘNG 😥";
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	
-	width: 100%;
-	height: 60px;
-
-	font-weight: bold;
-	color: rgba(65, 65, 65, 0.8);
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item.hide > .background {
-	display: none;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item.show > .background {
-	transition:
-		opacity 0.2s ease-out;
-	
-	opacity: 1;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin: 2px 10px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container > .wrapper {
-	position: relative;
-	display: block;
-
-	min-width: 134px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container > .wrapper > .status {
-	float: right;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container > .list {
-	position: relative;
-	display: inline-block;
-
-	margin-left: 8px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container > .list > .user {
-	display: inline-block;
-	width: 18px;
-	height: 18px;
-	min-width: unset;
-	min-height: unset;
-
-	border-radius: 50%;
-	margin: 0 1px;
-}
-
-#problemsPanel > .problemsContainer > .listContainer > .list > .item > .background > .container > .list > .more {
-	position: relative;
-	display: inline-block;
-
-	padding: 2px 8px 0;
-	margin: 0 1px;
-	border-radius: 10000px;
-	
-    font-weight: bold;
-    font-size: 12px;
-    font-style: normal;
-    line-height: 16px;
-	color: #131415;
-	text-transform: uppercase;
-	text-align: center;
-	word-break: keep-all;
-	overflow: hidden;
-	
-	background-color: rgb(216, 216, 216);
-}
-
-#problemsPanel > .problemsContainer > .problemContainer {
-	position: absolute;
-	
-	top: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-	
-	overflow: hidden;
-	background-color: inherit;
-	animation: problemViewerHide 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
-}
-
-#problemsPanel > .problemsContainer > .listContainer.hide + .problemContainer {
-	animation: problemViewerShow 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
-}
-
-#problemsPanel > .problemsContainer > .problemContainer > .content {
-	position: relative;
-	display: block;
-
-	overflow: auto;
-}
-
-/** ======================== PROBLEM VIEWER ======================== **/
-
-.problemViewer {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	--header-height: 70vh;
-}
-
-.problemViewer > .backgroundWrapper {
-	position: sticky;
-	display: block;
-
-	top: 0;
-	width: 100%;
-}
-
-.problemViewer > .backgroundWrapper > .background {
-	position: absolute;
-
-	width: 100%;
-	height: var(--header-height);
-}
-
-.problemViewer > .backgroundWrapper::after {
-	content: "";
-	position: absolute;
-
-	width: 100%;
-	height: var(--header-height);
-
-	background-color: rgba(59, 53, 63, 0.7);
-}
-
-.problemViewer > .content {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-	margin-top: var(--header-height);
-	padding-bottom: calc(var(--header-height) / 2);
-
-	background-color: white;
-}
-
-.problemViewer > .content > div {
-	width: 100%;
-	max-width: 1200px;
-	margin-left: auto;
-	margin-right: auto;
-	padding: 10px;
-	box-sizing: border-box;
-}
-
-.problemViewer > .content > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	top: calc(0px - var(--header-height));
-	height: 0;
-	padding: unset;
-
-	background-color: transparent;
-}
-
-.problemViewer > .content > .header > .left,
-.problemViewer > .content > .header > .right {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-shrink: 1;
-	justify-content: flex-end;
-
-	height: var(--header-height);
-	padding: 10px 20px;
-	box-sizing: border-box;
-}
-
-.problemViewer > .content > .header > .left > .title {
 	font-family: Nunito;
-	font-size: 26px;
-	font-weight: 800;
-	letter-spacing: .8px;
-	color: white;
+	font-weight: 300;
+	font-size: 28px;
+	line-height: 38px;
 }
 
-.problemViewer > .content > .header > .left > .point {
-	font-family: Nunito;
-	font-size: 22px;
-	font-weight: 400;
-	color: white;
+#mainContainer > .rankingContainer > .rankingTable {
+    overflow: auto;
 }
 
-.problemViewer > .content > .header > .left > .point > b {
-	font-weight: 800;
+#mainContainer > .rankingContainer > .rankingTable > table {
+    position: relative;
+    font-family: "Calibri";
+    box-sizing: border-box;
+    border-spacing: 0;
+    padding: 0 10px;
+    min-width: 100%;
 }
 
-.problemViewer > .content > .header > .left > .author {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin-top: 20px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th:nth-child(1),
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(1) {
+    width: 20px;
+    text-align: center;
 }
 
-.problemViewer > .content > .header > .left > .author > .avatar {
-	width: 64px;
-	height: 64px;
-	flex-shrink: 0;
-	border-radius: 50%;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th:nth-child(2),
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(2) {
+    text-align: left;
 }
 
-.problemViewer > .content > .header > .left > .author > .detail {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	margin-left: 10px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th:nth-child(2) {
+    width: 40px;
 }
 
-.problemViewer > .content > .header > .left > .author > .detail > t {
-	color: white;
-}
-
-.problemViewer > .content > .header > .left > .author > .detail > .title {
-	font-size: 11px;
-	font-weight: bold;
-	text-transform: uppercase;
-	color: rgba(245, 245, 245, 0.8);
-}
-
-.problemViewer > .content > .header > .left > .author > .detail > .name {
-	font-family: Nunito;
-	font-size: 16px;
-	font-weight: 800;
-	letter-spacing: .2px;
-}
-
-.problemViewer > .content > .header > .left > .author > .detail > .updated {
-	margin-top: 5px;
-	font-size: 13px;
-}
-
-.problemViewer > .content > .header > .left > .buttons > button {
-	margin: 10px 10px 0 0;
-}
-
-.problemViewer > .content > .header > .left > .buttons > button[key="love"][data-active="true"] > icon::after {
-	font-weight: 900;
-}
-
-.problemViewer > .content > .header > .right {
-	flex-grow: 0;
-	padding-bottom: 0;
-}
-
-.problemViewer > .content > .header > .right > span {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	padding: 10px;
-	margin-top: 2px;
-	background-color: rgba(0, 0, 0, 0.4);
-}
-
-.problemViewer > .content > .header > .right > span:last-child {
-	padding-bottom: 10px;
-}
-
-.problemViewer > .content > .header > .right > span > .title {
-	font-size: 11px;
-	font-weight: bold;
-	text-transform: uppercase;
-	letter-spacing: .4px;
-	color: rgba(255, 255, 255, 0.9);
-}
-
-.problemViewer > .content > .header > .right > span > .title::after {
-	content: "";
-	position: relative;
-	display: block;
-
-	width: 100%;
-	height: 1px;
-	background-color: rgba(255, 255, 255, 0.4);
-	margin: 4px 0;
-}
-
-.problemViewer > .content > .header > .right > .loved > .list:empty::after {
-	content: "Trống";
-	display: block;
-
-	margin-top: 10px;
-
-	font-size: 13px;
-	font-weight: bold;
-	text-transform: uppercase;
-	text-align: center;
-	color: rgba(220, 220, 220, 0.6);
-}
-
-.problemViewer > .content > .header > .right > .loved > .list > .user {
-	width: 18px;
-	height: 18px;
-	min-width: unset;
-	min-height: unset;
-	border-radius: 50%;
-	margin: 0 1px;
-}
-
-.problemViewer > .content > .header > .right > .status > .progressBar {
-	margin-bottom: 3px;
-}
-
-.problemViewer > .content > .header > .right > .status > .detail > .item {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin-top: 2px;
-}
-
-.problemViewer > .content > .header > .right > .status > .detail > .item > .wrapper {
-	min-width: 134px;
-}
-
-.problemViewer > .content > .header > .right > .status > .detail > .item > .wrapper > .status {
-	float: right;
-}
-
-.problemViewer > .content > .header > .right > .status > .detail > .item > .value {
-	margin-left: 10px;
-
-	font-size: 13px;
-	color: white;
-	white-space: nowrap;
-}
-
-.problemViewer > .content > .details {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-}
-
-.problemViewer > .content > .details > span {
-	position: relative;
-	display: inline-block;
-	flex-grow: 1;
-	flex-shrink: 1;
-
-	padding: 5px;
-}
-
-.problemViewer > .content > .details > span > .title {
-	font-family: Nunito;
-	font-size: 20px;
-	font-weight: 800;
-	white-space: nowrap;
-}
-
-.problemViewer > .content > .details > .left > .title {
-	margin-left: 5px;
-}
-
-.problemViewer > .content > .details > .left > .items > .item {
-	position: relative;
-	display: inline-block;
-
-	margin: 5px;
-	padding: 10px 10px 10px 20px;
-	border-radius: 7px;
-	background-color: rgb(240, 240, 240);
-}
-
-.problemViewer > .content > .details > .left > .items > .item::before {
-	content: "";
-	position: absolute;
-	display: block;
-
-	top: 12px;
-	bottom: 12px;
-	left: 10px;
-	width: 2px;
-
-	background-color: rgba(0, 0, 0, 0.2);
-}
-
-.problemViewer > .content > .details > .left > .items > .item:hover::before {
-	background-color: rgba(0, 0, 0, 0.6);
-}
-
-.problemViewer > .content > .details > .left > .items > .item > .label {
-	font-size: 11px;
-	font-weight: bold;
-	text-transform: uppercase;
-	letter-spacing: .4px;
-	color: rgba(26, 26, 26, 0.8);
-	user-select: none;
-}
-
-.problemViewer > .content > .details > .left > .items > .item > .value {
-	font-family: Nunito;
-	font-size: 18px;
-	font-weight: 500;
-}
-
-.problemViewer > .content > .details > .right {
-	flex-grow: 0;
-
-	margin-right: 15px;
-}
-
-.problemViewer > .content > .details > .right > .languages {
-	position: relative;
-	display: block;
-
-	margin-top: 5px;
-	margin-bottom: 10px;
-
-	font-family: "Consolas";
-	font-size: 18px;
-	font-weight: bold;
-	word-wrap: break-word;
-
-	color: rgb(2, 104, 172);
-}
-
-.problemViewer > .content > .details > .right > .tags {
-	position: relative;
-	display: block;
-	margin-top: 5px;
-}
-
-.problemViewer > .content > .details > .right > div:empty::after {
-	content: "Trống";
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(2) {
     display: flex;
-	align-items: center;
-	justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin: 0 0 0 10px;
+}
 
-	min-width: 200px;
-	min-height: 60px;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(2) .avt {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
 
-	font-family: "Calibri";
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(3) .username {
+    font-family: "Open Sans";
+    font-size: 11px;
+    font-style: italic;
+    color: rgb(114, 114, 114);
+    letter-spacing: .2px;
+}
+
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td:nth-child(3) .name {
+    font-size: 15px;
+    letter-spacing: .2px;
+}
+
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number:nth-child(5) {
+    color: rgb(100, 62, 202);
     font-size: 16px;
     font-weight: bold;
-    text-transform: uppercase;
-    text-align: center;
-
-    color: rgba(38, 38, 38, 0.6);
-	background-color: rgba(160, 160, 160, 0.1);
 }
 
-.problemViewer > .content > .info {
-	position: relative;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number:nth-child(4) {
+    color: #3c7be7;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.problemViewer > .content > .info > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th:nth-child(3) {
+    text-align: left;
 }
 
-.problemViewer > .content > .info > .header::after {
-	content: "";
-	position: absolute;
-	display: block;
-
-	bottom: 2px;
-	width: 40%;
-	height: 1px;
-	min-width: 320px;
-
-	background-color: rgba(68, 68, 68, 0.8);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="1"] {
+    background-color: rgba(111, 241, 134, 0.2);
 }
 
-.problemViewer > .content > .info > .header > t {
-	font-family: Nunito;
-	font-size: 23px;
-	padding: 0 10px;
-	cursor: pointer;
-
-	color: rgba(128, 128, 128, 0.6);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="2"] {
+    background-color: rgba(239, 241, 111, 0.2);
 }
 
-.problemViewer > .content > .info > .header > t:hover {
-	color: rgba(68, 68, 68, 0.8);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="3"] {
+    background-color: rgba(230, 111, 241, 0.2);
 }
 
-.problemViewer > .content > .info[data-active="content"] > .header > t[key="content"],
-.problemViewer > .content > .info[data-active="ranking"] > .header > t[key="ranking"] {
-	color: rgb(26, 26, 26);
-	border-bottom: 5px solid rgb(82, 82, 82);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="1"] td:nth-child(3) .name,
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="2"] td:nth-child(3) .name,
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr[data-rank="3"] td:nth-child(3) .name {
+    font-family: Nunito;
+    font-size: 16px;
+    font-weight: 850;
+    letter-spacing: .4px;
+    color: rgb(65, 65, 65);
 }
 
-.problemViewer > .content > .info > .ranking {
-	margin: 0 10px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th {
+    position: sticky;
+    top: 0;
+    background-color: rgb(255, 255, 255);
+    color: rgb(82, 82, 82);
+    font-family: Segoe UI;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    z-index: 1;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight {
-	display: flex;
-	flex-direction: column;
-	margin: 15px 0;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem > t {
+    display: inline-block;
+    color: rgb(82, 82, 82);
+    font-family: Segoe UI;
+    font-size: 13px;
+    font-weight: bold;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item,
-.problemViewer > .content > .info > .ranking > .spotlight > .item > span {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item {
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem > .toggler {
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    cursor: pointer;
 
-	margin: 5px 0;
-	padding: 10px;
-	
-	border-radius: 4px;
-    box-shadow: 0 1px 3px rgb(0, 0, 0, 0.1);
-	background-color: rgba(250, 250, 250, 0.8);
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left {
-	flex-grow: 0;
-	flex-shrink: 0;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .rank > .value {
-	text-align: right;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .rank > .value::before {
-	content: "#";
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .avatar {
-	position: relative;
-	margin: 0 10px;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .avatar > .image {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .avatar > .onlineIndicator {
-	position: absolute;
-	bottom: 5px;
-	right: 0;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .left > .user > .name {
-	font-family: Nunito;
-	font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 2px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem > .toggler::after {
+    content: "\f104";
+    position: relative;
     display: block;
-    color: rgb(14, 14, 14);
+    font-family: "Font Awesome 5 Free";
+    font-size: 18px;
+    font-weight: 900;
+    transform: translateY(2px);
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right {
-	flex-wrap: wrap;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem[data-folding="true"] {
+    width: 10px;
+    padding: unset;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span {
-	display: flex;
-	flex-direction: row;
-    justify-content: flex-end;
-    align-items: flex-start;
-	flex-wrap: wrap;
-	flex-grow: 1;
-
-	margin: 10px 10px 10px 0;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem[data-folding="true"] > t {
+    display: none;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item {
-	margin-right: 10px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem[data-folding="true"] > .toggler {
+    transform: rotate(180deg);
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item > .label {
-	display: flex;
-	align-items: center;
-
-	min-width: 50px;
-	min-height: 20px;
-    padding-bottom: 2px;
-    border-bottom: 2px solid rgba(124, 124, 124, 0.3);
-	box-sizing: border-box;
-
-	font-size: 10px;
-    font-weight: 700;
-    color: rgb(114, 114, 114);
-    text-transform: uppercase;
-    white-space: nowrap;
-	user-select: none;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th.problem[data-folding="true"] > .toggler::after {
+    transform: unset;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item > .label > tip {
-	margin-left: 5px;
+#mainContainer > .rankingContainer > .rankingTable > table > thead > tr > th,
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td {
+    padding: 10px 12px;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item > .value {
-	font-family: Nunito;
-	font-size: 25px;
-    font-weight: 300;
-    color: rgb(24, 24, 24);
-    margin-top: 4px;
-    line-height: .9;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td {
+    font-size: 13px;
 }
 
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item > .value {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-end;
-
-	margin-bottom: 6px;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item > .value > t[key="left"] {
-	font-family: Nunito;
-	font-size: 18px;
-    font-weight: 600;
-	color: rgb(24, 24, 24);
-    line-height: .9;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item > .value > t[key="right"] {
-	font-family: Consolas;
-	font-size: 15px;
-	font-weight: bold;
-	line-height: 1;
-
-	margin-left: 10px;
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item.green > .value > t {
-	color: rgb(7, 187, 22);
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item.yellow > .value > t {
-	color: rgb(225, 181, 8);
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > .bottom > .item.red > .value > t {
-	color: rgb(240, 25, 82);
-}
-
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item > .value:empty::before,
-.problemViewer > .content > .info > .ranking > .spotlight > .item > .right > span > .item > .value > t:empty::before {
-	content: "X";
-	color: rgba(128, 128, 128, 0.5);
-}
-
-.problemViewer > .content > .info > .ranking > table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.problemViewer > .content > .info > .ranking > table > thead > tr > th,
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td {
-	padding: unset;
-	vertical-align: middle;
-	padding: 0 10px 5px;
-}
-
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td {
-	padding-bottom: 0;
-}
-
-.problemViewer > .content > .info > .ranking > table > thead > tr > th {
-	font-size: 11px;
-    font-weight: 700;
-	text-align: left;
-    text-transform: uppercase;
-}
-
-.problemViewer > .content > .info > .ranking > table > thead > tr > th > tip {
-	margin-left: 5px;
-	transform: translateY(-2px);
-}
-
-.problemViewer > .content > .info > .ranking > table > thead > tr > th[key="rank"] {
-	width: 40px;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number {
+    font-size: 13px;
     text-align: right;
+    color: rgb(172, 172, 172);
 }
 
-.problemViewer > .content > .info > .ranking > table > thead > tr > th[key="point"],
-.problemViewer > .content > .info > .ranking > table > thead > tr > th[key="sp"] {
-	min-width: 50px;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number[data-folding="true"] {
+    font-size: 0;
+    padding: unset;
 }
 
-.problemViewer > .content > .info > .ranking > table > thead > tr > th[key="avatar"] {
-	width: 30px;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.link {
+    cursor: pointer;
 }
 
-.problemViewer > .content > .info > .ranking > table > thead > tr > th[key="uName"] {
-	width: 180px;
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.link,
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.correct,
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.passed,
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.accepted,
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.wrong,
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.skipped {
+    color: rgb(75, 75, 75);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td {
-    color: black;
-	text-decoration: none;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.correct {
+    background-color: rgb(147, 243, 158);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr:nth-child(2n + 1) > td {
-	background-color: rgba(250, 250, 250, 0.8);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.passed {
+    background-color: rgb(150, 245, 248);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td:first-child {
-	border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+#mainContainer > .rankingContainer > .rankingTable > table tr .number.accepted {
+    background-color: rgb(240, 237, 157);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td:last-child {
-	border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.wrong {
+    background-color: rgb(248, 187, 187)
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr:hover > td {
-	background-color: rgb(240, 240, 240);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.skipped {
+    background-color: rgb(212, 212, 212);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td:empty::before {
-	content: "X";
-	color: rgba(128, 128, 128, 0.5);
+#mainContainer > .rankingContainer > .rankingTable > table > tbody > tr > td.number.link:hover {
+    filter: brightness(1.1);
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="rank"] {
-	font-weight: 700;
-	text-align: right;
+@keyframes hide {
+    0, 99% {
+        z-index: initial;
+        visibility: visible;
+    }
+
+    100% {
+        z-index: -1;
+        visibility: hidden;
+    }
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="status"] {
-	padding: 0 20px;
+#mainContainer .problems {
+    box-sizing: border-box;
 }
 
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="point"],
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="sp"] {
-	font-family: Consolas;
-	font-weight: bold;
+#mainContainer > .problems > .problemsList {
+    position: relative;
+    display: block;
+    height: calc(100% - 20px);
+    margin: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    animation: problemsListShow 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
 }
-
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="avatar"] {
-	text-align: right;
-	padding: 0 0 0 20px;
-}
-
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="avatar"] > .avatar {
-	min-width: unset;
-	min-height: unset;
-	width: 22px;
-	height: 22px;
-	border-radius: 50%;
-	transform: translateY(3px);
-}
-
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="uName"] {
-	font-family: Nunito;
-	font-weight: 700;
-}
-
-.problemViewer > .content > .info > .ranking > table > tbody > tr > td[key="time"] {
-	font-size: 14px;
-}
-
-.problemViewer > .content > .info > .description {
-	position: relative;
-	margin-top: 20px;
-}
-
-.problemViewer > .content > .info > .description > .title {
-	font-family: Nunito;
-	font-size: 20px;
-	font-weight: 800;
-	white-space: nowrap;
-	margin-left: 10px;
-}
-
-.problemViewer > .content > .info > .description > .switch {
-	position: absolute;
-
-	right: 0;
-	top: 0;
-	margin: 5px 10px;
-}
-
-.problemViewer > .content > .info > .description > .switch > tag {
-	font-size: 16px;
-	text-transform: uppercase;
-
-	cursor: pointer;
-	background-color: transparent;
-}
-
-.problemViewer > .content > .info > .description > .switch > tag:hover {
-	background-color: rgba(240, 240, 240, 0.5);
-}
-
-.problemViewer > .content > .info > .description > .switch[data-active="markdown"] > .markdown,
-.problemViewer > .content > .info > .description > .switch[data-active="code"] > .code {
-	color: white;
-	background-color: rgb(46, 46, 46);
-}
-
-.problemViewer > .content > .info > .description > .content {
-	margin: 5px 10px;
-	border-top: 1px solid rgba(126, 126, 126, 0.5);
-}
-
-.problemViewer > .content > .info > .description > .content > .md2html,
-.problemViewer > .content > .info > .description > .content > .editor {
-	position: relative;
-	display: none;
-	padding-left: unset;
-	padding-right: unset;
-}
-
-.problemViewer > .content > .info > .description > .content > .md2html:empty::before {
-	content: "KHÔNG CÓ GÌ CẢ 😥";
-	position: absolute;
-
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	
-	font-weight: bold;
-	color: rgb(68, 68, 68);
-}
-
-.problemViewer > .content > .info > .description > .content[data-active="markdown"] > .md2html {
-	display: block;
-}
-
-.problemViewer > .content > .info > .description > .content[data-active="code"] > .editor {
-	display: flex;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .title {
-	font-family: Nunito;
-	font-size: 20px;
-	font-weight: 800;
-	white-space: nowrap;
-	margin-left: 10px;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	margin-top: 10px;
-	margin-bottom: 40px;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-basis: 0;
-
-	margin: 0 10px;
-	background-color: rgb(250, 250, 250);
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	padding: 10px 20px;
-	background-color: rgb(230, 230, 230);
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test > .header > .title {
-	flex-grow: 1;
-
-	font-family: "Consolas";
-	font-size: 17px;
-	font-weight: bold;
-	margin-right: 20px;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test > .header > .copy {
-	cursor: pointer;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test > .header > .copy::after {
-	font-size: 22px;
-	font-weight: 100;
-}
-
-.problemViewer > .content > .info > .tests > .testContainer > .content > .test > .header > .copy:hover::after {
-	font-weight: 900;
-}
-
-.problemViewer > .content > .info[data-active="ranking"] > .description,
-.problemViewer > .content > .info[data-active="ranking"] > .tests,
-.problemViewer > .content > .info[data-active="content"] > .ranking {
-	display: none;
-}
-
-/** ======================== PROBLEM VIEWER ANIMATION ======================== **/
 
 @keyframes problemsListShow {
-	0% {
-		visibility: hidden;
-	}
+    0% {
+        visibility: hidden;
+    }
 
-	1% {
-		visibility: visible;
-		transform: scale(.9);
-		filter: brightness(.9);
-		opacity: 0;
-	}
+    1% {
+        visibility: visible;
+        transform: scale(.9);
+        filter: brightness(.9);
+        opacity: 0;
+    }
 
-	100% {
-		visibility: visible;
-		transform: scale(1);
-		filter: brightness(1);
-		opacity: 1;
-	}
+    100% {
+        visibility: visible;
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
 }
 
 @keyframes problemsListHide {
-	0% {
-		transform: scale(1);
-		filter: brightness(1);
-		opacity: 1;
-	}
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
 
-	99% {
-		transform: scale(.9);
-		filter: brightness(.9);
-		opacity: 0;
-	}
+    99% {
+        transform: scale(.9);
+        filter: brightness(.9);
+        opacity: 0;
+    }
 
-	100% {
-		visibility: hidden;
-	}
+    100% {
+        visibility: hidden;
+    }
 }
 
 @keyframes problemViewerShow {
-	0% {
-		visibility: hidden;
-		transform: translateX(100%);
-	}
+    0% {
+        visibility: hidden;
+        transform: translateX(100%);
+    }
 
-	1% {
-		visibility: visible;
-		transform: scale(1.1);
-		filter: brightness(.9);
-		opacity: 0;
-	}
+    1% {
+        visibility: visible;
+        transform: scale(1.1);
+        filter: brightness(.9);
+        opacity: 0;
+    }
 
-	100% {
-		visibility: visible;
-		transform: scale(1);
-		filter: brightness(1);
-		opacity: 1;
-	}
+    100% {
+        visibility: visible;
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
 }
 
 @keyframes problemViewerHide {
-	0% {
-		transform: scale(1);
-		filter: brightness(1);
-		opacity: 1;
-	}
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+        opacity: 1;
+    }
 
-	99% {
-		transform: scale(1.1);
-		filter: brightness(.9);
-		opacity: 0;
-	}
+    99% {
+        transform: scale(1.1);
+        filter: brightness(.9);
+        opacity: 0;
+    }
 
-	100% {
-		visibility: hidden;
-		transform: translateX(100%);
-	}
+    100% {
+        visibility: hidden;
+        transform: translateX(100%);
+    }
 }
 
-/*? ENLARGED */
-
-.problemEnlarged {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	height: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
+#mainContainer > .problems > .problemsList.hide {
+    animation: problemsListHide 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
 }
 
-.problemEnlarged > .left {
-	position: relative;
-	display: flex;
-	flex-grow: 1;
-	flex-shrink: 1;
-	flex-direction: column;
-	height: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
+#mainContainer > .problems > .problemsList.hide + .problem {
+    animation: problemViewerShow 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
 }
 
-.problemEnlarged > .left > .top {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-shrink: 0;
-	align-items: center;
-	width: 100%;
-	padding: 20px 0;
-	box-sizing: border-box;
-	overflow-x: hidden;
-	overflow-y: auto;
+#mainContainer > .problems > .problemsList .header {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px;
 }
 
-.problemEnlarged > .left > .top > .group {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	width: 100%;
-	align-items: center;
-	justify-content: center;
+#mainContainer > .problems > .problemsList .header .left {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-.problemEnlarged > .left > .top > .group > .col {
-	position: relative;
-	display: flex;
-	flex: 1 1 0;
-	flex-direction: column;
-	padding: 0 20px;
-	align-items: center;
+#mainContainer > .problems > .problemsList .header .left .title {
+    font-family: "Nunito";
+    font-weight: 900;
+    font-size: 18px;
 }
 
-.problemEnlarged > .left > .top > .group > .col > .name {
-	font-size: 26px;
-	font-weight: bold;
-	text-align: center;
-	color: #34495e;
+#mainContainer > .problems > .problemsList .header .left .detail {
+    font-size: 12px;
 }
 
-.problemEnlarged > .left > .top > .group > .col > .point {
-	font-size: 12px;
-	color: #ecf0f1;
-	letter-spacing: 0.4px;
-	background-color: #1f8d4d;
-	padding: 2px 6px;
-	margin: 2px 0 10px;
-	border-radius: 4px;
+#mainContainer > .problems > .problemsList .list {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
-.problemEnlarged > .left > .top > .attachment {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: flex-end;
-	width: 100%;
-	box-sizing: border-box;
-	padding: 10px 20px;
+#mainContainer > .problems > .problemsList .list:empty {
+    height: 60px;
+    margin: 10px;
+    background-color: rgba(218, 218, 218, 0.4);
+    border-radius: 8px;
 }
 
-.problemEnlarged > .left > .top > .attachment::before {
-	content: "Tệp đính kèm:";
-	position: relative;
-	display: inline-block;
-	font-family: "Calibri";
-	font-size: 13px;
-	font-weight: bold;
-	padding-right: 6px;
-	color: rgb(124, 124, 124);
+#mainContainer > .problems > .problemsList .list:empty::before {
+    content: "Trống";
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 800;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: rgba(162, 162, 162, 0.8);
 }
 
-.problemEnlarged > .left > .top > .attachment > .link {
-	font-size: 14px;
+#mainContainer > .problems > .problemsList .list > .item {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    flex-grow: 0;
+
+    margin: 10px;
+    max-width: 520px;
+    box-sizing: border-box;
+    background-color: rgb(212, 212, 212);
+    border-radius: 8px;
+
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
+
+    transition: background-color 0.3s ease;
 }
 
-.problemEnlarged > .left > .top > .simpleTableWrapper > .simpleTable {
-	width: 100%;
+#mainContainer > .problems > .problemsList .list > .item:hover {
+    background-color: rgb(232, 232, 232);
 }
 
-.problemEnlarged > .left > .bottom {
-	position: relative;
-	display: flex;
-	flex-grow: 1;
-	flex-direction: column;
-	align-items: center;
-	padding: 20px;
-	box-sizing: border-box;
-	background-color: rgb(238, 238, 238);
+#mainContainer > .problems > .problemsList .list > .item > .thumbnail {
+    width: 100%;
+    max-height: 160px;
 }
 
-.problemEnlarged > .left > .bottom > .simpleTableWrapper {
-	position: relative;
-	display: block;
-	width: auto;
-	max-width: 100%;
-	margin-top: 20px;
+#mainContainer > .problems > .problemsList .list > .item > .thumbnail > img {
+    user-drag: none;
+    -webkit-user-drag: none;
 }
 
-.problemEnlarged > .left > .bottom > .simpleTableWrapper > .simpleTable.test tr > td {
-	font-family: "Consolas";
-	white-space: pre;
+#mainContainer > .problems > .problemsList .list > .item > .detail {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    flex-direction: row;
+    margin: 10px;
 }
 
-.problemEnlarged > .left > .bottom > .description {
-	position: relative;
-	width: 100%;
-	box-sizing: border-box;
-	white-space: pre-wrap;
-	line-height: 1.4em;
+#mainContainer > .problems > .problemsList .list > .item > .detail > .left {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-.problemEnlarged > .left > .bottom > .description > a,
-.problemEnlarged > .left > .bottom > .description > table,
-.problemEnlarged > .left > .bottom > .description > ul {
-	display: block;
+#mainContainer > .problems > .problemsList .list > .item > .detail > .left > .title {
+    font-family: "Nunito";
+    font-weight: 700;
+    font-size: 16px;
+    color: black;
 }
 
-.problemEnlarged > .left > .bottom > .image {
-	position: relative;
-	display: block;
-	min-width: 30px;
-	min-height: 30px;
-	width: 100%;
-	flex-shrink: 0;
-	margin-top: 20px;
-	border: 1px solid #ccc;
+#mainContainer > .problems > .problemsList .list > .item > .detail > .left > .duration {
+    font-family: "Calibri";
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 
-.problemEnlarged > .right {
-	position: relative;
-	display: none;
-	flex-grow: 2;
-	width: calc(100% - 100px);
+#mainContainer > .problems > .problemsList .list > .item > .detail > .left > .date {
+    font-size: 13px;
+    color: rgba(46, 46, 46, 0.6);
+    letter-spacing: .4px;
 }
 
-.problemEnlarged.embed > .right {
-	display: block;
+#mainContainer > .problems > .problemsList .list > .item > .detail > .right {
+    flex-shrink: 0;
 }
 
-.problemEnlarged > .right > .embedAttachment {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 100%;
+#mainContainer > .problems > .problemsList .list > .item > .detail > .right > .detail {
+    margin-top: 10px;
+    font-family: "Open Sans";
+    font-size: 10px;
+    font-weight: bold;
+    text-align: right;
+    text-transform: uppercase;
+    color: #383838;
+}
+
+#mainContainer > .problems > .problem {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    box-sizing: border-box;
+    background-color: inherit;
+    overflow: hidden;
+
+    animation: problemViewerHide 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0s 1 normal forwards;
+}
+
+#mainContainer > .problems > .problem .header {
+    position: relative;
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: row;
+    justify-content: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(92, 92, 92, 0.3);
+}
+
+#mainContainer > .problems > .problem .header > a {
+    position: absolute;
+    left: 10px;
+    max-width: calc(50% - 90px);
+    font-size: 12px;
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#mainContainer > .problems > .problem .header > .link {
+    margin: 0 10px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: rgba(82, 82, 82, 0.6);
+    cursor: pointer;
+    user-select: none;
+
+    transition: color 0.3s ease;
+}
+
+#mainContainer > .problems > .problem .header > .link:hover {
+    color: rgba(70, 70, 70, 0.8);
+}
+
+#mainContainer > .problems > .problem .header > .link.active {
+    text-decoration: underline;
+    color: rgb(58, 58, 58);
+}
+
+#mainContainer > .problems > .problem .mainBox {
+    position: relative;
+    display: block;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+#mainContainer > .problems > .problem .mainBox .board {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment {
+    position: relative;
+    display: inline-flex;
+    flex-grow: 4;
+    flex-shrink: 4;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment[data-type="image"] {
+    display: inline-block;
+    overflow: auto;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment[data-type="image"] > #problemAttachment {
+    height: auto;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment[data-display="false"] {
+    display: none;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    bottom: 20px;
+    right: 20px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom > span {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: rgb(216, 216, 216);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom > span:hover {
+    background-color: rgb(240, 240, 240);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom > span::before {
+    position: relative;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 12px;
+    color: rgb(42, 42, 42);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom > span.in::before {
+    content: "\f067";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > .zoom > span.out::before {
+    content: "\f068";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment > iframe {
+    border: unset;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 0;
+    align-items: center;
+    min-width: 360px;
+
+    border-left: 1px solid rgba(92, 92, 92, 0.3);
+
+    transition:
+        max-height 0.4s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .attachment[data-display="false"] + .sheet {
+    max-width: unset;
+    max-height: 100%;
 }
 
 @media only screen and (max-width: 800px) {
-	.problemEnlarged {
-		flex-direction: column;
-	}
+    #mainContainer > .problems > .problem .mainBox .board .attachment {
+        flex-grow: 1;
+    }
 
-	.problemEnlarged > .right {
-		width: 100%;
-		height: 50%;
-	}
+    #mainContainer > .problems > .problem .mainBox .board {
+        flex-direction: column;
+    }
+
+    #mainContainer > .problems > .problem .mainBox .board .sheet {
+        max-width: unset;
+        max-height: 200px;
+        min-height: 150px;
+        border-left: unset;
+        border-top: 1px solid rgba(92, 92, 92, 0.3);
+    }
+
+    #mainContainer > .problems > .problem .mainBox .board .sheet.showResult {
+        max-height: 280px;
+    }
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    width: 100%;
+    height: 0;
+    opacity: 0;
+
+    transition:
+        opacity 0.4s ease,
+        height 0.4s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet.showResult .result {
+    height: 45px;
+    opacity: 1;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row t {
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0 10px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row t::before {
+    font-weight: normal;
+    font-size: 12px;
+    color: rgb(46, 46, 46);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .correct {
+    color: rgb(52, 149, 68);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .wrong {
+    color: rgb(223, 60, 60);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .correct::before {
+    content: "Đúng ";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .wrong::before {
+    content: "Sai ";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .skipped::before {
+    content: "Bỏ qua ";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .point {
+    font-family: "Nunito";
+    font-weight: 900;
+    font-size: 18px;
+    text-align: center;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .result > .point:after {
+    content: " điểm";
+    font-weight: bold;
+    font-size: 16px;
+    color: rgb(46, 46, 46);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    width: calc(100% - 20px);
+    margin: 10px 20px 20px;
+
+    overflow: auto;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty] {
+    min-height: 200px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty]::before {
+    content: "\f51b";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, calc(-50% - 42px));
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 72px;
+    color: rgb(144, 144, 144);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty]::after {
+    content: "Không có dữ liệu";
+    position: absolute;
+    display: block;
+    width: calc(100% - 20px);
+    top: 50%;
+    transform: translateY(calc(-50% + 18px));
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    color: rgb(136, 136, 136);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="upcomming"]::before {
+    content: "\f252";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="upcomming"]::after {
+    content: "Chưa tới giờ làm bài";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="noresult"]::before {
+    content: "\f506";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="noresult"]::after {
+    content: "Bạn không làm bài này";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="guest"]::before {
+    content: "\f2f6";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet[data-empty="guest"]::after {
+    content: "Vui lòng đăng nhập để làm bài";
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 6px 10px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input > .label {
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 50px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="correct"] > .label {
+    color: rgb(18, 139, 39);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="wrong"] > .label {
+    color: rgb(223, 60, 60);
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input > .circleCheckbox {
+    margin: 0 2px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input > .circleCheckbox:last-child {
+    margin-right: 40px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .footer {
+    position: relative;
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: 36px;
+    oveflow: visible;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+#mainContainer > .problems > .problem .mainBox .board .sheet .footer > button {
+    top: -50%;
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex: 1 1 auto;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    transition: transform 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.link,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.correct,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.passed,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.accepted,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.wrong,
+#mainContainer > .problems > .problem .mainBox .ranking table tr .number.skipped {
+    text-align: center;
+    font-family: "Consolas";
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking.contestNotEnded:empty::before {
+    content: "\f080";
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking > table {
+    padding: 10px;
+}
+
+#mainContainer > .problems > .problem .mainBox .ranking.contestNotEnded:empty::after {
+    content: "Bài thi chưa kết thúc";
+}
+
+#mainContainer > .problems > .problem .mainBox[data-layout="2"] .board,
+#mainContainer > .problems > .problem .mainBox[data-layout="2"] .ranking {
+    transform: translateX(-100%);
 }
 
 /** =================== SYSLOGS =================== **/
@@ -2227,1674 +1358,6 @@ panel > .main > .loadingWrapper.show {
 	font-size: 13px;
 	font-weight: bold;
 	line-height: 18px;
-}
-
-/** =================== PROBLEMEDITOR =================== **/
-
-.problemEditor {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	
-	--header-height: 40vh;
-
-	padding: unset;
-	padding-bottom: calc(var(--header-height) / 2);
-	background-color: white;
-}
-
-.problemEditor[data-active="description"] {
-	height: 100%;
-	padding-bottom: unset;
-}
-
-.problemEditor > .header {
-	position: sticky;
-	display: flex;
-	flex-direction: row;
-	flex-grow: 0;
-	flex-shrink: 0;
-
-	top: 0;
-	padding: 20px 10px;
-
-	background-color: white;
-	border-bottom: 1px solid rgba(128, 128, 128, 0.5);
-	z-index: 10000;
-}
-
-.problemEditor > .header > span {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.problemEditor > .header > .left {
-	flex-grow: 1;
-}
-
-.problemEditor > .header > .left > t {
-	padding: 5px 15px;
-	margin: 0 10px;
-
-	font-family: Nunito;
-	font-size: 26px;
-	font-weight: 800;
-	color: var(--text-color);
-	cursor: pointer;
-	background-color: var(--bg-color);
-
-	--text-color: rgba(84, 84, 84, 0.6);
-	--bg-color: none;
-}
-
-.problemEditor > .header > .left > t > icon::after {
-	color: var(--text-color);
-	margin-right: 10px;
-}
-
-.problemEditor > .header > .left > t:hover {
-	--text-color: rgba(36, 36, 36, 0.8);
-	--bg-color: rgba(238, 238, 238, 0.5);
-}
-
-.problemEditor[data-active="main"] > .header > .left > .main,
-.problemEditor[data-active="description"] > .header > .left > .description {
-	--text-color: rgb(245, 245, 245);
-	--bg-color: rgba(14, 14, 14, 0.9);
-}
-
-.problemEditor > .header > .right {
-	flex-wrap: wrap;
-}
-
-.problemEditor > .header > .right > button {
-	flex-grow: 1;
-	flex-shrink: 0;
-	margin: 5px 10px 0;
-}
-
-.problemEditor > .main {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-.problemEditor > .main > .imageInput {
-	position: relative;
-	margin: unset;
-	margin-bottom: 20px;
-}
-
-.problemEditor > .main > .imageInput > .imageBox {
-	width: 100%;
-	height: var(--header-height);
-}
-
-.problemEditor > .main > .imageInput > button {
-	position: absolute;
-	bottom: 12px;
-	right: 22px;
-	z-index: 3;
-}
-
-.problemEditor > .main > div {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	margin: 10px;
-}
-
-.problemEditor > .main > div > span {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	flex-basis: 0;
-}
-
-.problemEditor > .main > div > span > .sq-input {
-	width: auto;
-	margin: 10px;
-}
-
-.problemEditor > .main > div > span > .checkboxContainer { 
-	width: auto;
-	margin: 0 10px 10px;
-}
-
-.problemEditor > .main > div > span > .sq-input > textarea {
-	resize: vertical;
-	height: 80px;
-}
-
-.problemEditor > .main > div > span > button {
-	margin: 0 10px 10px;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="right"] > .tagsPreview {
-	position: relative;
-	margin: 10px;
-	padding: 10px;
-	min-height: 100px;
-
-	border: 1px solid rgba(56, 56, 56, 0.6);
-	border-radius: 4px;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="right"] > .tagsPreview:empty::before {
-	content: "TAG PREVIEW";
-	position: absolute;
-
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	
-	font-weight: bold;
-	color: rgb(182, 182, 182);
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test {
-	position: relative;
-	margin: 10px 10px 20px;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .label {
-	position: relative;
-    display: inline-block;
-
-    font-family: "Calibri", "Segoe UI", "sans-serif";
-    font-size: 18px;
-    font-weight: 700;
-    color: black;
-    text-transform: uppercase;
-    letter-spacing: .1px;
-
-    user-select: none;
-    pointer-events: none;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list {
-	position: relative;
-	display: block;
-	
-	width: 100%;
-	min-height: 100px;
-	box-sizing: border-box;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list:empty::before {
-	content: "TRỐNG";
-
-	position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: bold;
-	color: rgb(182, 182, 182);
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	height: 120px;
-	margin: 10px 0;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > textarea {
-	position: relative;
-	flex-grow: 1;
-
-	height: 100%;
-	padding: 10px;
-	margin-right: 10px;
-	border-radius: 4px;
-
-	font-family: "Consolas";
-	font-size: 17px;
-	font-weight: bold;
-	
-	box-sizing: border-box;
-	background-color: rgba(245, 245, 245, 0.8);
-
-	resize: none;
-	border: unset;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > textarea:focus {
-	outline: none;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > .delete {
-	position: relative;
-	display: block;
-	flex-grow: 0;
-
-	top: 0;
-	right: 0;
-	width: 60px;
-	height: 100%;
-	background-color: rgba(245, 245, 245, 0.8);
-	border-radius: 4px;
-
-	cursor: pointer;
-	transition: background-color 0.2s ease;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > .delete:hover {
-	background-color: rgba(202, 202, 202, 0.5);
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > .delete::before {
-	content: "\f146";
-	position: absolute;
-
-	top: 50%;
-	left: 50%;
-
-	transform: translate(-50%, -50%);
-	font-family: "Font Awesome 5 Free";
-	font-size: 18px;
-	font-weight: 600;
-	color: #95a5a6;
-	transition: 0.2s;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .list > .cell > .delete:hover::before {
-	color: #e74c3c;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="left"] > .test > .add {
-	width: 100%;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="right"] > .accept {
-	position: relative;
-
-	margin: 10px;
-}
-
-.problemEditor > .main > div[key="top"] > span[key="right"] > .accept > .label {
-	position: relative;
-    display: inline-block;
-
-    font-family: "Calibri", "Segoe UI", "sans-serif";
-    font-size: 18px;
-    font-weight: 700;
-    color: black;
-    text-transform: uppercase;
-    letter-spacing: .1px;
-
-    user-select: none;
-    pointer-events: none;
-}
-
-.problemEditor > .description {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	flex-grow: 1;
-	flex-shrink: 1;
-
-	overflow: hidden;
-}
-
-.problemEditor > .description > .editor,
-.problemEditor > .description > .preview {
-	flex-grow: 1;
-	flex-basis: 0;
-
-	margin: 10px;
-}
-
-.problemEditor > .description > .preview {
-	overflow: auto;
-}
-
-.problemEditor > .description > .preview > .md2html {
-	padding-bottom: 60vh;
-}
-
-.problemEditor > .description > .editor:focus-within {
-	border-color: transparent;
-}
-
-.problemEditor[data-active="description"] > .main,
-.problemEditor[data-active="main"] > .description {
-	display: none;
-}
-
-/** =================== SUBMIT =================== **/
-
-#submitContainer {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	height: 220px;
-	overflow: hidden;
-}
-
-#submitContainer > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	margin: 10px 20px;
-	background-color: white;
-	z-index: 1;
-}
-
-#submitContainer > .header > .dropzone {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: center;
-	flex-grow: 1;
-
-	height: 100%;
-	padding: 10px;
-	margin-right: 10px;
-	box-sizing: border-box;
-
-	border: 2px dotted #ccc;
-	border-radius: 4px;
-	user-select: none;
-
-	transition: all 0.4s ease;
-	transition-property: color, background-color;
-}
-
-#submitContainer > .header > .dropzone.drag {
-	background-color: #ccc;
-	color: white;
-}
-
-#submitContainer > .header > .dropzone > .label {
-	color: rgba(104, 104, 104, 0.7);
-	font-size: 14px;
-	font-weight: bold;
-	text-transform: uppercase;
-	letter-spacing: .6px;
-	pointer-events: none;
-}
-
-#submitContainer > .header > input {
-	display: none;
-}
-
-#submitContainer > .queue {
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-#submitContainer > .queue.queue:empty::before {
-	content: "\f574";
-	font-size: 48px;
-	transform: translate(-50%, calc(-50% - 18px));
-}
-
-#submitContainer > .queue.queue:empty::after {
-	content: "Danh Sách Trống";
-	transform: translate(-50%, calc(-50% + 28px));
-}
-
-#submitContainer > .queue > .item {
-	display: flex;
-	flex-direction: column;
-
-	margin: 5px 20px;
-	padding: 10px;
-	border-radius: 5px;
-	background-color: rgb(250, 250, 250);
-	user-select: none;
-
-	--color: rgb(44, 44, 44);
-}
-
-#submitContainer > .queue > .item[data-status="wait"] {
-	--color: rgb(161, 5, 223);
-}
-
-#submitContainer > .queue > .item[data-status="uploading"] {
-	--color: rgb(4, 135, 235);
-}
-
-#submitContainer > .queue > .item[data-status="complete"] {
-	--color: rgb(89, 179, 0);
-}
-
-#submitContainer > .queue > .item[data-status="error"] {
-	--color: rgb(206, 6, 83);
-}
-
-#submitContainer > .queue > .item > .header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-
-#submitContainer > .queue > .item > .header > .name {
-	font-family: Consolas;
-	font-size: 15px;
-	font-weight: bold;
-}
-
-#submitContainer > .queue > .item > .header > .status {
-	font-size: 13px;
-	text-align: right;
-	color: var(--color);
-}
-
-#submitContainer > .queue > .item > .detail {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-#submitContainer > .queue > .item > .detail > .progressBar {
-	flex-grow: 1;
-
-	height: 6px;
-	margin: 2px 10px 0 0;
-	border-radius: 6px;
-	overflow: hidden;
-}
-
-#submitContainer > .queue > .item > .detail > .progressBar > .bar {
-	background-color: var(--color);
-}
-
-#submitContainer > .queue > .item > .detail > .value {
-	font-size: 14px;
-}
-
-#submitContainer > .queue > .item > .detail > .value::after {
-	content: "/";
-	margin: 0 5px;
-}
-
-#submitContainer > .queue > .item > .detail > .size {
-	font-size: 14px;
-	font-weight: bold;
-}
-
-/** =================== LOGS =================== **/
-
-#logsPanel > div.main:empty::before {
-	content: "\f564";
-}
-
-#logsPanel > .logsItemContainer {
-	position: relative;
-}
-
-#logsPanel > .logsItemContainer > .logItem {
-	position: relative;
-	
-	height: 48px;
-	margin-left: 20px;
-	padding-right: 36px;
-	box-sizing: border-box;
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
-	border-bottom: 1px solid rgba(230, 230, 230, 0.2);
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .l {
-	position: relative;
-	display: inline-block;
-	flex-grow: 1;
-
-	overflow: hidden;
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .l > .t {
-	font-size: 10px;
-	font-weight: normal;
-	color: rgba(59, 71, 82, 0.7);
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .l > .n {
-	font-size: 13px;
-	font-weight: bold;
-	color: #585858;
-}
-
-#logsPanel > .logsItemContainer > .logItem.scored > .h > .l > .n {
-	color: #1124c8;
-}
-
-#logsPanel > .logsItemContainer > .logItem.correct > .h > .l > .n {
-	color: #39aa56;
-}
-
-#logsPanel > .logsItemContainer > .logItem.passed > .h > .l > .n {
-	color: #0ca3be;
-}
-
-#logsPanel > .logsItemContainer > .logItem.accepted > .h > .l > .n {
-	color: #b9ab14;
-}
-
-#logsPanel > .logsItemContainer > .logItem.failed > .h > .l > .n {
-	color: #db4545;
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .r {
-	position: relative;
-	display: flex;
-	flex-grow: 0;
-	flex-direction: column;
-	align-items: flex-end;
-	justify-content: center;
-
-	margin-right: 10px;
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .r > t {
-	color: rgba(98, 98, 98, 0.7);
-	font-size: 11px;
-	letter-spacing: 0.01em;
-}
-
-#logsPanel > .logsItemContainer > .logItem > .h > .r > .s {
-	font-weight: bold;
-	color: rgba(82, 82, 82, 0.7);
-	font-size: 11px;
-}
-
-#logsPanel > .logsItemContainer > .logItem > icon {
-	position: absolute;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	right: 0;
-	top: 0;
-	width: 36px;
-	height: 100%;
-
-	cursor: pointer;
-	background-color: #f8f8f8;
-	color: #c0c0c0;
-	text-decoration: none;
-
-	transition: all 0.2s ease;
-}
-
-#logsPanel > .logsItemContainer > .logItem > icon::after {
-	font-size: 16px;
-	color: rgb(84, 84, 84);
-}
-
-#logsPanel > .logsItemContainer > .logItem > icon:not(.link) {
-	cursor: not-allowed;
-}
-
-#logsPanel > .logsItemContainer > .logItem > icon:hover {
-	background-color: #f1f1f1;
-	color: #6e6e6e;
-}
-
-#logsPanel > .logsItemContainer > .logItem.queue > .h > .l > .n {
-	color: #8710cc;
-}
-
-#logsPanel > .logsItemContainer > .logItem.judging > .h > .l > .n {
-	color: #c811c8;
-}
-
-#logsPanel > .logsItemContainer > .logItem.queue > icon::after,
-#logsPanel > .logsItemContainer > .logItem.judging > icon::after {
-	animation: logIconSpin 1s linear 0s infinite forwards;
-}
-
-@keyframes logIconSpin {
-	0% {
-		transform: rotate(0deg);
-	}
-	100% {
-		transform: rotate(360deg);
-	}
-}
-
-/** =================== LOGVIEWER =================== **/
-
-.logViewer {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	width: 100%;
-	height: 100%;
-}
-
-.logViewer > .header {
-	position: relative;
-	display: inline-flex;
-	flex-direction: column;
-	flex-grow: 1;
-	box-sizing: border-box;
-	padding-left: 10px;
-	height: 100%;
-}
-
-.logViewer > .header::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 10px;
-	height: 100%;
-	background-color: #b9b9b9;
-}
-
-.logViewer > .header > .top {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	align-items: center;
-	flex-grow: 0;
-
-	padding: 20px 0 10px;
-}
-
-.logViewer > .header > .top > .problem {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	flex-grow: 0;
-
-	margin: 0 20px;
-}
-
-.logViewer > .header > .top > .problem > .problemIcon {
-	position: relative;
-	flex-shrink: 0;
-
-	width: 92px;
-	height: 92px;
-	margin-right: 20px;
-	border-radius: 50%;
-}
-
-.logViewer > .header > .top > .problem > .info {
-	position: relative;
-	display: block;
-	flex-shrink: 1;
-}
-
-.logViewer > .header > .top > .problem > .info > .name {
-	position: relative;
-
-	font-family: Nunito;
-	font-size: 25px;
-	font-weight: 950;
-	letter-spacing: .8px;
-	color: rgb(70, 70, 70);
-
-	cursor: pointer;
-}
-
-.logViewer > .header > .top > .problem > .info > .name:hover {
-	text-decoration: underline;
-}
-
-.logViewer > .header > .top > .problem > .info > .name::after {
-	content: "\f35d";
-	position: relative;
-	display: inline-block;
-
-	margin-left: 6px;
-	transform: translateY(-3px);
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 13px;
-	font-weight: 600;
-	text-align: center;
-	color: rgb(70, 70, 70);
-}
-
-.logViewer > .header > .top > .problem > .info > .point {
-	position: relative;
-	display: inline-block;
-
-	padding: 2px 6px;
-	margin-top: 2px;
-
-	font-size: 12px;
-	color: #ecf0f1;
-	letter-spacing: 0.4px;
-	background-color: #27ae60;
-	border-radius: 4px;
-}
-
-.logViewer > .header > .top > .pointContainer {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	flex-grow: 1;
-	flex-shrink: 0;
-
-	margin: 20px 20px 0;
-}
-
-.logViewer > .header > .top > .pointContainer > .pointBox {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	flex-grow: 1;
-	flex-shrink: 0;
-
-	margin: 0 10px;
-}
-
-.logViewer > .header > .top > .pointContainer[data-type="point"] > .pointBox[data-name="point"],
-.logViewer > .header > .top > .pointContainer[data-type="sp"] > .pointBox[data-name="sp"] {
-	order: -1;
-}
-
-.logViewer > .header > .top > .pointContainer > .pointBox > .title {
-	position: relative;
-	display: block;
-	background-color: rgba(168, 168, 168, 0.2);
-	padding: 2px 20px;
-	border-radius: 14px;
-
-	font-family: "Calibri";
-	font-size: 16px;
-	font-weight: bold;
-	color: rgb(68, 68, 68);
-	letter-spacing: .4px;
-	text-transform: uppercase;
-}
-
-.logViewer > .header > .top > .pointContainer > .pointBox > .point {
-	margin-top: 2px;
-
-	font-family: "Nunito";
-	font-size: 36px;
-	font-weight: 300;
-}
-
-.logViewer > .header > .top > .pointContainer[data-type="point"] > .pointBox[data-name="point"] > .point,
-.logViewer > .header > .top > .pointContainer[data-type="sp"] > .pointBox[data-name="sp"] > .point {
-	font-size: 56px;
-	font-weight: 400;
-}
-
-.logViewer > .header > .top > .pointContainer > .pointBox > .help {
-	position: absolute;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	right: -30px;
-	width: 20px;
-	height: 20px;
-	background-color: rgb(88, 88, 88);
-	border-radius: 50%;
-}
-
-.logViewer > .header > .top > .pointContainer > .pointBox > .help::before {
-	content: "\f128";
-	position: relative;
-	
-	font-family: "Font Awesome 5 Free";
-	font-size: 10px;
-	font-weight: bolder;
-	color: white;
-}
-
-.logViewer > .header > .bottom {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-.logViewer > .header > .bottom > .line {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	flex-grow: 0;
-	margin: 10px 0;
-}
-
-.logViewer > .header > .bottom > .line > .left {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	box-sizing: border-box;
-	padding: 0 0 0 20px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .row {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin: 1px 0;
-}
-
-.logViewer > .header > .bottom > .line > .left > .row::before {
-	content: "\f111";
-	position: relative;
-	flex-shrink: 0;
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 14px;
-	font-weight: 600;
-	margin-right: 16px;
-	width: 20px;
-	text-align: center;
-	color: rgba(46, 46, 46, 0.5);
-}
-
-.logViewer > .header > .bottom > .line > .left > .problemInfo {
-	margin-bottom: 10px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .problemInfo::before {
-	content: "\f128";
-	color: #464646;
-	font-size: 21px;
-	margin-right: 20px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .problemInfo > .problemID,
-.logViewer > .header > .bottom > .line > .left > .problemInfo > .language {
-	position: relative;
-	font-family: Consolas;
-	font-weight: bold;
-	font-size: 18px;
-	color: #464646;
-}
-
-.logViewer > .header > .bottom > .line > .left > .problemInfo > .language {
-	font-family: Calibri;
-	font-size: 16px;
-	margin-left: 20px;
-}
-
-/*? Correct */
-
-.logViewer > .header[data-level="correct"] > .bottom > .line > .left > .problemInfo > .problemID,
-.logViewer > .header[data-level="correct"] > .bottom > .line > .left > .problemInfo > .language,
-.logViewer > .header[data-level="correct"] > .bottom > .line > .left > .problemInfo::before {
-	color: #39aa56;
-}
-
-.logViewer > .header[data-level="correct"]::before {
-	background-color: #39aa56;
-}
-
-.logViewer > .header[data-level="correct"] > .bottom > .line > .left > .problemInfo::before {
-	content: "\f00c";
-}
-
-/*? Passed */
-
-.logViewer > .header[data-level="passed"] > .bottom > .line > .left > .problemInfo > .problemID,
-.logViewer > .header[data-level="passed"] > .bottom > .line > .left > .problemInfo > .language,
-.logViewer > .header[data-level="passed"] > .bottom > .line > .left > .problemInfo::before {
-	color: #39aaa1;
-}
-
-.logViewer > .header[data-level="passed"]::before {
-	background-color: #39aaa1;
-}
-
-.logViewer > .header[data-level="passed"] > .bottom > .line > .left > .problemInfo::before {
-	content: "\f129";
-}
-
-/*? Accepted */
-
-.logViewer > .header[data-level="accepted"] > .bottom > .line > .left > .problemInfo > .problemID,
-.logViewer > .header[data-level="accepted"] > .bottom > .line > .left > .problemInfo > .language,
-.logViewer > .header[data-level="accepted"] > .bottom > .line > .left > .problemInfo::before {
-	color: #d89519;
-}
-
-.logViewer > .header[data-level="accepted"]::before {
-	background-color: #edde3f;
-}
-
-.logViewer > .header[data-level="accepted"] > .bottom > .line > .left > .problemInfo::before {
-	content: "\f12a";
-}
-
-/*? Failed */
-
-.logViewer > .header[data-level="failed"] > .bottom > .line > .left > .problemInfo > .problemID,
-.logViewer > .header[data-level="failed"] > .bottom > .line > .left > .problemInfo > .language,
-.logViewer > .header[data-level="failed"] > .bottom > .line > .left > .problemInfo::before {
-	color: #db4545;
-}
-
-.logViewer > .header[data-level="failed"]::before {
-	background-color: #db4545;
-}
-
-.logViewer > .header[data-level="failed"] > .bottom > .line > .left > .problemInfo::before {
-	content: "\f00d";
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	margin: 6px 2px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table {
-	margin: 4px 20px 0 0;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td {
-	padding: 2px 6px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(1) {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	padding-left: unset;
-
-	font-family: "Calibri", "Segoe UI";
-	font-size: 16px;
-	font-weight: bold;
-	color: rgb(56, 56, 56);
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(1)::before {
-	content: "\f111";
-	position: relative;
-	flex-shrink: 0;
-
-	width: 20px;
-	margin-right: 12px;
-
-	font-family: "Font Awesome 5 Free";
-	font-size: 20px;
-	font-weight: 600;
-	text-align: center;
-	line-height: 20px;
-	color: rgba(46, 46, 46, 0.5);
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(1)[data-icon="clock"]::before {
-	content: "\f017";
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(1)[data-icon="gavel"]::before {
-	content: "\f0e3";
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(1)[data-icon="line"]::before {
-	content: "\f201";
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(2) {
-	font-size: 13px;
-	font-weight: bold;
-
-	text-align: right;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr > td:nth-child(3) {
-	font-family: "Consolas";
-	font-size: 15px;
-	font-weight: bold;
-
-	text-align: right;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr.green td:nth-child(3) {
-	color: rgb(8, 165, 40);
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr.yellow td:nth-child(3) {
-	color: #d89519;
-}
-
-.logViewer > .header > .bottom > .line > .left > .sp > table tr.red td:nth-child(3) {
-	color: rgb(211, 47, 47);
-}
-
-.logViewer > .header > .bottom > .line > .left > t {
-	position: relative;
-	font-family: "Calibri", "Segoe UI";
-	font-size: 15px;
-	color: rgb(56, 56, 56);
-}
-
-.logViewer > .header > .bottom > .line > .left > .submitTime::before {
-	content: "\f783";
-}
-
-.logViewer > .header > .bottom > .line > .left > .submitted::before {
-	content: "\f093";
-}
-
-.logViewer > .header > .bottom > .line > .left > .status::before {
-	content: "\f05a";
-}
-
-.logViewer > .header > .bottom > .line > .left > .result::before {
-	content: "\f682";
-}
-
-.logViewer > .header > .bottom > .line > .left > .point::before {
-	content: "\f044";
-}
-
-.logViewer > .header > .bottom > .line > .left > .result b {
-	display: inline;
-	padding: 0 4px;
-}
-
-.logViewer > .header > .bottom > .line > .left > .result b.green {
-	color: #39aa56;
-}
-
-.logViewer > .header > .bottom > .line > .left > .result b.red {
-	color: #db4545;
-}
-
-.logViewer > .header > .bottom > .line > .left > .point {
-	font-weight: bold;
-	font-size: 16px;
-}
-
-.logViewer > .header > .bottom > .line > .right {
-	position: relative;
-	display: inline-flex;
-	flex-direction: column;
-	flex-grow: 0;
-
-	min-width: 140px;
-	margin-right: 20px;
-}
-
-.logViewer > .header > .bottom > .line > .right > .submitter {
-	position: relative;
-	display: flex;
-	flex-direction: row-reverse;
-	align-items: center;
-	margin-bottom: 20px;
-}
-
-.logViewer > .header > .bottom > .line > .right > .submitter > .avatar {
-	position: relative;
-	flex-shrink: 0;
-
-	width: 50px;
-	height: 50px;
-	border-radius: 50%;
-	object-fit: cover;
-}
-
-.logViewer > .header > .bottom > .line > .right > .submitter > .info {
-	position: relative;
-	margin-right: 10px;
-}
-
-.logViewer > .header > .bottom > .line > .right > .submitter > .info > .tag {
-	font-family: "Calibri";
-	font-size: 11px;
-	letter-spacing: 0.4px;
-	color: #546e7a;
-	font-weight: bold;
-	text-align: right;
-}
-
-.logViewer > .header > .bottom > .line > .right > .submitter > .info > .name {
-	font-family: Nunito;
-	font-size: 16px;
-	font-weight: 850;
-	color: #425161;
-	text-align: right;
-}
-
-.logViewer > .header > .bottom > .line.log {
-	flex-direction: column;
-}
-
-.logViewer > .testList {
-	position: relative;
-	display: inline-block;
-	flex-grow: 0;
-	flex-shrink: 0;
-	width: 280px;
-	height: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
-	background-color: rgb(238, 238, 238);
-}
-
-.logViewer > .testList:empty::before {
-	content: "Không tìm thấy test nào cả :(";
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	text-align: center;
-	font-family: "Calibri", "Segoe UI";
-	font-weight: bold;
-	font-size: 16px;
-	color: gray;
-}
-
-.logViewer > .testList > .item {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-	box-sizing: border-box;
-	padding: 10px 10px 10px 16px;
-	background-color: rgb(245, 245, 245);
-	counter-increment: testItem;
-
-	transition: background-color 0.2s ease;
-}
-
-.logViewer > .testList > .item:hover {
-	background-color: rgb(255, 255, 255);
-}
-
-.logViewer > .testList > .item::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 6px;
-	height: 100%;
-	background-color: #b9b9b9
-}
-
-.logViewer > .testList > .item > .line {
-	position: relative;
-	display: flex;
-	width: 100%;
-	flex-direction: row;
-	align-items: center;
-	flex-grow: 1;
-}
-
-.logViewer > .testList > .item > .line.detail {
-	position: relative;
-	flex-direction: column;
-	align-items: flex-start;
-	margin-top: 10px;
-}
-
-.logViewer > .testList > .item > .line.detail t {
-	display: block;
-	width: 100%;
-	font-size: 13px;
-	white-space: pre-wrap;
-	color: rgb(80, 80, 80);
-}
-
-.logViewer > .testList > .item > .line > .left {
-	position: relative;
-	flex-grow: 1;
-}
-
-.logViewer > .testList > .item > .line > .left > .testID {
-	position: relative;
-	font-size: 15px;
-	font-weight: bold;
-	color: #464646;
-}
-
-.logViewer > .testList > .item > .line > .left > .testID::before {
-	content: "#"counter(testItem);
-	position: relative;
-	display: inline-block;
-	font-size: 11px;
-	width: 25px;
-}
-
-.logViewer > .testList > .item > .line > .left > .status {
-	position: relative;
-	font-size: 12px;
-}
-
-.logViewer > .testList > .item > .line > .right {
-	position: relative;
-	display: inline-flex;
-	flex-direction: column;
-	align-items: flex-end;
-	flex-grow: 0;
-	flex-shrink: 0;
-}
-
-.logViewer > .testList > .item > .line > .right > .point {
-	position: relative;
-	font-size: 13px;
-	font-weight: bold;
-	text-align: right;
-	color: rgb(78, 78, 78);
-}
-
-.logViewer > .testList > .item > > .line .right > .runtime {
-	position: relative;
-	font-size: 12px;
-	color: rgb(114, 114, 114);
-}
-
-.logViewer > .testList > .item.passed::before {
-	background-color: #39aa56;
-}
-
-.logViewer > .testList > .item.passed > .line > .left > .testID {
-	color: #39aa56;
-}
-
-.logViewer > .testList > .item.accepted::before {
-	background-color: #edde3f;
-}
-
-.logViewer > .testList > .item.accepted > .line > .left > .testID {
-	color: #cfc337;
-}
-
-.logViewer > .testList > .item.failed::before {
-	background-color: #c0392b;
-}
-
-.logViewer > .testList > .item.failed > .line > .left > .testID {
-	color: #c0392b;
-}
-
-@media only screen and (max-width: 800px) {
-	.logViewer {
-		height: auto;
-		flex-direction: column;
-	}
-
-	.logViewer > .header {
-		height: unset;
-	}
-
-	.logViewer > .testList {
-		width: 100%;
-		height: unset;
-	}
-
-	.logViewer > .testList > .item {
-		padding-left: 20px;
-	}
-
-	.logViewer > .testList > .item::before {
-		width: 10px;
-	}
-}
-
-/** =================== RANKING =================== **/
-
-.rankingContainer {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-#content > .rankingContainer {
-	overflow: hidden;
-}
-
-.rankingContainer > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	padding: 50px 50px 10px;
-}
-
-.rankingContainer > .header::before {
-	content: "";
-	position: absolute;
-
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 120px;
-
-	background: #7f7fd5;
-	background: linear-gradient(to left, #7f7fd5, #86a8e7, #91eae4);
-}
-
-.rankingContainer > .header > icon::after {
-	font-size: 28px;
-}
-
-.rankingContainer > .header > .title {
-	flex-grow: 1;
-	margin-left: 20px;
-
-	font-family: Nunito;
-	font-weight: 300;
-	font-size: 28px;
-	line-height: 38px;
-}
-
-.rankingContainer > #ranking {
-	position: relative;
-	display: block;
-	flex-grow: 1;
-	
-	width: auto;
-	margin: 0 10px;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-
-	z-index: 1;
-	overflow: auto;
-}
-
-.rankingContainer > div#ranking:empty::before {
-	content: "\f02d";
-}
-
-.rankingContainer > div#ranking:empty::after {
-	content: "Không có dữ liệu hoặc đã bị tắt";
-}
-
-#ranking > table {
-	position: relative;
-
-	min-width: 100%;
-	box-sizing: border-box;
-	border-spacing: 0;
-
-	font-family: "Calibri";
-}
-
-#ranking > table > thead > tr > th:nth-child(1),
-#ranking > table tr > td:nth-child(1) {
-	width: 20px;
-	text-align: center;
-}
-
-#ranking > table > thead > tr > th:nth-child(2),
-#ranking > table > tr > td:nth-child(2) {
-	text-align: left;
-}
-
-#ranking > table > thead > tr > th:nth-child(2) {
-	width: 40px;
-}
-
-#ranking > table > tbody > tr > td:nth-child(2) {
-	display: flex;
-	align-items: center;
-	padding: 10px;
-	margin: 0 0 0 10px;
-}
-
-#ranking > table > tbody > tr > td:nth-child(2) .avatar {
-	position: relative;
-	display: block;
-
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-}
-
-#ranking > table > tbody > tr > td:nth-child(3) .username {
-	font-family: "Open Sans";
-	font-size: 11px;
-	font-style: italic;
-	color: rgb(114, 114, 114);
-	letter-spacing: .2px;
-}
-
-#ranking > table > tbody > tr > td:nth-child(3) .name {
-	font-size: 15px;
-	letter-spacing: .2px;
-}
-
-
-#ranking > table > tbody > tr > td.number:nth-child(4) {
-	color: #3c7be7;
-	font-size: 16px;
-	font-weight: bold;
-}
-
-#ranking > table > tbody > tr > td.number:nth-child(5) {
-    color: rgb(100, 62, 202);
-    font-size: 16px;
-    font-weight: bold;
-}
-
-#ranking > table > tbody > tr[data-rank="1"] {
-	background-color: rgba(111, 241, 134, 0.2);
-}
-
-#ranking > table > tbody > tr[data-rank="2"] {
-	background-color: rgba(239, 241, 111, 0.2);
-}
-
-#ranking > table > tbody > tr[data-rank="3"] {
-	background-color: rgba(230, 111, 241, 0.2);
-}
-
-#ranking > table > tbody > tr[data-rank="1"] > td:nth-child(3) > .name,
-#ranking > table > tbody > tr[data-rank="2"] > td:nth-child(3) > .name,
-#ranking > table > tbody > tr[data-rank="3"] > td:nth-child(3) > .name {
-	font-family: Nunito;
-	font-size: 16px;
-	font-weight: 850;
-	letter-spacing: .4px;
-	color: rgb(65, 65, 65);
-}
-
-#ranking > table > thead > tr > th {
-	position: sticky;
-	top: 0;
-
-	border-bottom: 1px solid rgba(155, 155, 155, 0.4);
-	background-color: white;
-
-	font-family: Segoe UI;
-	font-size: 13px;
-	font-weight: bold;
-	color: rgb(82, 82, 82);
-
-	z-index: 1;
-}
-
-#ranking > table > thead > tr > th:nth-child(3) {
-	text-align: left;
-}
-
-#ranking > table > thead > tr > th.problem > t {
-	display: inline-block;
-	color: rgb(82, 82, 82);
-	font-family: Segoe UI;
-	font-size: 13px;
-	font-weight: bold;
-}
-
-#ranking > table > thead > tr > th.problem > .toggler {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 18px;
-	height: 18px;
-	padding: 0 4px;
-	cursor: pointer;
-
-	transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-#ranking > table > thead > tr > th.problem > .toggler::after {
-	content: "\f104";
-	position: relative;
-	display: block;
-	font-family: "Font Awesome 5 Free";
-	font-size: 18px;
-	font-weight: 900;
-	transform: translateY(2px);
-}
-
-#ranking > table > thead > tr > th.problem[data-folding="true"] {
-	width: 10px;
-	padding: unset;
-}
-
-#ranking > table > thead > tr > th.problem[data-folding="true"] > t {
-	display: none;
-}
-
-#ranking > table > thead > tr > th.problem[data-folding="true"] > .toggler {
-	transform: rotate(180deg);
-}
-
-#ranking > table > thead > tr > th.problem[data-folding="true"] > .toggler::after {
-	transform: unset;
-}
-
-#ranking > table > thead > tr > th,
-#ranking > table tr > td {
-	padding: 10px 12px;
-}
-
-#ranking > table tr > td {
-	font-size: 13px;
-}
-
-#ranking > table tr > td.number,
-#ranking > table tr > td.number > t {
-	font-size: 13px;
-	text-align: right;
-	color: rgb(172, 172, 172);
-}
-
-#ranking > table tr > td.number > t.big {
-	font-size: 16px;
-	font-weight: bold;
-}
-
-#ranking > table tr > td.number[data-folding="true"] > t {
-	display: none;
-}
-
-#ranking > table tr > td.number.link {
-	cursor: pointer;
-}
-
-#ranking > table tr .number.link > t,
-#ranking > table tr .number.correct > t,
-#ranking > table tr .number.passed > t,
-#ranking > table tr .number.accepted > t,
-#ranking > table tr .number.failed > t,
-#ranking > table tr .number.skipped > t {
-	color: rgb(75, 75, 75);
-}
-
-#ranking > table tr > td.number.correct {
-	background-color: var(--status-correct);
-}
-
-#ranking > table tr > td.number.passed {
-	background-color: var(--status-passed);
-}
-
-#ranking > table tr > td.number.accepted {
-	background-color: var(--status-accepted);
-}
-
-#ranking > table tr > td.number.failed {
-	background-color: var(--status-failed);
-}
-
-#ranking > table tr > td.number.skipped {
-	background-color: var(--status-skipped);
-}
-
-#ranking > table tr > td.number.link:hover {
-	filter: brightness(1.1);
-}
-
-.rankingCellTooltip {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-.rankingCellTooltip > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.rankingCellTooltip > .header t {
-	color: white;
-}
-
-.rankingCellTooltip > .header > .problem {
-	font-family: "Consolas";
-	font-size: 16px;
-	font-weight: bold;
-}
-
-.rankingCellTooltip > .header > .status {
-	font-weight: bold;
-}
-
-.rankingCellTooltip[data-status="correct"] > .header > .status {
-	color: #73ff96;
-}
-
-.rankingCellTooltip[data-status="passed"] > .header > .status {
-	color: #93efff;
-}
-
-.rankingCellTooltip[data-status="accepted"] > .header > .status {
-	color: #fff589;
-}
-
-.rankingCellTooltip[data-status="failed"] > .header > .status {
-	color: #ffbaba;
-}
-
-.rankingCellTooltip > .point > tbody > tr > td:nth-child(1) {
-	font-size: 14px;
-}
-
-.rankingCellTooltip > .point > tbody > tr > td:nth-child(2) {
-	font-family: "Consolas";
-	font-size: 16px;
-	font-weight: bold;
 }
 
 /** =================== CONTESTINFO =================== **/
@@ -4236,416 +1699,6 @@ panel > .main > .loadingWrapper.show {
 		width: 100%;
 		min-width: 480px;
 	}
-}
-
-/** =================== USERCARD =================== **/
-
-.userCard {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-
-	padding: 5px;
-
-	min-width: 200px;
-	min-height: 80px;
-}
-
-.userCard > .loadingWrapper {
-	position: absolute;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-
-	opacity: 1;
-	z-index: 1;
-
-	transition: opacity 0.3s ease;
-}
-
-.userCard.loaded > .loadingWrapper {
-	opacity: 0;
-}
-
-.userCard > .loadingWrapper[data-type="errored"] > .simpleSpinner {
-	display: none;
-}
-
-.userCard > .loadingWrapper[data-type="errored"]::before {
-	content: "\f071";
-    position: relative;
-	display: block;
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    font-size: 18px;
-	font-style: normal;
-    color: rgb(255, 255, 255);
-}
-
-.userCard > .loadingWrapper[data-type="errored"] > .error {
-	font-size: 11px;
-	text-align: center;
-
-	color: white;
-	max-width: 100%;
-
-	padding: 6px 10px 0;
-	box-sizing: border-box;
-	word-wrap: break-word;
-	white-space: normal;
-}
-
-.userCard > .header {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	align-items: center;
-}
-
-.userCard > .header > .left {
-	position: relative;
-	display: block;
-	width: 80px;
-	height: 80px;
-
-	margin: 0 5px;
-}
-
-.userCard > .header > .left > .avatar {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 100%;
-
-	border-radius: 50%;
-}
-
-.userCard > .header > .left > .status {
-	position: absolute;
-	display: block;
-	bottom: 0;
-	right: 0;
-	width: 16px;
-	height: 16px;
-
-	background-color: rgb(190, 179, 179);
-	border: 3px solid rgb(100, 100, 100);
-	border-radius: 50%;
-}
-
-.userCard > .header > .left > .status[data-status="online"] {
-	background-color: rgb(120, 255, 140);
-}
-
-.userCard > .header > .right {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-
-	margin: 0 5px;
-}
-
-.userCard > .header > .right > .username {
-	color: rgba(255, 255, 255, 0.9);
-	font-family: "Calibri";
-	font-weight: 500;
-	font-size: 13px;
-}
-
-.userCard > .header > .right > .username::before {
-	content: "@";
-}
-
-.userCard > .header > .right > .detail {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-
-	align-items: flex-end;
-}
-
-.userCard > .header > .right > .detail > .name {
-	color: white;
-	font-family: "Nunito";
-	font-weight: 900;
-	font-size: 20px;
-	letter-spacing: .6px;
-}
-
-.userCard > .header > .right > .detail > .id {
-	color: rgba(216, 216, 216, 0.9);
-	font-size: 14px;
-	font-weight: bold;
-
-	margin-bottom: 3px;
-}
-
-.userCard > .header > .right > .detail > .id::before {
-	content: "#";
-}
-
-.userCard > .header > .right > .status {
-	margin-top: 10px;
-
-	color: rgb(224, 224, 224);
-	font-family: "Calibri";
-	font-size: 13px;
-}
-
-.userCard > .submissions {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-.userCard > .submissions > .bar {
-	position: relative;
-	display: block;
-	width: 100%;
-	height: 20px;
-
-	margin: 5px 0;
-	background-color: rgba(128, 128, 128, 0.6);
-}
-
-.userCard > .submissions > .bar > .inner {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	width: 0;
-	height: 100%;
-	overflow: hidden;
-
-	transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.userCard > .submissions > .bar > .inner > span {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-
-	height: 100%;
-	font-size: 15px;
-	font-weight: bold;
-	color: rgb(75, 75, 75);
-
-	overflow: hidden;
-}
-
-.userCard > .submissions > .bar > .inner > span.correct {
-	background-color: rgb(147, 243, 158);
-}
-
-.userCard > .submissions > .bar > .inner > span.passed {
-	background-color: rgb(150, 245, 248);
-}
-
-.userCard > .submissions > .bar > .inner > span.accepted {
-	background-color: rgb(240, 237, 157);
-}
-
-.userCard > .submissions > .bar > .inner > span.failed {
-	background-color: rgb(248, 187, 187);
-}
-
-.userCard > .submissions > .bar > .inner > span.skipped {
-	background-color: rgb(212, 212, 212);
-}
-
-.userCard > .submissions > .list {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-}
-
-.userCard > .submissions > .list > .item {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	height: 40px;
-	background-color: rgba(58, 58, 58, 0.8);
-
-	opacity: 0;
-	transform: translateY(20px);
-
-	transition:
-		opacity 0.2s ease-out,
-		transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-}
-
-.userCard > .submissions > .list > .item.show {
-	opacity: 1;
-	transform: unset;
-}
-
-.userCard > .submissions > .list > .item > .left {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-
-	padding: 0 10px;
-}
-
-.userCard > .submissions > .list > .item > .left > .title {
-	padding-top: 5px;
-
-	font-family: "Nunito";
-	font-weight: 800;
-	font-size: 15px;
-	line-height: 12px;
-	color: white;
-
-	opacity: 0;
-	transform: translateX(40px);
-
-	transition:
-		opacity 0.2s ease-out 0.1s,
-		transform 0.4s cubic-bezier(0.33, 1, 0.68, 1) 0.1s;
-}
-
-.userCard > .submissions > .list > .item.show > .left > .title {
-	opacity: 1;
-	transform: unset;
-}
-
-.userCard > .submissions > .list > .item[data-status="correct"] > .left > .title {
-	color: rgb(148, 255, 148);
-}
-
-.userCard > .submissions > .list > .item[data-status="passed"] > .left > .title {
-	color: rgb(188, 253, 255);
-}
-
-.userCard > .submissions > .list > .item[data-status="accepted"] > .left > .title {
-	color: rgb(255, 253, 183);
-}
-
-.userCard > .submissions > .list > .item[data-status="failed"] > .left > .title {
-	color: rgb(255, 156, 156);
-}
-
-.userCard > .submissions > .list > .item[data-status="skipped"] > .left > .title {
-	color: rgb(214, 214, 214);
-}
-
-.userCard > .submissions > .list > .item > .left > .detail {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	opacity: 0;
-
-	transition: opacity 0.2s ease-out 0.25s;
-}
-
-.userCard > .submissions > .list > .item.show > .left > .detail {
-	opacity: 1;
-}
-
-.userCard > .submissions > .list > .item > .left > .detail > .id {
-	margin-right: 10px;
-
-	font-size: 12px;
-	color: rgb(251, 189, 107);
-}
-
-.userCard > .submissions > .list > .item > .left > .detail > .extension {
-	font-size: 12px;
-	color: rgba(226, 226, 226, 0.8);
-}
-
-.userCard > .submissions > .list > .item > .right {
-	position: relative;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	height: 100%;
-	margin-left: 10px;
-	opacity: 0;
-
-	transition: opacity 0.2s ease-out 0.3s;
-}
-
-.userCard > .submissions > .list > .item.show > .right {
-	opacity: 1;
-}
-
-.userCard > .submissions > .list > .item > .right > t > sub {
-	margin-left: 2px;
-
-	vertical-align: baseline;
-	font-family: "Segoe UI";
-	font-size: 13px;
-	color: rgb(184, 184, 184);
-}
-
-.userCard > .submissions > .list > .item > .right > .point {
-	font-family: Calibri;
-	font-size: 19px;
-	font-weight: bold;
-	color: white;
-}
-
-.userCard > .submissions > .list > .item > .right > .sp {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-end;
-
-	min-width: 120px;
-	height: 100%;
-	margin-left: 15px;
-	padding-right: 10px;
-
-	font-family: Nunito;
-	font-size: 24px;
-	font-weight: bold;
-	color: rgb(195, 238, 255);
-
-	background-color: rgba(98, 98, 98, 0.5);
-}
-
-.userCard > .submissions > .list > .item > .right > .sp::before,
-.userCard > .submissions > .list > .item > .right > .sp::after {
-	content: "";
-	position: absolute;
-	display: block;
-	top: 0;
-	left: -15px;
-	width: 0;
-	height: 0;
-	border-style: solid;
-	border-width: 0 15px 20px 0;
-	border-color: transparent rgba(98, 98, 98, 0.5) transparent transparent;
-}
-
-.userCard > .submissions > .list > .item > .right > .sp::after {
-	top: unset;
-	bottom: 0;
-	border-width: 0 0 20px 15px;
-	border-color: transparent transparent rgba(98, 98, 98, 0.5) transparent;
-}
-
-.userCard > .submissions > .list > .item > .right > .sp > sub {
-	margin-top: 4px;
-	color: rgb(160, 203, 221);
-}
-
-.userCard:not(.loaded) > .header,
-.userCard:not(.loaded) > .submissions {
-	display: none;
 }
 
 /** =================== FOOTER =================== **/

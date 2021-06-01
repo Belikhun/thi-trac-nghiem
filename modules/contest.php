@@ -46,38 +46,22 @@
 		}
 	}
 
-	define("CONTEST_STARTED", 1);
+    define("CONTEST_STARTED", 1);
 	define("CONTEST_NOTENDED", 2);
 	define("CONTEST_ENDED", 3);
 
-	/**
-	 * Check for time requirements in contest mode
-	 * 
-	 * @param	Array	$req
-	 * 	Requirements
-	 * 
-	 * @param	Bool	$justReturn
-	 * 	If this set to true, this function will return
-	 * 	`true` if all the requirements met, else will
-	 * 	return a code according to the *api response code*
-	 * 
-	 * @param	Bool	$instantDeath
-	 * 	If this set to true, no output will be printed
-	 * 	if an requirements does not met
-	 * 
-	 * @param	Int		$resCode
-	 * 	Response code
-	 */
-	function contest_timeRequire(
-		Array $req = Array(
-			CONTEST_STARTED,
-			CONTEST_NOTENDED
-		),
-		Bool $justReturn = true,
-		Bool $instantDeath = false,
-		Int $resCode = 403
-	) {
-		$duringTime = getConfig("time.contest.during");
+	function problemTimeRequire(String $id, Array $req = Array(
+		CONTEST_STARTED,
+		CONTEST_NOTENDED
+	), $justReturn = true, $instantDeath = false, $resCode = 403) {
+        global $problemList;
+
+        if (!problemExist($id))
+            return false;
+        
+        $problem = problemGet($id);
+        $duringTime = $problem["time"]["during"];
+        
 		if ($duringTime <= 0)
 			return true;
 
@@ -85,9 +69,9 @@
 		if ($_SESSION["username"] !== null && $_SESSION["id"] === "admin")
 			return true;
 
-		$beginTime = getConfig("time.contest.begin");
-		$offsetTime = getConfig("time.contest.offset");
-		$t = $beginTime - microtime(true) + ($duringTime * 60);
+		$beginTime = $problem["time"]["begin"];
+		$offsetTime = $problem["time"]["offset"];
+		$t = $beginTime - microtime(true) + ($duringTime);
 
 		foreach ($req as $key => $value) {
 			$returnCode = null;
@@ -95,28 +79,28 @@
 
 			switch($value) {
 				case CONTEST_STARTED:
-					if ($t > $duringTime * 60) {
+					if ($t > $duringTime) {
 						$returnCode = 103;
-						$message = "Kì thi chưa bắt đầu";
+						$message = "Kì thi \"$id\" chưa bắt đầu";
 					}
 					break;
 
 				case CONTEST_NOTENDED:
 					if ($t < -$offsetTime && $duringTime !== 0) {
 						$returnCode = 104;
-						$message = "Kì thi đã kết thúc";
+						$message = "Kì thi \"$id\" đã kết thúc";
 					}
 					break;
 
 				case CONTEST_ENDED:
 					if ($t > -$offsetTime && $duringTime !== 0) {
 						$returnCode = 105;
-						$message = "Kì thi chưa kết thúc";
+						$message = "Kì thi \"$id\" chưa kết thúc";
 					}
 					break;
 
 				default:
-					trigger_error("Unknown case: $value", E_USER_ERROR);
+					trigger_error("Unknown case: ". $value, E_USER_ERROR);
 					break;
 			}
 
@@ -131,7 +115,7 @@
 				if ($instantDeath === true) {
 					http_response_code($resCode);
 					die();
-				}
+                }
 
 				stop($returnCode, $message, $resCode);
 			}
