@@ -8,6 +8,8 @@
 */
 
 body.dark {
+    background-color: #212121;
+
     --status-correct: #86c900;
 	--status-passed: #40b0e8;
 	--status-accepted: #f6c21c;
@@ -17,4 +19,168 @@ body.dark {
 
 body.dark #superContainer {
 	background-color: rgb(10, 10, 10);
+}
+
+body.dark #mainContainer {
+    background-color: rgb(32, 32, 32);
+}
+
+body.dark #mainContainer > .problems > .problemsList .list:empty {
+    background-color: rgb(38, 38, 38);
+}
+
+body.dark #mainContainer > .rankingContainer {
+	background-color: rgb(19, 19, 19);
+}
+
+body.dark #mainContainer > .rankingContainer > .header::before {
+	background: linear-gradient(to right, #141e30, #243b55);
+}
+
+/** =================== PROBLEM LIST =================== **/
+
+body.dark #mainContainer > .problems > .problemsList > .list > .item {
+    background-color: rgb(22, 22, 22);
+}
+
+body.dark #mainContainer > .problems > .problemsList > .list > .item:hover {
+    box-shadow: 0 0 0 3px rgb(68, 178, 252);
+}
+
+body.dark #mainContainer > .problems > .problemsList > .list > .item > .point {
+    background-color: rgb(44, 44, 44);
+}
+
+body.dark #mainContainer > .problems > .problemsList > .list > .item > .detail > span > t::before {
+    color: rgb(218, 218, 218);
+}
+
+body.dark #mainContainer > .problems > .problemsList > .list > .item > .thumbnail {
+    filter: brightness(0.8);
+}
+
+body.dark #mainContainer > .problems > .problem .header > .link {
+    color: rgb(146, 146, 146);
+}
+
+body.dark #mainContainer > .problems > .problem .header > .link.active {
+    color: rgb(206, 206, 206);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .footer {
+    background-color: rgba(54, 54, 54, 0.4);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="correct"] > .label,
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .correct {
+    color: rgb(104, 230, 125);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .markBox .input[data-status="wrong"] > .label,
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row .wrong {
+    color: rgb(255, 163, 163);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .row t::before {
+    color: rgb(226, 226, 226);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .sheet .result > .point:after {
+    color: rgb(235, 235, 235);
+}
+
+/* Rank Panel */
+
+body.dark #mainContainer .rankingTable table tr td:nth-child(3) .username {
+    color: rgb(160, 160, 160);
+}
+
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="1"] {
+    background-color: rgba(11, 129, 33, 0.2);
+}
+
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="2"] {
+    background-color: rgba(136, 138, 15, 0.2);
+}
+
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="3"] {
+    background-color: rgba(112, 12, 121, 0.2);
+}
+
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="1"] td:nth-child(3) .name,
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="2"] td:nth-child(3) .name,
+body.dark #mainContainer .rankingTable table tbody tr[data-rank="3"] td:nth-child(3) .name {
+    color: rgb(236, 236, 236);
+}
+
+body.dark #mainContainer .rankingTable table tr th {
+    background-color: #303030;
+    color: rgb(202, 202, 202);
+    border-bottom-color: rgb(88, 88, 88);
+}
+
+body.dark #mainContainer .rankingTable table tr th.problem > t {
+    color: rgb(202, 202, 202);
+}
+
+body.dark #mainContainer .rankingTable table tr th:nth-child(1),
+body.dark #mainContainer .rankingTable table tr td:nth-child(1) {
+    color: rgb(184, 184, 184);
+}
+
+body.dark #mainContainer .rankingTable table tr td.number {
+    color: rgb(82, 82, 82);
+}
+
+body.dark #mainContainer .rankingTable table tr td.number:nth-child(4) {
+    color: rgb(98, 202, 246);
+}
+
+body.dark #mainContainer .rankingTable table tr td.number:nth-child(5) {
+    color: rgb(195, 158, 255);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.link,
+body.dark #mainContainer .rankingTable table tr .number.correct,
+body.dark #mainContainer .rankingTable table tr .number.passed,
+body.dark #mainContainer .rankingTable table tr .number.accepted,
+body.dark #mainContainer .rankingTable table tr .number.wrong,
+body.dark #mainContainer .rankingTable table tr .number.skipped {
+    color: rgb(224, 224, 224);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.correct {
+    background-color: rgb(30, 118, 1);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.passed {
+    background-color: rgb(20, 119, 144);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.accepted {
+    background-color: rgb(138, 134, 24);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.wrong {
+    background-color: rgb(112, 8, 27);
+}
+
+body.dark #mainContainer .rankingTable table tr .number.skipped {
+    background-color: rgb(90, 90, 90);
+}
+
+body.dark #mainContainer .rankingTable table tr td:nth-child(3) {
+    color: #6099fb;
+}
+
+body.dark #mainContainer .rankingTable table tr:nth-child(3) td:nth-child(2) .name {
+    background-color: #2b9959;
+}
+
+body.dark #mainContainer > .problems > .problem > .mainBox > .ranking > table > tbody > tr > td.number:nth-child(5) {
+	color: rgb(224, 224, 224);
+}
+
+body.dark #mainContainer > .problems > .problem .mainBox .board .attachment > iframe {
+    filter: invert(0.9);
 }

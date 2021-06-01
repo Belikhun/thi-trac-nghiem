@@ -92,7 +92,7 @@
 				"type" => "text",
 				"label" => "Tên kì thi",
 				"color" => "blue",
-				"value" => "Ôn tập",
+				"value" => "Thi Trắc Ngiệm",
 				"required" => true
 			),
 
@@ -101,159 +101,8 @@
 				"language" => "md",
 				"label" => "Mô tả kì thi",
 				"height" => 600,
-				"value" => "Bài làm nộp lên được chấm bằng phần mềm <a href=\"http://dsapblog.wordpress.com/\" target=\"_blank\" rel=\"noopener\">Themis (Lê Minh Hoàng & Đỗ Đức Đông)</a>",
+				"value" => "Chào mừng tới hệ thống thi trắc nghiệm!",
 				"required" => true
-			),
-
-			"result" => Array(
-				"__title" => "Kết Quả",
-				"__display" => "column",
-
-				"publish" => Array(
-					"type" => "checkbox",
-					"label" => "Công bố kết quả",
-					"color" => "pink",
-					"value" => true
-				),
-
-				"enableSP" => Array(
-					"type" => "checkbox",
-					"label" => "Sử dụng SubmissionPoint v1 <i>(thử nghiệm)</i>",
-					"color" => "blue",
-					"value" => false
-				),
-
-				"spRanking" => Array(
-					"type" => "checkbox",
-					"label" => "Xếp hạng bằng SubmissionPoint",
-					"color" => "blue",
-					"value" => false
-				),
-
-				"spNoTimeWeighting" => Array(
-					"type" => "checkbox",
-					"label" => "Bỏ qua thời gian khi tính điểm SubmissionPoint",
-					"color" => "blue",
-					"value" => false
-				),
-			),
-
-			"submit" => Array(
-				"__display" => "column",
-				"__title" => "Nộp Bài",
-
-				"enabled" => Array(
-					"type" => "checkbox",
-					"label" => "Cho phép nộp bài",
-					"color" => "pink",
-					"value" => true
-				),
-
-				"inProblemsList" => Array(
-					"type" => "checkbox",
-					"label" => "Các bài nộp lên phải có trong danh sách đề",
-					"color" => "blue",
-					"value" => true,
-					"note" => "<b>LƯU Ý:</b> Khi cài đặt này bị tắt, tên tệp nộp lên sẽ được chuyển thành chữ HOA"
-				)
-			),
-
-			"ranking" => Array(
-				"__display" => "column",
-				"__title" => "Xếp Hạng",
-
-				"enabled" => Array(
-					"type" => "checkbox",
-					"label" => "Bật bảng xếp hạng",
-					"color" => "pink",
-					"value" => true
-				),
-
-				"viewTask" => Array(
-					"type" => "checkbox",
-					"label" => "Hiển thị điểm các bài làm trong bảng Xếp Hạng",
-					"color" => "blue",
-					"value" => true
-				),
-
-				"hideDisabled" => Array(
-					"type" => "checkbox",
-					"label" => "Ẩn điểm của đề bài đã bị tắt",
-					"color" => "blue",
-					"value" => true
-				),
-
-				"showAllUsers" => Array(
-					"type" => "checkbox",
-					"label" => "Hiển thị toàn bộ Thí Sinh",
-					"color" => "blue",
-					"value" => false
-				)
-			),
-
-			"log" => Array(
-				"__display" => "column",
-				"__title" => "Nhật Ký",
-
-				"enabled" => Array(
-					"type" => "checkbox",
-					"label" => "Cho phép xem tệp nhật ký",
-					"color" => "pink",
-					"value" => true
-				),
-
-				"viewOther" => Array(
-					"type" => "checkbox",
-					"label" => "Cho phép xem tệp nhật ký của người khác",
-					"color" => "blue",
-					"value" => true
-				)
-			),
-
-			"problem" => Array(
-				"__display" => "column",
-				"__title" => "Đề Bài",
-
-				"public" => Array(
-					"type" => "checkbox",
-					"label" => "Cho phép Khách xem đề bài",
-					"color" => "blue",
-					"value" => true
-				),
-
-				"sortByName" => Array(
-					"type" => "checkbox",
-					"label" => "Sắp xếp đề bài theo tên",
-					"color" => "blue",
-					"value" => true
-				)
-			),
-		),
-
-		"folders" => Array(
-			"__icon" => "folder",
-			"__title" => "Thư Mục",
-
-			"submit" => Array(
-				"type" => "text",
-				"label" => "Thư mục lưu bài làm của Themis",
-				"color" => "blue",
-				"value" => "D:\Themis\data\uploadDir"
-			),
-
-			"submitLogs" => Array(
-				"type" => "text",
-				"label" => "Thư mục nhật ký của Themis",
-				"color" => "gray",
-				"value" => "%submitFolder%/Logs",
-				"note" => "⚠ Không nên thay đổi giá trị này"
-			),
-
-			"submissions" => Array(
-				"type" => "text",
-				"label" => "Thư mục lưu dữ liệu chấm",
-				"color" => "blue",
-				"value" => "%submitFolder%/submissions"
 			)
 		),
 
@@ -266,33 +115,7 @@
 				"label" => "Khu Vực",
 				"color" => "blue",
 				"value" => "Asia/Ho_Chi_Minh"
-			),
-
-			"contest" => Array(
-				"__display" => "column",
-				"__title" => "Kì Thi",
-
-				"begin" => Array(
-					"type" => "datetime",
-					"label" => "Bắt đầu kì thi",
-					"color" => "blue",
-					"value" => 0
-				),
-
-				"during" => Array(
-					"type" => "number",
-					"label" => "Thời gian làm bài (phút)",
-					"color" => "blue",
-					"value" => 0
-				),
-
-				"offset" => Array(
-					"type" => "number",
-					"label" => "Thời gian bù (giây)",
-					"color" => "blue",
-					"value" => 0
-				)
-			),
+			)
 		),
 
 		"announcement" => Array(
@@ -325,7 +148,7 @@
 				"color" => "blue",
 				"value" => "This is a sample Announcement <i>(with HTML!)</i>"
 			)
-		), 
+		),
 
 		"clientSettings" => Array(
 			"__icon" => "config",
@@ -369,22 +192,6 @@
 			"rankUpdate" => Array(
 				"type" => "range",
 				"label" => "Thời gian cập nhật xếp hạng",
-				"value" => 3,
-				"min" => 1,
-				"max" => 11,
-				"step" => 1,
-				"unit" => "ms/yêu cầu",
-				"valueList" => Array(1 => 500, 2 => 1000, 3 => 2000, 4 => 10000, 5 => 60000, 6 => 120000, 7 => 240000, 8 => 300000, 9 => 600000, 10 => 3600000, 11 => -1),
-				"valueWarn" => Array(
-					"type" => "lower",
-					"value" => 1000,
-					"color" => "red"
-				)
-			),
-
-			"logsUpdate" => Array(
-				"type" => "range",
-				"label" => "Thời gian cập nhật nhật ký",
 				"value" => 3,
 				"min" => 1,
 				"max" => 11,

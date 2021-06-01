@@ -204,7 +204,10 @@
                 "name" => $item["name"],
                 "point" => $item["point"],
                 "time" => $item["time"],
-                "thumbnail" => "/api/problems/thumbnail?id=". $i
+                "thumbnail" => "/api/problems/thumbnail?id=". $i,
+                "attachment" => isset($item["attachment"])
+                    ? $item["attachment"]
+                    : null
             ));
         
         return $list;
@@ -318,7 +321,7 @@
             "detail" => Array()
         );
 
-        foreach ($problem["result"] as $i => $value) {
+        foreach ($problem["results"] as $i => $value) {
             $template = Array(
                 "status" => "",
                 "result" => $value,
@@ -388,6 +391,8 @@
         
 		if ($duringTime <= 0)
 			return true;
+
+        $duringTime *= 60;
 
 		// Admin can bypass this check
 		if ($_SESSION["username"] !== null && $_SESSION["id"] === "admin")

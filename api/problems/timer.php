@@ -29,7 +29,7 @@
 		));
 
 	$beginTime = $problem["time"]["begin"];
-	$duringTime = $problem["time"]["during"];
+	$duringTime = $problem["time"]["during"] * 60;
 	$offsetTime = $problem["time"]["offset"];
 	$t = $beginTime - microtime(true) + $duringTime;
 

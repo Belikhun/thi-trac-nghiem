@@ -250,7 +250,7 @@
 								</span>
 							</div>
 	
-							<div id="problemRanking" class="ranking rankingTable"></div>
+							<div id="problemRanking" class="ranking showEmpty rankingTable"></div>
 						</div>
 					</div>
 				</span>

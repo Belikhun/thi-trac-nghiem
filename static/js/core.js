@@ -706,7 +706,7 @@ const ttn = {
 
             async __update() {
                 let beginTime = this.timeData.begin;
-                let duringTime = this.timeData.during;
+                let duringTime = this.timeData.during * 60;
                 let offsetTime = this.timeData.offset;
                 let t = beginTime - this.__getTime() + duringTime;
     
@@ -776,7 +776,7 @@ const ttn = {
 
 				this.buttons.appendChild(this.reload);
                 await this.fetchList();
-                this.reload.addEventListener("mouseup", () => this.fetchList());
+                this.reload.addEventListener("click", () => this.fetchList());
             },
 
             destroyAll() {
@@ -803,68 +803,67 @@ const ttn = {
                 this.reload.disabled = false;
             },
 
-            createItem(data) {
-                clog("DEBG", data);
-                let time = new ttn.contest.Time(data.time);
+            createItem(item) {
+                this.log("DEBG", "Rendering", item);
+                let time = new ttn.contest.Time(item.time);
 
-                var item = buildElementTree("span", "item", [
-                    {
-                        type: "div",
-                        class: ["lazyload", "thumbnail"],
-                        name: "thumbnailContainer",
-                        list: [
-                            { type: "img", name: "thumbnail" },
-                            { type: "div", class: "simpleSpinner", name: "spinner" }
-                        ]
-                    },
-                    {
-                        type: "div",
-                        class: "detail",
-                        name: "detail",
-                        list: [
-                            {
-                                type: "span",
-                                class: "left",
-                                name: "left",
-                                list: [
-                                    { type: "t", class: "title", name: "problemName", text: data.name },
-                                    { type: "t", class: "duration", name: "duration", text: `${Math.round(data.time.during / 60)} phút` },
-                                    { type: "t", class: "date", name: "date", text: (new Date(data.time.begin * 1000)).toLocaleString() }
-                                ]
-                            },
-                            {
-                                type: "span",
-                                class: "right",
-                                name: "right",
-                                list: [
-                                    { type: "t", class: "detail", name: "detail", text: `Đang lấy thông tin` },
-                                    { type: "timer", name: "timer" }
-                                ]
-                            }
-                        ]
-                    }
-                ]);
+				let card = makeTree("span", ["item", "hide"], {
+					thumbnail: new lazyload({ source: item.thumbnail, classes: "thumbnail" }),
 
-                item.obj.dataset.id = data.id;
-                item.obj.addEventListener("mouseup", (e) => ttn.contest.problem.open(data.id));
-                item.obj.thumbnailContainer.thumbnail.addEventListener("load", () => item.obj.thumbnailContainer.dataset.loaded = 1);
-                item.obj.thumbnailContainer.thumbnail.src = data.thumbnail;
+					icons: { tag: "span", class: "icons", child: {
+						attachment: {
+							tag: "icon",
+							class: "attachment",
+							data: { icon: "file" },
+							title: "Có Tệp Đính Kèm"
+						},
+
+						status: { tag: "span", class: "status", text: "Chưa Nộp" },
+					}},
+
+					point: { tag: "span", class: "point", text: item.point },
+					pName: { tag: "t", class: "name", text: item.name },
+
+					detail: { tag: "div", class: "detail", child: {
+						left: { tag: "span", class: "left", name: "left", child: {
+							pID: { tag: "t", class: "id", text: item.id },
+							duration: { tag: "t", class: "duration", text: `${item.time.during} phút` }
+						}},
+
+						middle: { tag: "span", class: "middle" },
+
+						right: { tag: "span", class: "right", child: {
+							timer: { tag: "timer" }
+						}}
+					}}
+				});
+
+                card.dataset.id = item.id;
+				card.dataset.soundhover = 1;
+                sounds.applySound(card);
+                card.addEventListener("click", () => ttn.contest.problem.open(item.id));
+
+				if (item.attachment) {
+					card.icons.attachment.style.display = null;
+					card.icons.attachment.title = item.attachment;
+				} else
+					card.icons.attachment.style.display = "none";
 
                 time.timeUpdateHandler = (data) => {
                     if (this.optimize)
                         return;
 
-                    item.tree.dataset.soundhover = 1;
-                    sounds.applySound(item.tree);
-                    time.showMs = (data.phase === 2 || data.phase === 3) && ttn.contest.showMs;
-                    item.obj.detail.right.detail.innerText = ["Bắt đầu sau", "Đang thi", "Sắp kết thúc", "Đã kết thúc"][data.phase - 1]
-                    item.obj.detail.right.timer.dataset.color = ["blue", "green", "yellow", "red"][data.phase - 1]
-                    item.obj.detail.right.timer.innerHTML = `<days>${data.days}</days>${data.time.str}${data.showMs ? `<ms>${data.time.ms}</ms>` : ""}`;
+                    card.showMs = (data.phase === 2 || data.phase === 3) && ttn.contest.showMs;
+                    card.icons.status.dataset.phase = data.phase - 1;
+                    card.icons.status.innerText = ["Sắp Bắt Đầu", "Đang Diễn Ra", "Sắp Kết Thúc", "Đã kết thúc"][data.phase - 1];
+					
+                    card.detail.right.timer.dataset.color = ["blue", "green", "yellow", "red"][data.phase - 1]
+                    card.detail.right.timer.innerHTML = `<days>${data.days}</days>${data.time.str}${data.showMs ? `<ms>${data.time.ms}</ms>` : ""}`;
                 }
 
-                time.onUpComming = () => this.upComming.appendChild(item.tree);
-                time.onInOffset = time.onInProgress = () => this.inProgress.appendChild(item.tree);
-                time.onCompleted = () => this.completed.appendChild(item.tree);
+                time.onUpComming = () => this.upComming.appendChild(card);
+                time.onInOffset = time.onInProgress = () => this.inProgress.appendChild(card);
+                time.onCompleted = () => this.completed.appendChild(card);
 
                 this.runningList.push(time);
             }
@@ -934,9 +933,9 @@ const ttn = {
 					horizontal: true
 				});
 
-                this.boardToggler.addEventListener("mouseup", () => this.changePanel(1));
-                this.rankingToggler.addEventListener("mouseup", () => this.changePanel(2));
-                this.quitBtn.addEventListener("mouseup", () => this.toggle(false));
+                this.boardToggler.addEventListener("click", () => this.changePanel(1));
+                this.rankingToggler.addEventListener("click", () => this.changePanel(2));
+                this.quitBtn.addEventListener("click", () => this.toggle(false));
 
                 this.markBox.addEventListener("click", () => {
                     if (!this.data || this.data.judged === true)
@@ -947,7 +946,7 @@ const ttn = {
                     localStorage.setItem(`problem.${this.data.id}`, data.join(";"));
                 });
 
-                this.submitBtn.addEventListener("mouseup", async () => {
+                this.submitBtn.addEventListener("click", async () => {
                     let data = this.getCheckedList();
 
                     if (await this.submit(data)) {
@@ -1013,14 +1012,14 @@ const ttn = {
                 if (hash === this.previousRankHash && !bypass)
                     return false;
         
-                clog("debg", "Updating Rank", `[${hash}]`);
+                this.log("DEBG", "Updating Rank", `[${hash}]`);
                 let updateRankTimer = new StopClock();
         
                 if (data.list.length === 0 && data.rank.length === 0) {
                     emptyNode(this.ranking);
         
                     this.previousRankHash = hash;
-                    clog("debg", "Rank Is Empty. Took", {
+                    this.log("DEBG", "Rank Is Empty. Took", {
                         color: flatc("blue"),
                         text: updateRankTimer.stop + "s"
                     });
@@ -1035,7 +1034,7 @@ const ttn = {
                                 <th>#</th>
                                 <th></th>
                                 <th>Thí sinh</th>
-                                <th>TB</th>
+                                <th>ĐIỂM</th>
                 `
         
                 for (let i of data.list)
@@ -1083,7 +1082,7 @@ const ttn = {
                 this.ranking.innerHTML = out;
                 this.previousRankHash = hash;
         
-                clog("debg", "Rank Updated. Took", {
+                this.log("DEBG", "Rank Updated. Took", {
                     color: flatc("blue"),
                     text: updateRankTimer.stop + "s"
                 });
@@ -1238,13 +1237,13 @@ const ttn = {
             },
 
             async loadAttachment(data) {
-				if (!this.data)
-					return;
-
                 await waitFor(async () => {
                     let response = {}
 
                     try {
+						if (!this.data)
+							return false;
+
                         response = await myajax({
                             url: "/api/problems/timer",
                             method: "GET",
@@ -1439,8 +1438,9 @@ const ttn = {
                 this.result.correct.innerText = `${data.correct}/${data.total}`;
                 this.result.wrong.innerText = data.wrong;
                 this.result.skipped.innerText = data.skipped;
-                this.result.point.innerText = data.point;
+                this.result.point.innerText = round(data.point, 2);
                 this.renderMarkBox(data.total, { readonly: true });
+
                 setTimeout(() => {
                     this.sheet.classList.add("showResult");
 
@@ -2499,6 +2499,7 @@ const ttn = {
 					}
 	
 					sounds.confirm(1);
+					this.wavec.loading = true;
 	
 					try {
 						await myajax({
@@ -2518,7 +2519,12 @@ const ttn = {
 						color: flatc("yellow"),
 						text: id
 					});
+
+					await ttn.contest.list.fetchList();
+					if (ttn.contest.problem.id)
+						ttn.contest.problem.toggle(false);
 	
+					this.wavec.loading = false;
 					this.wavec.hide();
 				},
 
