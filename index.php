@@ -170,6 +170,16 @@
 		-->
 		<div id="navbar"></div>
 
+		<span id="timer">
+			<t id="problemName" class="name">Đang tải</t>
+			<t id="problemTimerDetail" class="detail">Idle</t>
+			<timer id="problemTimer"><days>0</days>+00:00:00<ms>000</ms></timer>
+			<div class="progressBar">
+				<div id="problemProgressBar" class="bar"></div>
+				<t id="problemProgressInfo" class="right">00:00</t>
+			</div>
+		</span>
+
 		<div id="superContainer">
 			<div id="userSettings"></div>
 			<div id="waveContainer"></div>
@@ -217,7 +227,7 @@
 										<span id="problemZoomIn" class="in"></span>
 										<span id="problemZoomOut" class="out"></span>
 									</div>
-									<div class="simple-spinner"></div>
+									<div spinner class="spinner"></div>
 								</span>
 	
 								<span id="problemSheet" class="sheet">

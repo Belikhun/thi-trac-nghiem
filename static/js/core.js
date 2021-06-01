@@ -1,5 +1,5 @@
 //? |-----------------------------------------------------------------------------------------------|
-//? |  /static/js/core.js                                                                           |
+//? |  /static/js/ttn.js                                                                           |
 //? |                                                                                               |
 //? |  Copyright (c) 2018-2021 Belikhun. All right reserved                                         |
 //? |  Licensed under the MIT License. See LICENSE in the project root for license information.     |
@@ -17,6 +17,7 @@ async function updateServerData() {
 	document.title = response.data.pageTitle;
 	window.SERVER = response.data;
 	window.SESSION = response.data.SESSION;
+	window.LOGGED_IN = !!window.SESSION.username;
 	window.API_TOKEN = SESSION.API_TOKEN;
 	updateServerHandlers.forEach((f) => f(window.SERVER));
 }
@@ -490,7 +491,7 @@ const ttn = {
 						<td>
 							<div class="lazyload avt">
 								<img onload="this.parentNode.dataset.loaded = 1" src="/api/avatar?u=${i.username}"/>
-								<div class="simple-spinner"></div>
+								<div class="simpleSpinner"></div>
 							</div>
 						</td>
 						<td>
@@ -536,6 +537,942 @@ const ttn = {
 		}
 	},
 
+	contest: {
+		priority: 3,
+        showMs: false,
+		
+		doCorrectTime: true,
+		delta: 0,
+
+        init() {
+        },
+
+        Time: class {
+            constructor(data = { begin: time(), during: 0, offset: 0 }) {
+                this.updateInterval = 1000;
+                this.updateTimeout = null;
+                this.paused = false;
+                this.last = 0;
+                this.ms = false;
+
+                this.upCommingHandler = null;
+                this.inProgressHandler = null;
+                this.inOffsetHandler = null;
+                this.completedHandler = null;
+                this.upCommingHandled = false;
+                this.inProgressHandled = false;
+                this.inOffsetHandled = false;
+                this.completedHandled = false;
+
+                this.timeUpdateHandler = async () => {}
+
+                // START
+                this.data = data;
+                this.updateHandler();
+            }
+
+            set update(t) {
+                this.updateInterval = t;
+            }
+
+            set showMs(show) {
+                if (show) {
+                    this.ms = true;
+                    this.updateInterval = 60;
+                } else {
+                    this.ms = false;
+                    this.updateInterval = 1000;
+                }
+            }
+
+            set onUpComming(f = () => {}) {
+                this.upCommingHandler = f;
+            }
+
+            set onInProgress(f = () => {}) {
+                this.inProgressHandler = f;
+            }
+
+            set onInOffset(f = () => {}) {
+                this.inOffsetHandler = f;
+            }
+
+            set onCompleted(f = () => {}) {
+                this.completedHandler = f;
+            }
+
+            set onTimeUpdate(f = () => {}) {
+                this.timeUpdateHandler = f;
+            }
+
+            set data(data) {
+                if (!typeof data === "object")
+                    throw { code: -1, description: `ttn.contest.Time().data: data is not type of object, instead got ${typeof data}` }
+
+                this.timeData = data;
+                this.last = 0;
+                this.upCommingHandled = false;
+                this.inProgressHandled = false;
+                this.inOffsetHandled = false;
+                this.completedHandled = false;
+                this.__update();
+            }
+
+            phaseHandler(phase) {
+                if (phase === 1 && !this.upCommingHandled && typeof this.upCommingHandler === "function") {
+                    this.upCommingHandler();
+                    this.upCommingHandled = true;
+                    this.inProgressHandled = false;
+                    this.inOffsetHandled = false;
+                    this.completedHandled = false;
+                } else if (phase === 2 && !this.inProgressHandled && typeof this.inProgressHandler === "function") {
+                    this.inProgressHandler();
+                    this.upCommingHandled = false;
+                    this.inProgressHandled = true;
+                    this.inOffsetHandled = false;
+                    this.completedHandled = false;
+                } else if (phase === 3 && !this.inOffsetHandled && typeof this.inOffsetHandler === "function") {
+                    this.inOffsetHandler();
+                    this.upCommingHandled = false;
+                    this.inProgressHandled = false;
+                    this.inOffsetHandled = true;
+                    this.completedHandled = false;
+                } else if (phase === 4 && !this.completedHandled && typeof this.completedHandler === "function") {
+                    this.completedHandler();
+                    this.upCommingHandled = false;
+                    this.inProgressHandled = false;
+                    this.inOffsetHandled = false;
+                    this.completedHandled = true;
+                }
+            }
+
+            async updateHandler() {
+                clearTimeout(this.updateTimeout);
+
+                if (this.paused)
+                    return;
+
+                let timer = new StopClock();
+                
+                try {
+                    await this.__update();
+                } catch(e) {
+                    //? IGNORE ERROR
+                    clog("ERRR", e);
+                }
+                
+                this.updateTimeout = setTimeout(() => this.updateHandler(), this.updateInterval - (timer.stop * 1000));
+            }
+
+            pause(pause = true) {
+                if (pause) {
+                    this.paused = true;
+                    clearTimeout(this.updateTimeout);
+                } else {
+                    this.paused = false;
+                    this.updateHandler();
+                }
+            }
+
+            destroy() {
+                clearTimeout(this.updateTimeout);
+
+                delete this.updateInterval
+                delete this.updateTimeout
+                delete this.paused
+                delete this.last
+                delete this.ms
+
+                delete this.upCommingHandler
+                delete this.inProgressHandler
+                delete this.inOffsetHandler
+                delete this.completedHandler
+                delete this.upCommingHandled
+                delete this.inProgressHandled
+                delete this.inOffsetHandled
+                delete this.completedHandled
+
+                delete this.timeUpdateHandler
+
+                delete this.data
+            }
+
+			__getTime() {
+				if (ttn.contest.doCorrectTime)
+					return (time() + ttn.contest.delta)
+				else
+					return time();
+			}
+
+            async __update() {
+                let beginTime = this.timeData.begin;
+                let duringTime = this.timeData.during;
+                let offsetTime = this.timeData.offset;
+                let t = beginTime - this.__getTime() + duringTime;
+    
+                let phase = 0;
+                let progress = 0;
+                let end = 0;
+    
+                if (t > duringTime) {
+                    t -= duringTime;
+                    if (this.last === 0)
+                        this.last = t;
+
+                    phase = 1;
+                    progress = ((t) / this.last) * 100;
+                    end = this.last;
+                } else if (t > 0) {
+                    phase = 2;
+                    progress = (t / duringTime) * 100;
+                    end = duringTime;
+                } else if (t > -offsetTime) {
+                    t += offsetTime;
+                    
+                    phase = 3;
+                    progress = (t / offsetTime) * 100;
+                    end = offsetTime;
+                } else {
+                    t += offsetTime;
+    
+                    phase = 4;
+                    progress = 100;
+                }
+    
+                let days = Math.floor(t / 86400) + (t < 0 ? 1 : 0);
+                let timeParsed = parseTime(t % 86400, { showPlus: true, forceShowHours: true });
+                
+                this.phaseHandler(phase);
+                await this.timeUpdateHandler({
+                    phase,
+                    begin: beginTime,
+                    during: duringTime,
+                    offset: offsetTime,
+                    end,
+                    progress,
+                    days,
+                    time: timeParsed,
+                    showMs: this.ms
+                });
+            }
+        },
+
+        list: {
+            container: $("#problemsListContainer"),
+            upComming: $("#problemListUpComming"),
+            inProgress: $("#problemListInProgress"),
+            completed: $("#problemListCompleted"),
+            reload: $("#problemsListReload"),
+
+            optimize: false,
+            runningList: [],
+
+            async init() {
+                await this.fetchList();
+                this.reload.addEventListener("mouseup", () => this.fetchList());
+            },
+
+            destroyAll() {
+                for (let item of this.runningList)
+                    item.destroy();
+            },
+
+            async fetchList() {
+                this.reload.disabled = true;
+
+                this.destroyAll();
+                emptyNode(this.upComming);
+                emptyNode(this.inProgress);
+                emptyNode(this.completed);
+
+                let data = (await myajax({
+                    url: `/api/problems/list`,
+                    method: "GET"
+                })).data
+
+                for (let item of data)
+                    this.createItem(item);
+
+                this.reload.disabled = false;
+            },
+
+            createItem(data) {
+                clog("DEBG", data);
+                let time = new ttn.contest.Time(data.time);
+
+                var item = buildElementTree("span", "item", [
+                    {
+                        type: "div",
+                        class: ["lazyload", "thumbnail"],
+                        name: "thumbnailContainer",
+                        list: [
+                            { type: "img", name: "thumbnail" },
+                            { type: "div", class: "simpleSpinner", name: "spinner" }
+                        ]
+                    },
+                    {
+                        type: "div",
+                        class: "detail",
+                        name: "detail",
+                        list: [
+                            {
+                                type: "span",
+                                class: "left",
+                                name: "left",
+                                list: [
+                                    { type: "t", class: "title", name: "problemName", text: data.name },
+                                    { type: "t", class: "duration", name: "duration", text: `${Math.round(data.time.during / 60)} phút` },
+                                    { type: "t", class: "date", name: "date", text: (new Date(data.time.begin * 1000)).toLocaleString() }
+                                ]
+                            },
+                            {
+                                type: "span",
+                                class: "right",
+                                name: "right",
+                                list: [
+                                    { type: "t", class: "detail", name: "detail", text: `Đang lấy thông tin` },
+                                    { type: "timer", name: "timer" }
+                                ]
+                            }
+                        ]
+                    }
+                ]);
+
+                item.obj.dataset.id = data.id;
+                item.obj.addEventListener("mouseup", (e) => ttn.contest.problem.open(data.id));
+                item.obj.thumbnailContainer.thumbnail.addEventListener("load", () => item.obj.thumbnailContainer.dataset.loaded = 1);
+                item.obj.thumbnailContainer.thumbnail.src = data.thumbnail;
+
+                time.timeUpdateHandler = (data) => {
+                    if (this.optimize)
+                        return;
+
+                    item.tree.dataset.soundhover = 1;
+                    sounds.applySound(item.tree);
+                    time.showMs = (data.phase === 2 || data.phase === 3) && ttn.contest.showMs;
+                    item.obj.detail.right.detail.innerText = ["Bắt đầu sau", "Đang thi", "Sắp kết thúc", "Đã kết thúc"][data.phase - 1]
+                    item.obj.detail.right.timer.dataset.color = ["blue", "green", "yellow", "red"][data.phase - 1]
+                    item.obj.detail.right.timer.innerHTML = `<days>${data.days}</days>${data.time.str}${data.showMs ? `<ms>${data.time.ms}</ms>` : ""}`;
+                }
+
+                time.onUpComming = () => this.upComming.appendChild(item.tree);
+                time.onInOffset = time.onInProgress = () => this.inProgress.appendChild(item.tree);
+                time.onCompleted = () => this.completed.appendChild(item.tree);
+
+                this.runningList.push(time);
+            }
+        },
+
+        problem: {
+            timer: {
+				container: $("#timer"),
+                time: null,
+                name: $("#problemName"),
+                timer: $("#problemTimer"),
+                timerDetail: $("#problemTimerDetail"),
+                bar: $("#problemProgressBar"),
+                info: $("#problemProgressInfo")
+            },
+
+            quitBtn: $("#problemQuit"),
+            submitBtn: $("#problemSubmit"),
+
+            mainBox: $("#problemMainBox"),
+            sheet: $("#problemSheet"),
+            ranking: $("#problemRanking"),
+
+            boardToggler: $("#problemBoardToggler"),
+            rankingToggler: $("#problemRankingToggler"),
+
+            markBox: $("#problemMarkBox"),
+            attachmentWrapper: $("#problemAttachmentWrapper"),
+            attachmentLink: $("#problemAttachmentLink"),
+            attachment: $("#problemAttachment"),
+
+            zoom: {
+                container: $("#problemZoom"),
+                in: $("#problemZoomIn"),
+                out: $("#problemZoomOut")
+            },
+
+            result: {
+                correct: $("#problemResultCorrect"),
+                wrong: $("#problemResultWrong"),
+                skipped: $("#problemResultSkipped"),
+                point: $("#problemResultPoint"),
+            },
+
+            data: {},
+            showing: false,
+            previousRankHash: null,
+
+            async init() {
+                this.timer.time = new ttn.contest.Time();
+                
+                this.timer.time.timeUpdateHandler = (data) => {
+                    this.timer.timer.innerHTML = `<days>${data.days}</days>${data.time.str}${data.showMs ? `<ms>${data.time.ms}</ms>` : ""}`;
+                    this.timer.timerDetail.innerText = ["Bắt đầu sau", "Thời gian làm bài", "Thời gian nộp bài", "Bài thi đã kết thúc"][data.phase - 1]
+                    this.timer.bar.style.width = `${data.progress}%`;
+                    this.timer.bar.dataset.blink = ["none", "none", "grow", "fade"][data.phase - 1];
+                    this.timer.bar.dataset.blinkFast = data.progress < 20 ? true : false;
+                    this.timer.bar.dataset.color = this.timer.timer.dataset.color = ["blue", "green", "yellow", "red"][data.phase - 1]
+                    this.timer.bar.classList[data.showMs ? "add" : "remove"]("noTransition");
+                    this.timer.info.innerText = `${parseTime(data.end).str}`;
+                }
+
+				new Scrollable(this.sheet, {
+					content: this.markBox,
+					horizontal: true
+				});
+
+                this.boardToggler.addEventListener("mouseup", () => this.changePanel(1));
+                this.rankingToggler.addEventListener("mouseup", () => this.changePanel(2));
+                this.quitBtn.addEventListener("mouseup", () => this.toggle(false));
+
+                this.markBox.addEventListener("click", () => {
+                    if (!this.data || this.data.judged === true)
+                        return;
+
+                    let data = this.getCheckedList();
+                    clog("DEBG", "Saving", this.data.id, { data });
+                    localStorage.setItem(`problem.${this.data.id}`, data.join(";"));
+                });
+
+                this.submitBtn.addEventListener("mouseup", async () => {
+                    let data = this.getCheckedList();
+
+                    if (await this.submit(data)) {
+                        await this.loadData(this.data.id);
+                        this.renderMarkBox(this.data.question, { readonly: true, data });
+                    }
+                });
+
+                this.changePanel(1);
+                this.toggle(false);
+            },
+
+            changePanel(panel = 1) {
+                if (this.mainBox.dataset.layout == panel)
+                    return;
+    
+                switch (panel) {
+                    case 1:
+                        emptyNode(this.ranking);
+
+                        this.boardToggler.classList.add("active");
+                        this.rankingToggler.classList.remove("active");
+                        sounds.toggle(1);
+                        break;
+                
+                    case 2:
+                        this.boardToggler.classList.remove("active");
+                        this.rankingToggler.classList.add("active");
+                        sounds.toggle(0);
+
+                        setTimeout(() => this.fetchRank(true), 400);
+                        break;
+        
+                    default:
+                        return;
+                }
+        
+                this.mainBox.dataset.layout = panel;
+            },
+
+            async fetchRank(bypass = false) {
+                let response = {}
+                
+                try {
+                    response = await myajax({
+                        url: "/api/problems/rank",
+                        method: "GET",
+                        query: { id: this.data.id }
+                    });
+                } catch(e) {
+                    errorHandler(e);
+                    throw e;
+                }
+        
+                let data = response.data;
+
+                if (response.code === 105)
+                    this.ranking.classList.add("contestNotEnded");
+                else
+                    this.ranking.classList.remove("contestNotEnded");
+
+                let hash = response.hash;
+                if (hash === this.previousRankHash && !bypass)
+                    return false;
+        
+                clog("debg", "Updating Rank", `[${hash}]`);
+                let updateRankTimer = new StopClock();
+        
+                if (data.list.length === 0 && data.rank.length === 0) {
+                    emptyNode(this.ranking);
+        
+                    this.previousRankHash = hash;
+                    clog("debg", "Rank Is Empty. Took", {
+                        color: flatc("blue"),
+                        text: updateRankTimer.stop + "s"
+                    });
+        
+                    return false;
+                }
+        
+                let out = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th></th>
+                                <th>Thí sinh</th>
+                                <th>TB</th>
+                `
+        
+                for (let i of data.list)
+                    out += `
+                        <th
+                            class="problem"
+                            title="${data.nameList[i] || i}"
+                        >
+                            ${data.nameList[i] || i}
+                        </th>`;
+        
+                out += "</tr></thead><tbody>";
+                let ptotal = 0;
+                let rank = 0;
+        
+                for (let i of data.rank) {
+                    if (ptotal !== i.point) {
+                        ptotal = i.point;
+                        rank++;
+                    }
+        
+                    out += `
+                        <tr data-rank=${rank}>
+                            <td>${rank}</td>
+                            <td>
+                                <div class="lazyload avt">
+                                    <img onload="this.parentNode.dataset.loaded = 1" src="/api/avatar?u=${i.username}"/>
+                                    <div class="simpleSpinner"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <t class="username">${i.username}</t>
+                                <t class="name">${escapeHTML(i.name || "u:" + i.username)}</t>
+                            </td>
+                            <td class="number">${parseFloat(i.point).toFixed(2)}</td>
+                    `
+        
+                    for (let j of data.list)
+                        out += `<td class="number ${i.detail[j].status || "unknown"}">${(i.detail[j].answer && i.detail[j].answer !== "") ? i.detail[j].answer : "X"}</td>`;
+                    
+                    out += "</tr>";
+                }
+        
+                out += "</tbody></table>";
+                this.ranking.innerHTML = out;
+                this.previousRankHash = hash;
+        
+                clog("debg", "Rank Updated. Took", {
+                    color: flatc("blue"),
+                    text: updateRankTimer.stop + "s"
+                });
+            },
+
+            optimize(optimize = true) {
+                this.timer.time.pause(optimize);
+            },
+
+            toggle(show = true) {
+                if (show) {
+                    this.showing = true;
+                    this.submitBtn.disabled = false;
+                    emptyNode(this.markBox);
+                    this.sheet.classList.remove("showResult")
+                    this.sheet.removeAttribute("data-empty");
+                    this.attachmentWrapper.dataset.display = false;
+                    this.attachmentLink.style.display = "none";
+
+                    // OPTIMIZE
+                    ttn.contest.list.optimize = true;
+                    this.timer.time.showMs = ttn.contest.showMs;
+                    this.optimize(false);
+
+                    sounds.toggle(0);
+					this.timer.container.classList.add("show");
+                    ttn.contest.list.container.classList.add("hide");
+                } else {
+                    this.showing = false;
+                    ttn.contest.list.optimize = false;
+                    this.timer.time.showMs = false;
+                    this.optimize(true);
+                    delete this.data;
+                    this.data = null;
+                    
+                    this.attachmentWrapper.removeChild(this.attachment);
+                    let clone = this.attachment.cloneNode();
+                    clone.src = "";
+                    this.attachmentWrapper.insertBefore(clone, this.attachmentWrapper.childNodes[0]);
+                    this.attachment = clone;
+                    
+                    sounds.toggle(1);
+                    ttn.contest.list.container.classList.remove("hide");
+					this.timer.container.classList.remove("show");
+                    this.attachmentWrapper.removeAttribute("data-loaded");
+                }
+            },
+
+            async loadData(id) {
+                try {
+                    response = await myajax({
+                        url: "/api/problems/get",
+                        method: "GET",
+                        query: { id }
+                    });
+                } catch(e) {
+                    errorHandler(e);
+                    this.toggle(false);
+                    return false;
+                }
+
+                this.data = response.data;
+                return true;
+            },
+
+            async open(id) {
+                this.toggle(true);
+
+                if (!(await this.loadData(id)))
+                    return;
+
+                this.timer.time.onUpComming = () => {
+                    if (this.data.result) {
+                        this.printResult(this.data.result);
+                        this.loadAttachment(this.data);
+                    } else {
+                        this.submitBtn.disabled = true;
+                        this.sheet.dataset.empty = (LOGGED_IN) ? "upcomming" : "guest";
+                    }
+                }
+
+                this.timer.time.onInProgress = () => {
+                    this.sheet.removeAttribute("data-empty");
+                    this.loadAttachment(this.data);
+
+                    if (!LOGGED_IN) {
+                        this.sheet.dataset.empty = "guest";
+                        this.submitBtn.disabled = true;
+                        return;
+                    }
+
+                    if (this.data.result)
+                        this.printResult(this.data.result);
+                    else if (this.data.submit.length > 0) {
+                        this.renderMarkBox(this.data.question, { data: this.data.submit, readonly: true });
+                        this.submitBtn.disabled = true;
+                    } else {
+                        let lastStorage = localStorage.getItem(`problem.${this.data.id}`);
+                        lastStorage = (lastStorage) ? lastStorage.split(";") : [];
+                        this.renderMarkBox(this.data.question, { data: lastStorage, readonly: this.data.judged });
+                        this.submitBtn.disabled = this.data.judged;
+                    }
+                }
+
+                this.timer.time.onInOffset = async () => {
+                    this.sheet.removeAttribute("data-empty");
+                    this.loadAttachment(this.data);
+
+                    if (!LOGGED_IN) {
+                        this.sheet.dataset.empty = "guest";
+                        this.submitBtn.disabled = true;
+                        return;
+                    }
+
+                    if (this.data.result)
+                        this.printResult(this.data.result);
+                    else if (this.data.submit.length > 0) {
+                        this.renderMarkBox(this.data.question, { data: this.data.submit, readonly: true });
+                        this.submitBtn.disabled = true;
+                    } else {
+                        let checked = this.getCheckedList();
+                        let lastStorage = localStorage.getItem(`problem.${this.data.id}`);
+                        let data = (checked.length > 0) ? checked : ((lastStorage) ? lastStorage.split(";") : []);
+
+                        if (!this.data.judged)
+                            await this.submit(data, false);
+
+                        this.submitBtn.disabled = this.data.judged;
+                        this.renderMarkBox(this.data.question, { readonly: true, data });
+                    }
+                }
+
+                this.timer.time.onCompleted = async () => {
+                    if (!(await this.loadData(id)))
+                        return;
+
+                    this.loadAttachment(this.data);
+                    this.submitBtn.disabled = true;
+
+                    if (this.data.result)
+                        this.printResult(this.data.result);
+                    else {
+                        emptyNode(this.markBox);
+                        this.sheet.dataset.empty = (LOGGED_IN) ? "noresult" : "guest";
+                    }
+                }
+
+                this.timer.name.innerText = this.data.name;
+                this.timer.time.data = this.data.time;
+            },
+
+            async loadAttachment(data) {
+                await waitFor(async () => {
+                    let response = {}
+
+                    try {
+                        response = await myajax({
+                            url: "/api/problems/timer",
+                            method: "GET",
+                            query: { id: this.data.id }
+                        })
+                    } catch(e) {
+                        errorHandler(e);
+                        return false;
+                    }
+                    
+                    return (response.data.phase >= 2)
+                }, () => clog("OKAY", "Server in expected phase"), 20, 500);
+
+                this.zoom.container.style.display = "none";
+                this.attachmentWrapper.removeAttribute("data-loaded");
+
+                if (data.attachment.url) {
+                    this.attachmentLink.href = data.attachment.url;
+                    this.attachmentLink.innerText = `${data.attachment.file} (${convertSize(data.attachment.size)})`;
+                    this.attachmentLink.style.display = "block";
+
+                    let isImage = ["png", "jpg", "svg"].includes(data.attachment.extension);
+                    let isHTML = data.attachment.extension === "html";
+                    this.attachmentWrapper.dataset.display = true;
+                    this.attachmentWrapper.dataset.type = isImage ? "image" : "document";
+
+                    if (data.attachment.embed) {
+                        this.attachmentWrapper.removeChild(this.attachment);
+    
+                        setTimeout(() => {
+                            let newNode = document.createElement(isImage ? "img" : (isHTML) ? "iframe" : "embed");
+                            newNode.id = "problemAttachment";
+
+                            newNode.style.display = "block";
+                            newNode.addEventListener("load", () => {
+                                this.attachmentWrapper.dataset.loaded = 1;
+
+                                if (isHTML) {
+                                    newNode.contentDocument.body.style.zoom = newNode.clientWidth / 620;
+                                    this.zoom.container.style.display = "block";
+
+                                    this.zoom.in.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) + 0.5;
+                                    this.zoom.out.onclick = () => newNode.contentDocument.body.style.zoom = parseFloat(newNode.contentDocument.body.style.zoom) - 0.5;
+
+                                    let injectCSS = document.createElement("style");
+                                    injectCSS.type = "text/css";
+                                    injectCSS.appendChild(document.createTextNode(`
+                                        #page-container,
+                                        #sidebar {
+                                            background-color: transparent;
+                                            background-image: unset;
+                                        }
+
+                                        .pf {
+                                            box-shadow: unset;
+                                        }
+                                    `));
+
+                                    newNode.contentDocument.head.appendChild(injectCSS);
+                                }
+                            })
+
+                            newNode.addEventListener("error", () => this.attachmentWrapper.dataset.loaded = "errored");
+                            newNode.src = `${data.attachment.url}&embed=true#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0&page=1&view=FitH`;
+
+                            this.attachmentWrapper.insertBefore(newNode, this.attachmentWrapper.childNodes[0]);
+                            this.attachment = newNode;
+                        }, 1500);
+                    } else {
+                        this.attachmentWrapper.dataset.display = false;
+                        this.attachmentLink.style.display = "none";
+                    }
+                } else {
+                    this.attachmentWrapper.dataset.display = false;
+                    this.attachmentLink.style.display = "none";
+                }
+            },
+
+            renderMarkBox(count = 40, {
+                answer = ["A", "B", "C", "D"],
+                readonly = false,
+                data = []
+            } = {}) {
+                emptyNode(this.markBox);
+                let html = "";
+
+                for (let i = 1; i <= count; i++) {
+                    let input = "";
+
+                    for (let item of answer)
+                        input += `
+                            <label for="problemQuestion_${i}${item}" class="circleCheckbox">
+                                <input
+                                    id="problemQuestion_${i}${item}"
+                                    name="problemQuestion${i}"
+                                    type="radio" value="${item}"
+                                    ${(typeof data[i-1] === "string" && data[i-1] === item) ? "checked" : ""}
+                                    ${readonly ? "disabled" : ""}
+                                    class="sound" data-soundcheck
+                                >
+                                <div class="checkmark">${item}</div>
+                            </label>
+                        `
+
+                    html += `
+                        <span class="input sound" data-soundhoversoft data-question="${i}">
+                            <t class="label">Câu ${i}</t>
+                            ${input}
+                        </span>
+                    `
+                }
+
+                this.markBox.innerHTML = html;
+                sounds.scan();
+            },
+
+            getCheckedList() {
+                let inputList = this.markBox.querySelectorAll("span.input[data-question]");
+                let list = []
+
+                for (let item of inputList) {
+                    let i = Math.floor(item.dataset.question) - 1;
+                    let c = item.querySelector("input:checked");
+                    
+                    list[i] = (c) ? c.value : "";
+                }
+
+                return list;
+            },
+
+            async submit(data, prompt = true) {
+                this.submitBtn.disabled = true;
+                let response = {}
+
+                if (prompt) {
+                    let note = document.createElement("div");
+                    note.classList.add("note", "warning");
+                    note.innerHTML = `<span class="inner">Bạn sẽ <b>không thể sửa lại bài</b> một khi đã nộp bài!</span>`;
+
+                    let res = await popup.show({
+                        windowTitle: "Nộp Bài",
+                        title: "Xác nhận nộp bài",
+                        message: this.data.name,
+                        description: `Bạn có chắc muốn nộp bài trước không?`,
+                        additionalNode: note,
+                        level: "warning",
+                        buttonList: {
+                            okay: { text: "OK", color: "blue" },
+                            cancel: { text: "HỦY", color: "red" },
+                        }
+                    });
+
+                    if (res !== "okay") {
+                        this.submitBtn.disabled = false;
+                        return false;
+                    }
+                }
+
+                try {
+                    response = await myajax({
+                        url: "/api/problems/submit",
+                        method: "POST",
+                        form: {
+                            id: this.data.id,
+                            data: JSON.stringify(data),
+                            token: API_TOKEN
+                        }
+                    })
+                } catch(e) {
+                    errorHandler(e);
+                    return false;
+                }
+
+                this.data.judged = true;
+
+                popup.show({
+                    windowTitle: "Nộp Bài",
+                    title: "Nộp bài thành công",
+                    message: (prompt) ? "Nộp trước " + formatTime((this.data.time.begin + this.data.time.during) - response.data.time) : "Vừa xong",
+                    description: `Đã nộp bài <b>${this.data.name}</b> lên máy chủ!<br>Bạn có thể xem kết quả chấm sau khi hết giờ kiểm tra.`,
+                    level: "okay",
+                    buttonList: {
+                        okay: { text: "OK", color: "rainbow" }
+                    }
+                });
+
+                return true;
+            },
+
+            printResult(data) {
+                this.submitBtn.disabled = true;
+                this.result.correct.innerText = `${data.correct}/${data.total}`;
+                this.result.wrong.innerText = data.wrong;
+                this.result.skipped.innerText = data.skipped;
+                this.result.point.innerText = data.point;
+                this.renderMarkBox(data.total, { readonly: true });
+                setTimeout(() => {
+                    this.sheet.classList.add("showResult");
+
+                    for (let i = 0; i < data.detail.length; i++) {
+                        let item = data.detail[i];
+    
+                        let c = this.markBox.querySelector(`span.input[data-question="${i + 1}"]`);
+                        let r = null;
+                        let a = null;
+                        
+                        if (c)
+                            switch (item.status) {
+                                case "correct":
+                                    c.dataset.status = "correct";
+                                    r = c.querySelector(`#problemQuestion_${i+1}${item.result}`);
+                                    r.checked = true;
+                                    r.parentElement.dataset.color = "green";
+                                    break;
+    
+                                case "wrong":
+                                    c.dataset.status = "wrong";
+                                    r = c.querySelector(`#problemQuestion_${i+1}${item.result}`);
+                                    r.checked = true;
+                                    r.parentElement.dataset.color = "blue";
+                                    a = c.querySelector(`#problemQuestion_${i+1}${item.answer}`);
+                                    a.parentElement.dataset.color = "red";
+                                    a.parentElement.dataset.force = true;
+                                    break;
+    
+                                case "skipped":
+                                    c.dataset.status = "skipped";
+                                    r = c.querySelector(`#problemQuestion_${i+1}${item.result}`);
+                                    r.checked = true;
+                                    r.parentElement.dataset.color = "yellow";
+                                    break;
+    
+                                default:
+                                    clog("WARN", "ttn.contest.problem.printResult(): unknwon item status:", item.status);
+                                    continue;
+                            }
+                    }
+                }, 600);
+            }
+        }
+    },
+
 	userSettings: {
 		priority: 2,
 		container: $("#userSettings"),
@@ -551,8 +1488,8 @@ const ttn = {
 				description: "thay đổi cách Thi Trắc Nghiệm hoạt động"
 			});
 
-			smenu.onShow(() => ttn.content.classList.add("parallax"));
-			smenu.onHide(() => ttn.content.classList.remove("parallax"));
+			smenu.onShow(() => ttn.container.classList.add("parallax"));
+			smenu.onHide(() => ttn.container.classList.remove("parallax"));
 
 			if (["beta", "indev", "debug", "test"].includes(SERVER.versionTag)) {
 				new smenu.components.Note({
@@ -726,7 +1663,7 @@ const ttn = {
 					color: "blue",
 					save: "clock.showMs",
 					defaultValue: SERVER.clientSettings.showMs,
-					onChange: (v) => ttn.timer.toggleMs(v)
+					onChange: (v) => ttn.contest.showMs = v
 				}, general);
 
 				new smenu.components.Checkbox({
@@ -734,7 +1671,7 @@ const ttn = {
 					color: "pink",
 					save: "clock.autoCorrect",
 					defaultValue: true,
-					onChange: async (v) => await ttn.timer.doCorrectTime(v)
+					onChange: async (v) => ttn.contest.doCorrectTime = v
 				}, general);
 			}
 		},

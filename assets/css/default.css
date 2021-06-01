@@ -308,7 +308,7 @@ body.dark tag {
 	transition: unset;
 }
 
-.lazyload > :first-child:not(.simpleSpinner) {
+.lazyload > :first-child:not(div[spinner]) {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -320,15 +320,14 @@ body.dark tag {
 		opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
-.lazyload > .simpleSpinner {
+.lazyload > div[spinner] {
 	position: absolute;
-	width: 16px;
-	height: 16px;
-	top: calc(50% - 8px);
-	left: calc(50% - 8px);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
-.lazyload.light > .simpleSpinner {
+.lazyload.light > div[spinner] {
 	border-color: rgb(214, 214, 214);
 	border-right-color: transparent;
 }
@@ -337,12 +336,12 @@ body.dark tag {
 	background-color: transparent;
 }
 
-.lazyload[data-loaded] > :first-child:not(.simpleSpinner) {
+.lazyload[data-loaded] > :first-child:not(div[spinner]) {
 	opacity: 1;
 }
 
-.lazyload[data-loaded] > .simpleSpinner,
-.lazyload[data-errored] > .simpleSpinner {
+.lazyload[data-loaded] > div[spinner],
+.lazyload[data-errored] > div[spinner] {
 	display: none;
 }
 

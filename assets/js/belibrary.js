@@ -1034,7 +1034,8 @@ class lazyload {
 		source,
 		classes,
 		tagName = "div",
-		doLoad = true
+		doLoad = true,
+		spinner = "simpleSpinner"
 	} = {}) {
 		/** @type {HTMLElement} */
 		this.container
@@ -1069,7 +1070,8 @@ class lazyload {
 
 		this.source = source;
 		this.spinner = document.createElement("div");
-		this.spinner.classList.add("simpleSpinner");
+		this.spinner.setAttribute("spinner", "true");
+		this.spinner.classList.add(spinner);
 		this.container.append(this.spinner);
 
 		if (doLoad)

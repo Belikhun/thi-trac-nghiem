@@ -9,7 +9,7 @@
 
 body {
 	position: relative;
-	background-color: #666666;
+	background-color: #ffffff;
 	font-family: "Open Sans", "Segoe UI", "Calibri", Tahoma, Geneva, Verdana, sans-serif;
 	margin: 0 0 20px;
 	overflow: hidden;
@@ -45,17 +45,17 @@ input:-webkit-autofill {
 	position: absolute;
 	display: block;
 
-	top: 0;
+	top: 40px;
 	left: 0;
+	bottom: 0;
 	width: 100vw;
-	height: calc(100vh - 40px);
-	margin-top: 40px;
 
 	box-sizing: border-box;
 	overflow: hidden;
 	background-color: #f0f0f0;
 
 	transition:
+		top 0.6s cubic-bezier(0.23, 1, 0.32, 1),
 		transform 0.4s ease,
 		filter 0.4s ease;
 }
@@ -1027,7 +1027,7 @@ input:-webkit-autofill {
     justify-content: center;
     width: 100%;
     height: 36px;
-    oveflow: visible;
+    overflow: visible;
     background-color: rgba(255, 255, 255, 0.4);
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -1358,6 +1358,75 @@ input:-webkit-autofill {
 	font-size: 13px;
 	font-weight: bold;
 	line-height: 18px;
+}
+
+/** =================== TIMER =================== **/
+
+#timer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+
+    top: 40px;
+    left: 0;
+    right: 0;
+    height: 0;
+
+    padding: 10px;
+    box-sizing: border-box;
+	border-top: 1px solid rgba(0, 0, 0, 0.2);
+    opacity: 0;
+
+    transition:
+        opacity 0.6s ease,
+        height 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#timer.show {
+    height: 110px;
+    opacity: 1;
+}
+
+#timer.show + #superContainer {
+	top: 150px;
+}
+
+#timer > .name {
+    font-family: "Nunito";
+    font-size: 18px;
+    font-weight: bold;
+    max-width: calc(100% - 100px);
+    text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#timer > .detail {
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    text-align: left;
+    text-transform: uppercase;
+    color: #383838;
+}
+
+#timer > .progressBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+}
+
+#timer > .progressBar > .right {
+    right: 10px;
+    top: -8px;
+}
+
+@media only screen and (max-width: 700px) {
+    .navBar .right .name {
+        display: none;
+    }
 }
 
 /** =================== CONTESTINFO =================== **/

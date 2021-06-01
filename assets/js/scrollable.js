@@ -50,6 +50,7 @@ class Scrollable {
 
 			this.content = container;
 			this.content.removeAttribute("id");
+			this.container.appendChild(this.content);
 		}
 
 		this.container.classList.add("scrollable");
@@ -74,7 +75,6 @@ class Scrollable {
 
 		this.container.insertBefore(this.hBar, this.container.firstChild);
 		this.container.insertBefore(this.vBar, this.container.firstChild);
-		this.container.appendChild(this.content);
 
 		// Initialize some variables
 		this.distance = distance;
@@ -114,15 +114,13 @@ class Scrollable {
 			let contentScrollable = true;
 
 			if (!this.scrollout && !this.smooth) {
-				let delta = (this.horizontal)
-					? event.deltaX
-					: event.deltaY;
+				let delta = event.deltaY;
 	
-				let from = (horizontal)
+				let from = (this.horizontal)
 					? this.content.scrollLeft
 					: this.content.scrollTop;
 	
-				let maxScroll = (horizontal)
+				let maxScroll = (this.horizontal)
 					? this.content.scrollWidth - this.content.offsetWidth
 					: this.content.scrollHeight - this.content.offsetHeight;
 	
@@ -407,9 +405,7 @@ class Scrollable {
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = (horizontal)
-				? event.deltaX
-				: event.deltaY;
+			delta = event.deltaY;
 		else
 			delta = value - from;
 		
@@ -442,9 +438,7 @@ class Scrollable {
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = (horizontal)
-				? event.deltaX
-				: event.deltaY;
+			delta = event.deltaY;
 		else
 			delta = value - from;
 		

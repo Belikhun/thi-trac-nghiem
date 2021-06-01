@@ -13,17 +13,11 @@
 	require_once $_SERVER["DOCUMENT_ROOT"] ."/libs/belibrary.php";
 	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php";
 	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";
-	require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/contest.php";
 
 	$root = str_replace("\\", "/", $_SERVER["DOCUMENT_ROOT"]);
 	$path = str_replace("\\", "/", getcwd());
 	$clientPath = str_replace($_SERVER["DOCUMENT_ROOT"], "", $path);
 	$size = convertSize(folderSize($path));
-
-	$contestStarted = contest_timeRequire([CONTEST_STARTED]);
-	$attachment = $contestStarted
-		? problemListAttachment()
-		: Array();
 
 	$filesList = glob($path ."/*.*");
 	$list = Array();
@@ -110,45 +104,6 @@
 			<t class="title big">Các tệp công khai</t>
 			<t class="title small">Danh sách các tệp công khai có thể tải về</t>
 			<div class="space"></div>
-		</div>
-
-		<div class="group file">
-			<t class="title">Tệp đính kèm trong các đề bài</t>
-
-			<?php if ($contestStarted !== true) { ?>
-
-				<div class="item lr warning">
-					<t class="left">Danh sách tệp đã bị ẩn vì khì thi chưa bắt đầu.</t>
-					<div class="right"></div>
-				</div>
-
-			<?php } elseif (sizeof($attachment) === 0) { ?>
-
-				<div class="item lr info">
-					<t class="left">Không tìm thấy tệp đính kèm nào.</t>
-					<div class="right"></div>
-				</div>
-
-			<?php } else foreach ($attachment as $key => $value) { ?>
-					
-				<div class="item lr">
-					<div class="left">
-						<t class="file-origin"><?php print $value["name"]; ?> [<?php print $value["id"]; ?>]</t>
-						<t class="file-name"><?php print $value["attachment"]; ?></t>
-						<t class="file-info">
-							Ngày sửa đổi: <?php print date("d/m/Y H:i:s", $value["lastmodify"]); ?>
-							<span class="dot"></span>
-							Kích cỡ: <?php print convertSize($value["size"]); ?>
-						</t>
-					</div>
-
-					<div class="right">
-						<a href="<?php print $value["url"]; ?>" class="sq-btn green" download="<?php print $value["attachment"]; ?>">Tải về</a>
-					</div>
-				</div>
-
-			<?php } ?>
-
 		</div>
 
 		<div class="group file">
