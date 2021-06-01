@@ -1860,7 +1860,7 @@ function createInput({
 	// Some types are not included because there are api to create that specific input
 	//
 	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types
-	if (!["text", "textarea", "email", "password", "color", "number", "date", "time", "select", "file", "datetime-local", "month", "week", "tel", "url"].includes(type))
+	if (!["text", "textarea", "datetime", "email", "password", "color", "number", "date", "time", "select", "file", "datetime-local", "month", "week", "tel", "url"].includes(type))
 		throw { code: -1, description: `createInput(${type}): Invalid type: ${type}` }
 
 	let container = makeTree("span", "sq-input", {

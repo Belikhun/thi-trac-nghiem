@@ -12,6 +12,19 @@
     foreach(glob(PROBLEMS_DIR ."/*", GLOB_ONLYDIR) as $i => $path)
         $problemList[basename($path)] = json_decode((new fip($path ."/data.json")) -> read(), true);
 
+    define("PROBLEM_TEMPLATE", Array(
+        "name" => "Sample Problem",
+        "point" => 0,
+        "time" => Array(
+            "begin" => 0,
+            "during" => 0,
+            "offset" => 0
+        ),
+        "results" => Array(),
+        "thumbnail" => null,
+        "attachment" => null
+    ));
+
     // Return Code
     define("PROBLEM_OKAY", 0);
     define("PROBLEM_ERROR", 1);
@@ -22,116 +35,136 @@
     define("PROBLEM_ERROR_DISABLED", 6);
     define("PROBLEM_ERROR_NOT_SUBMITTED", 7);
 
-    function problemAdd(String $id, Array $add, Array $thumbnail = null, Array $attachment = null) {
-        global $problemList;
-
-        $moveThumbnail = false;
-        $moveAttachment = false;
-        if (problemExist($id))
-            return PROBLEM_ERROR_IDREJECT;
-
-        $problemList[$id] = $add;
-
-        if (isset($thumbnail)) {
-            $thumbnailFile = utf8_encode(strtolower($thumbnail["name"]));
-            $acceptExt = array("jpg", "png", "gif", "webp");
-            $extension = pathinfo($thumbnailFile, PATHINFO_EXTENSION);
-
-            if (!in_array($extension, $acceptExt))
-                return PROBLEM_ERROR_FILEREJECT;
-
-            if ($thumbnail["size"] > MAX_IMAGE_SIZE)
-                return PROBLEM_ERROR_FILETOOLARGE;
-
-            if ($thumbnail["error"] > 0)
-                return PROBLEM_ERROR;
-
-            $moveThumbnail = true;
-            $problemList[$id]["thumbnail"] = $thumbnailFile;
-        }
-
-        if (isset($attachment)) {
-            $attachmentFile = utf8_encode(strtolower($attachment["name"]));
-
-            if ($attachment["size"] > MAX_ATTACHMENT_SIZE)
-                return PROBLEM_ERROR_FILETOOLARGE;
-
-            if ($attachment["error"] > 0)
-                return PROBLEM_ERROR;
-
-            $moveAttachment = true;
-            $problemList[$id]["attachment"] = $attachmentFile;
-        }
-
-        mkdir(PROBLEMS_DIR. "/" .$id);
-        problemSave($id);
-
-        if ($moveThumbnail)
-            move_uploaded_file($thumbnail["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $thumbnailFile);
-
-        if ($moveAttachment)
-            move_uploaded_file($attachment["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $attachmentFile);
-
-        return PROBLEM_OKAY;
-    }
-
     function problemEdit(String $id, Array $set, Array $thumbnail = null, Array $attachment = null) {
-        global $problemList;
-    
-        if (!problemExist($id))
-            return PROBLEM_ERROR_IDREJECT;
-    
-        $data = $problemList[$id];
-        $new = $data;
-    
-        if (isset($thumbnail)) {
-            $thumbnailFile = utf8_encode(strtolower($thumbnail["name"]));
-            $extension = pathinfo($thumbnailFile, PATHINFO_EXTENSION);
-    
-            if (!in_array($extension, IMAGE_ALLOW))
-                return PROBLEM_ERROR_FILEREJECT;
-    
-            if ($thumbnail["size"] > MAX_IMAGE_SIZE)
-                return PROBLEM_ERROR_FILETOOLARGE;
-    
-            if ($thumbnail["error"] > 0)
-                return PROBLEM_ERROR;
-    
-            if (isset($problemList[$id]["thumbnail"]) && file_exists(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["thumbnail"]))
-                unlink(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["thumbnail"]);
-    
-            move_uploaded_file($thumbnail["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $thumbnailFile);
-    
-            $new["thumbnail"] = $thumbnailFile;
-        }
-    
-        if (isset($attachment)) {
-            $attachmentFile = utf8_encode(strtolower($attachment["name"]));
-            $extension = pathinfo($attachmentFile, PATHINFO_EXTENSION);
-    
-            if ($attachment["size"] > MAX_ATTACHMENT_SIZE)
-                return PROBLEM_ERROR_FILETOOLARGE;
-    
-            if ($attachment["error"] > 0)
-                return PROBLEM_ERROR;
-    
-            if (isset($problemList[$id]["attachment"]) && file_exists(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["attachment"]))
-                unlink(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["attachment"]);
-    
-            move_uploaded_file($attachment["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $attachmentFile);
-    
-            $new["attachment"] = $attachmentFile;
-        }
-    
-        $key = array_intersect_key($data, $set);
-        foreach ($key as $i => $value)
-            $new[$i] = isset($set[$i]) ? $set[$i] : $new[$i];
-    
-        $problemList[$id] = $new;
-        problemSave($id);
-    
-        return PROBLEM_OKAY;
-    }
+		global $problemList;
+
+		if (!problemExist($id))
+			return PROBLEM_ERROR_IDREJECT;
+
+		$defTemplate = PROBLEM_TEMPLATE;
+
+		// Add image and attachment value if current data have
+		// it because the template does not have the image and
+		// attachment field
+		if (isset($problemList[$id]["thumbnail"]))
+			$defTemplate["thumbnail"] = $problemList[$id]["thumbnail"];
+
+		if (isset($problemList[$id]["attachment"]))
+			$defTemplate["attachment"] = $problemList[$id]["attachment"];
+
+		if (isset($thumbnail)) {
+			$thumbnailFile = utf8_encode(strtolower($thumbnail["name"]));
+			$extension = pathinfo($thumbnailFile, PATHINFO_EXTENSION);
+
+			if (!in_array($extension, IMAGE_ALLOW))
+				return PROBLEM_ERROR_FILEREJECT;
+
+			if ($thumbnail["size"] > MAX_IMAGE_SIZE)
+				return PROBLEM_ERROR_FILETOOLARGE;
+
+			if ($thumbnail["error"] > 0)
+				return PROBLEM_ERROR;
+
+			if (isset($problemList[$id]["thumbnail"]) && file_exists(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["thumbnail"]))
+				unlink(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["thumbnail"]);
+
+			move_uploaded_file($thumbnail["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $thumbnailFile);
+
+			$set["thumbnail"] = $thumbnailFile;
+		}
+
+		if (isset($attachment)) {
+			$attachmentFile = utf8_encode(strtolower($attachment["name"]));
+			$extension = pathinfo($attachmentFile, PATHINFO_EXTENSION);
+
+			if ($attachment["size"] > MAX_ATTACHMENT_SIZE)
+				return PROBLEM_ERROR_FILETOOLARGE;
+
+			if ($attachment["error"] > 0)
+				return PROBLEM_ERROR;
+
+			if (isset($problemList[$id]["attachment"]) && file_exists(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["attachment"]))
+				unlink(PROBLEMS_DIR ."/". $id ."/". $problemList[$id]["attachment"]);
+
+			move_uploaded_file($attachment["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $attachmentFile);
+
+			$set["attachment"] = $attachmentFile;
+		}
+
+		// Merge current data into the template, then merge changes into
+		// the template.
+		// This is to automaticly update problem config to the template
+		mergeObjectRecursive($defTemplate, $problemList[$id], false, true);
+		mergeObjectRecursive($defTemplate, $set, function($a, $b, $k) {
+			if ($a !== "NULL" && $a !== $b)
+				stop(3, "Loại biến không khớp! Yêu cầu $k là \"$a\", nhận được \"$b\"!", 400, Array(
+					"expect" => $a,
+					"got" => $b,
+					"key" => $k
+				));
+	
+			return true;
+		}, true);
+
+		$problemList[$id] = $defTemplate;
+		problemSave($id);
+
+		return PROBLEM_OKAY;
+	}
+
+	function problemAdd(String $id, Array $add, Array $thumbnail = null, Array $attachment = null) {
+		global $problemList;
+
+		if (problemExist($id))
+			return PROBLEM_ERROR_IDREJECT;
+		
+		$problemList[$id] = PROBLEM_TEMPLATE;
+		mergeObjectRecursive($problemList[$id], $add, function($a, $b, $k) {
+			if ($a !== "NULL" && $a !== $b)
+				stop(3, "Loại biến không khớp! Yêu cầu $k là \"$a\", nhận được \"$b\"!", 400, Array(
+					"expect" => $a,
+					"got" => $b,
+					"key" => $k
+				));
+	
+			return true;
+		}, true);
+
+		mkdir(PROBLEMS_DIR. "/" .$id, 0777, true);
+
+		if (isset($thumbnail)) {
+			$thumbnailFile = utf8_encode(strtolower($thumbnail["name"]));
+			$extension = pathinfo($thumbnailFile, PATHINFO_EXTENSION);
+
+			if (!in_array($extension, IMAGE_ALLOW))
+				return PROBLEM_ERROR_FILEREJECT;
+
+			if ($thumbnail["size"] > MAX_IMAGE_SIZE)
+				return PROBLEM_ERROR_FILETOOLARGE;
+
+			if ($thumbnail["error"] > 0)
+				return PROBLEM_ERROR;
+
+			move_uploaded_file($thumbnail["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $thumbnailFile);
+			$problemList[$id]["thumbnail"] = $thumbnailFile;
+		}
+
+		if (isset($attachment)) {
+			$attachmentFile = utf8_encode(strtolower($attachment["name"]));
+
+			if ($attachment["size"] > MAX_ATTACHMENT_SIZE)
+				return PROBLEM_ERROR_FILETOOLARGE;
+
+			if ($attachment["error"] > 0)
+				return PROBLEM_ERROR;
+
+			move_uploaded_file($attachment["tmp_name"], PROBLEMS_DIR ."/". $id ."/". $attachmentFile);
+			$problemList[$id]["attachment"] = $attachmentFile;
+		}
+
+		problemSave($id);
+		return PROBLEM_OKAY;
+	}
 
     function problemSave(String $id) {
         global $problemList;

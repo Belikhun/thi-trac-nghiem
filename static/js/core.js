@@ -762,12 +762,19 @@ const ttn = {
             upComming: $("#problemListUpComming"),
             inProgress: $("#problemListInProgress"),
             completed: $("#problemListCompleted"),
-            reload: $("#problemsListReload"),
-
+			buttons: $("#problemListButtons"),
+			
+            reload: undefined,
             optimize: false,
             runningList: [],
 
             async init() {
+				this.reload = createButton("LÀM MỚI", {
+					style: "round",
+					icon: "reload"
+				});
+
+				this.buttons.appendChild(this.reload);
                 await this.fetchList();
                 this.reload.addEventListener("mouseup", () => this.fetchList());
             },
@@ -874,6 +881,7 @@ const ttn = {
                 info: $("#problemProgressInfo")
             },
 
+			footer: $("#problemFooter"),
             quitBtn: $("#problemQuit"),
             submitBtn: $("#problemSubmit"),
 
@@ -904,6 +912,7 @@ const ttn = {
 
             data: {},
             showing: false,
+			id: null,
             previousRankHash: null,
 
             async init() {
@@ -1104,6 +1113,7 @@ const ttn = {
                     ttn.contest.list.container.classList.add("hide");
                 } else {
                     this.showing = false;
+					this.id = null;
                     ttn.contest.list.optimize = false;
                     this.timer.time.showMs = false;
                     this.optimize(true);
@@ -1146,6 +1156,7 @@ const ttn = {
                 if (!(await this.loadData(id)))
                     return;
 
+				this.id = id;
                 this.timer.time.onUpComming = () => {
                     if (this.data.result) {
                         this.printResult(this.data.result);
@@ -1227,6 +1238,9 @@ const ttn = {
             },
 
             async loadAttachment(data) {
+				if (!this.data)
+					return;
+
                 await waitFor(async () => {
                     let response = {}
 
@@ -1680,8 +1694,6 @@ const ttn = {
 			group: smenu.Group.prototype,
 
 			init() {
-				return false;
-
 				this.group = new smenu.Group({ label: "khác", icon: "circle" });
 
 				let update = new smenu.Child({ label: "Làm Mới" }, this.group);
@@ -1728,49 +1740,6 @@ const ttn = {
 					else {
 						ttn.rank.enabled = true;
 						ttn.rank.updateDelay = sliderStep[v];
-					}
-				});
-
-				let updateLogs = new smenu.components.Slider({
-					label: "Thời gian cập nhật nhật kí",
-					color: "blue",
-					save: "others.logsUpdate",
-					min: 1,
-					max: 11,
-					unit: "giây",
-					defaultValue: SERVER.clientSettings.logsUpdate,
-					valueStep: sliderStep
-				}, update);
-
-				updateLogs.onInput((v) => updateLogs.set({ color: (v <= 2) ? "red" : "blue" }));
-				updateLogs.onChange(async (v, e) => {
-					if (v < 3 && e.isTrusted)
-						if (await popup.show(lowWarningSettings) === "cancel") {
-							updateLogs.set({ value: 3 });
-							return;
-						}
-
-					if (v === 11)
-						if (await popup.show({
-							level: "warning",
-							windowTitle: "Cảnh Báo",
-							title: "Cảnh Báo",
-							message: "Tắt tự động cập nhật nhật ký",
-							description: "Việc này sẽ làm cho tình trạng nộp bài của bạn không được tự động cập nhật.<br>Bạn có chắc muốn tắt tính năng này không?",
-							buttonList: {
-								cancel: { color: "blue", text: "Bấm Lộn! Trả Về Cũ Đi!" },
-								ignore: { color: "red", text: "TẮT! TẮT HẾT!" }
-							}
-						}) === "cancel") {
-							updateLogs.set({ value: 3 });
-							return;
-						}
-
-					if (sliderStep[v] === false)
-						ttn.logs.enabled = false;
-					else {
-						ttn.logs.enabled = true;
-						ttn.logs.updateDelay = sliderStep[v];
 					}
 				});
 
@@ -2099,6 +2068,512 @@ const ttn = {
 					
 					this.logsContainer.innerHTML = html.join("\n");
 					this.log("info", `Refreshed SysLogs [${hash}]`);
+				}
+			},
+
+			problemEditor: {
+				/** @type {HTMLElement} */
+				container: null,
+				
+				id: null,
+				action: null,
+				updateTimeout: null,
+				addButton: null,
+				editButton: null,
+				deleteButton: null,
+				languages: {},
+				
+				/** @type {wavec.Container} */
+				wavec: wavec.Container.prototype,
+
+				async init() {
+					this.container = makeTree("form", "problemEditor", {
+						header: { tag: "div", class: "header", child: {
+							left: { tag: "span", class: "left", child: {
+								main: { tag: "t", class: "main", html: `<icon data-icon="pencil"></icon>thông tin` }
+							}},
+
+							right: { tag: "span", class: "right", child: {
+								delete: createButton("Xóa", {
+									color: "red",
+									classes: "delete",
+									style: "round",
+									icon: "trash",
+									complex: true
+								}),
+
+								cancel: createButton("Hủy", {
+									color: "yellow",
+									classes: "cancel",
+									style: "round",
+									icon: "close",
+									complex: true
+								}),
+
+								submit: createButton("LƯU", {
+									color: "blue",
+									type: "submit",
+									classes: "submit",
+									style: "round",
+									icon: "save",
+									complex: true
+								})
+							}}
+						}},
+
+						main: { tag: "div", class: "main", child: {
+							thumbnail: createImageInput({
+								id: "problemEditorThumbnail",
+								src: "/api/problems/thumbnail",
+								resetText: "Xóa Ảnh Hiện Tại"
+							}),
+							
+							top: { tag: "div", class: "row", child: {
+								left: { tag: "span", class: "column", child: {
+									pID: createInput({
+										label: "Mã Đề Bài",
+										type: "text",
+										id: "problemEditorID",
+										required: true
+									}),
+
+									pTitle: createInput({
+										label: "Tên Đề Bài",
+										type: "text",
+										id: "problemEditorTitle",
+										required: true
+									}),
+
+									point: createInput({
+										type: "number",
+										label: "Điểm",
+										id: "problemEditorPoint",
+										required: true
+									}),
+
+									datetime: { tag: "div", class: "row", child: {
+										date: createInput({
+											type: "date",
+											label: "Ngày Bắt Đầu",
+											id: "problemEditorBeginDate",
+											required: true
+										}),
+
+										time: createInput({
+											type: "time",
+											label: "Giờ Bắt Đầu",
+											id: "problemEditorBeginTime",
+											required: true
+										}),
+
+										setNow: createButton("HIỆN TẠI", {
+											color: "brown",
+											style: "round",
+											icon: "clock"
+										})
+									}},
+
+									during: createInput({
+										type: "number",
+										label: "Thời Gian Làm Bài",
+										id: "problemEditorDuring",
+										required: true
+									}),
+
+									offset: createInput({
+										type: "number",
+										label: "Thời Gian Bù Giờ",
+										id: "problemEditorOffset",
+										required: true
+									}),
+
+									attachment: createInput({
+										type: "file",
+										label: "Tệp Tài Liệu",
+										id: "problemEditorAttachment",
+										required: false
+									}),
+
+									removeAttachment: createButton("Xóa Tệp Tài Liệu Hiện Tại", {
+										color: "pink",
+										icon: "trash",
+										complex: true
+									})
+								}},
+
+								right: { tag: "span", class: "column", child: {
+									test: { tag: "div", class: "test", child: {
+										label: { tag: "t", class: "label", text: "Đáp Án" },
+										list: { tag: "div", class: "list" },
+										add: createButton("THÊM", {
+											icon: "plus",
+											classes: "add",
+											complex: true
+										})
+									}}
+								}}
+							}}
+						}}
+					});
+
+					this.wavec = new wavec.Container(this.container);
+					this.container.addEventListener("submit", () => {});
+					this.container.action = "javascript:void(0);";
+					this.container.dataset.active = "main";
+					this.container.addEventListener("submit", () => this.postSubmit());
+					this.container.main.top.left.datetime.time.input.step = 1;
+					this.container.main.top.right.test.add.addEventListener("click", () => this.addTest());
+					this.container.header.right.cancel.addEventListener("click", () => this.wavec.hide());
+					this.container.header.right.delete.addEventListener("click", () => this.delete(this.id));
+
+					this.container.main.thumbnail.onReset(async () => {
+						if (this.id && await this.deleteFile("thumbnail", this.id))
+							this.container.main.thumbnail.clear();
+					});
+
+					this.container.main.top.left.datetime.setNow.addEventListener("click", () => {
+						setDateTimeValue(
+							this.container.main.top.left.datetime.date.input,
+							this.container.main.top.left.datetime.time.input
+						);
+					});
+
+					// Inject Button Into Problem Viewer
+					this.addButton = createButton("Tạo Đề Bài", {
+						color: "pink",
+						style: "round",
+						icon: "plus"
+					});
+
+					this.editButton = createButton("Chỉnh Sửa", {
+						color: "green",
+						icon: "pencil",
+						complex: true
+					});
+
+					this.deleteButton = createButton("Xóa", {
+						color: "red",
+						icon: "trash",
+						complex: true
+					});
+
+					ttn.contest.problem.footer.append(this.editButton, this.deleteButton);
+					ttn.contest.list.buttons.appendChild(this.addButton);
+					this.addButton.addEventListener("click", () => this.create());
+					this.editButton.addEventListener("click", () => this.edit(ttn.contest.problem.id));
+					this.deleteButton.addEventListener("click", () => this.delete(ttn.contest.problem.id));
+				},
+
+				async resetForm() {
+					this.container.main.top.left.pID.input.value = "";
+					this.container.main.top.left.pID.input.disabled = false;
+					this.container.main.top.left.pTitle.input.value = "";
+					this.container.main.top.left.point.input.value = "";
+
+					setDateTimeValue(
+						this.container.main.top.left.datetime.date.input,
+						this.container.main.top.left.datetime.time.input
+					);
+
+					this.container.main.top.left.during.input.value = "";
+					this.container.main.top.left.offset.input.value = "";
+					this.container.main.top.left.attachment.input.value = null;
+
+					this.container.main.thumbnail.clear();
+					emptyNode(this.container.main.top.right.test.list);
+					this.container.header.right.delete.style.display = "none";
+					this.action = null;
+				},
+
+				addTest(value = "") {
+					let randName = randString(8);
+                    let answer = ["A", "B", "C", "D"];
+                    let input = "";
+
+                    for (let mark of answer) {
+                        let randID = randString(8);
+
+                        input += `
+                            <label for="problemEdit_${randID}" class="circleCheckbox">
+                                <input
+                                    id="problemEdit_${randID}"
+                                    name="problemEdit_${randName}"
+                                    type="radio" value="${mark}"
+									required
+									${(value.toUpperCase() === mark ? `checked=true` : "")}
+                                >
+                                <div class="checkmark">${mark}</div>
+                            </label>
+                        `
+                    }
+
+                    html = `
+                        <div class="cell">
+                            ${input}
+                            <span class="delete" onClick="this.parentElement.remove()"></span>
+                        </div>
+                    `
+
+					this.container.main.top.right.test.list.appendChild(htmlToElement(html));
+				},
+
+				getTest() {
+					let testNodes = this.container.main.top.right.test.list.querySelectorAll("div.cell");
+					let test = []
+	
+					for (let item of testNodes) {
+						let input = item.querySelector("label > input:checked");
+
+						if (!input)
+							throw { code: -1, description: `Cannot find checked input in test list` }
+
+						test.push(input.value);
+					}
+
+					return test;
+				},
+
+				async create() {
+					this.wavec.set({ title: "đề bài - Tạo Mới" });
+					this.wavec.show();
+					this.wavec.loading = true;
+
+					await this.resetForm();
+					this.container.main.top.left.attachment.input.disabled = false;
+					this.container.main.top.left.removeAttachment.disabled = true;
+					this.action = "add";
+
+					this.wavec.loading = false;
+					setTimeout(() => this.container.main.top.left.pID.input.focus(), 600);
+				},
+
+				async edit(id) {
+					this.wavec.show();
+					this.wavec.loading = true;
+					this.wavec.set({ title: `đề bài - ${id}` });
+
+					let response = await myajax({
+						url: "/api/problems/get",
+						method: "GET",
+						query: {
+							id: id
+						}
+					});
+	
+					let data = response.data;
+					this.log("INFO", "Editing problem", {
+						color: flatc("yellow"),
+						text: id
+					}, data);
+
+					this.id = data.id;
+	
+					await this.resetForm();
+					this.container.header.right.delete.style.display = null;
+					this.container.main.top.left.pID.input.value = data.id;
+					this.container.main.top.left.pID.input.disabled = true;
+					this.container.main.top.left.pTitle.input.value = data.name;
+					this.container.main.top.left.point.input.value = data.point;
+
+					setDateTimeValue(
+						this.container.main.top.left.datetime.date.input,
+						this.container.main.top.left.datetime.time.input,
+						data.time.begin
+					);
+
+					this.container.main.top.left.during.input.value = data.time.during;
+					this.container.main.top.left.offset.input.value = data.time.offset;
+					this.container.main.thumbnail.src(`/api/problems/thumbnail?id=${data.id}`);
+
+					if (data.attachment && data.attachment.file) {
+						this.container.main.top.left.removeAttachment.disabled = false;
+
+						this.container.main.top.left.removeAttachment.onclick = async () => {
+							this.container.main.top.left.removeAttachment.disabled = true;
+
+							if (!await this.deleteFile("attachment", data.id, data.attachment.file))
+								this.container.main.top.left.removeAttachment.disabled = false;
+						}
+					} else
+						this.container.main.top.left.removeAttachment.disabled = true;
+
+					for (let item of data.answer)
+						this.addTest(item);
+
+					this.action = "edit";
+					this.wavec.loading = false;
+				},
+
+				async postSubmit() {
+					this.wavec.loading = true;
+	
+					let data = {
+						id: this.container.main.top.left.pID.input.value,
+						name: this.container.main.top.left.pTitle.input.value,
+						point: parseFloat(this.container.main.top.left.point.input.value),
+						
+						time: {
+							begin: getDateTimeValue(
+								this.container.main.top.left.datetime.date.input,
+								this.container.main.top.left.datetime.time.input
+							),
+
+							during: parseInt(this.container.main.top.left.during.input.value),
+							offset: parseInt(this.container.main.top.left.offset.input.value)
+						},
+
+						results: this.getTest()
+					}
+	
+					let thumbnail = this.container.main.thumbnail.input.files[0] || null;
+					let attachment =  this.container.main.top.left.attachment.input.files[0] || null;
+					
+					await this.submit(this.action, data, thumbnail, attachment);
+
+					await ttn.contest.list.fetchList();
+					if (ttn.contest.problem.id)
+						ttn.contest.problem.open(ttn.contest.problem.id);
+
+					this.wavec.loading = false;
+					this.wavec.hide();
+				},
+	
+				async submit(action, data, thumbnail = null, attachment = null) {
+					if (!["edit", "add"].includes(action))
+						throw { code: -1, description: `ttn.userSettings.admin.problemEditor.submit(${action}): not a valid action!` }
+	
+					this.log("INFO", "Problem Submit:", {
+						color: flatc("green"),
+						text: action
+					}, {
+						color: flatc("yellow"),
+						text: data.id
+					});
+	
+					try {
+						await myajax({
+							url: "/api/problems/" + action,
+							method: "POST",
+							form: {
+								data: JSON.stringify(data),
+								thumbnail,
+								attachment,
+								token: API_TOKEN
+							}
+						});
+					} catch(e) {
+						errorHandler(e);
+						throw e;
+					}
+
+					return true;
+				},
+
+				async delete(id) {
+					this.log("WARN", "Deleting Problem", {
+						color: flatc("yellow"),
+						text: id + "."
+					}, "Waiting for confirmation");
+	
+					let confirm = await popup.show({
+						level: "warning",
+						windowTitle: "Problems Editor",
+						title: `Xóa \"${id}\"`,
+						message: `Xác nhận`,
+						description: `Bạn có chắc muốn xóa đề bài <i>${id}</i> không?`,
+						note: `Hành động này <b>không thể hoàn tác</b> một khi đã thực hiện!`,
+						noteLevel: "warning",
+						buttonList: {
+							delete: { text: "XÓA!!!", color: "red" },
+							cancel: { text: "Hủy Bỏ", color: "blue" }
+						}
+					})
+	
+					if (confirm !== "delete") {
+						this.log("INFO", "Cancelled deletion of", {
+							color: flatc("yellow"),
+							text: id + "."
+						});
+
+						return;
+					}
+	
+					sounds.confirm(1);
+	
+					try {
+						await myajax({
+							url: "/api/problems/remove",
+							method: "POST",
+							form: {
+								id: id,
+								token: API_TOKEN
+							}
+						});
+					} catch(e) {
+						errorHandler(e);
+						throw e;
+					}
+	
+					this.log("OKAY", "Deleted Problem", {
+						color: flatc("yellow"),
+						text: id
+					});
+	
+					this.wavec.hide();
+				},
+
+				async deleteFile(type, id, fileName = null) {
+					if (!["thumbnail", "attachment"].includes(type))
+						throw { code: -1, description: `ttn.userSettings.admin.problemEditor.deleteFile(${type}): not a valid type!` }
+	
+					typeName = { thumbnail: "Ảnh Nền", attachment: "Tệp Đính Kèm" }[type]
+	
+					this.log("WARN", "Preparing to delete", typeName, "of", {
+						color: flatc("yellow"),
+						text: `${id}.`
+					}, "Waiting for confirmation...");
+	
+					let action = await popup.show({
+						windowTitle: "Xác nhận",
+						title: `Xóa ${typeName} của đề "${id}"`,
+						description: `Bạn có chắc muốn xóa ${fileName ? `<b>${fileName}</b>` : "không"}?`,
+						note: `Hành động này <b>không thể hoàn tác</b> một khi đã thực hiện!`,
+						level: "warning",
+						buttonList: {
+							delete: { color: "pink", text: "XÓA!!!" },
+							cancel: { color: "blue", text: "Hủy" }
+						}
+					})
+	
+					if (action !== "delete") {
+						this.log("INFO", "Cancelled deletion", typeName, "of", {
+							color: flatc("yellow"),
+							text: id
+						})
+	
+						return false;
+					}
+	
+					try {
+						await myajax({
+							url: `/api/problems/${type}`,
+							method: "DELETE",
+							header: {
+								id: id,
+								token: API_TOKEN
+							}
+						})
+					} catch(e) {
+						errorHandler(e);
+						throw e;
+					}
+	
+					this.log("OKAY", "Deleted", typeName, "of", {
+						color: flatc("yellow"),
+						text: id
+					})
+	
+					return true;
 				}
 			}
 		},

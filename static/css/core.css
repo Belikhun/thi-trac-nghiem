@@ -1770,6 +1770,274 @@ input:-webkit-autofill {
 	}
 }
 
+/** =================== PROBLEMEDITOR =================== **/
+
+.problemEditor {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	
+	--header-height: 40vh;
+
+	padding: unset;
+	padding-bottom: calc(var(--header-height) / 2);
+	background-color: white;
+}
+
+.problemEditor[data-active="description"] {
+	height: 100%;
+	padding-bottom: unset;
+}
+
+.problemEditor > .header {
+	position: sticky;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	top: 0;
+	padding: 20px 10px;
+
+	background-color: white;
+	border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+	z-index: 10000;
+}
+
+.problemEditor > .header > span {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.problemEditor > .header > .left {
+	flex-grow: 1;
+}
+
+.problemEditor > .header > .left > t {
+	padding: 5px 15px;
+	margin: 0 10px;
+
+	font-family: Nunito;
+	font-size: 26px;
+	font-weight: 800;
+	color: var(--text-color);
+	cursor: pointer;
+	background-color: var(--bg-color);
+
+	--text-color: rgba(84, 84, 84, 0.6);
+	--bg-color: none;
+}
+
+.problemEditor > .header > .left > t > icon::after {
+	color: var(--text-color);
+	margin-right: 10px;
+}
+
+.problemEditor > .header > .left > t:hover {
+	--text-color: rgba(36, 36, 36, 0.8);
+	--bg-color: rgba(238, 238, 238, 0.5);
+}
+
+.problemEditor[data-active="main"] > .header > .left > .main,
+.problemEditor[data-active="description"] > .header > .left > .description {
+	--text-color: rgb(245, 245, 245);
+	--bg-color: rgba(14, 14, 14, 0.9);
+}
+
+.problemEditor > .header > .right {
+	flex-wrap: wrap;
+}
+
+.problemEditor > .header > .right > button {
+	flex-grow: 1;
+	flex-shrink: 0;
+	margin: 5px 10px 0;
+}
+
+.problemEditor > .main {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+}
+
+.problemEditor > .main > .imageInput {
+	position: relative;
+	margin: unset;
+	margin-bottom: 20px;
+}
+
+.problemEditor > .main > .imageInput > .imageBox {
+	width: 100%;
+	height: var(--header-height);
+}
+
+.problemEditor > .main > .imageInput > button {
+	position: absolute;
+	bottom: 12px;
+	right: 22px;
+	z-index: 3;
+}
+
+.problemEditor > .main > div {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+
+	margin: 10px;
+}
+
+.problemEditor > .main > div > span {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-basis: 0;
+}
+
+.problemEditor > .main > div > span > .sq-input {
+	width: auto;
+	margin: 10px;
+}
+
+.problemEditor > .main > div > span > .checkboxContainer { 
+	width: auto;
+	margin: 0 10px 10px;
+}
+
+.problemEditor > .main > div > span > .sq-input > textarea {
+	resize: vertical;
+	height: 80px;
+}
+
+.problemEditor > .main > div > span > button {
+	margin: 0 10px 10px;
+}
+
+.problemEditor > .main > div > span > .row {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	margin: 10px 10px 10px 0;
+}
+
+.problemEditor > .main > div > span > .row > .sq-input {
+	margin-left: 10px;
+}
+.problemEditor > .main > div > span > .row > .sq-btn {
+	height: 50px;
+	margin-left: 10px;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test {
+	position: relative;
+	margin: 10px 10px 20px;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .label {
+	position: relative;
+    display: inline-block;
+
+    font-family: "Calibri", "Segoe UI", "sans-serif";
+    font-size: 18px;
+    font-weight: 700;
+    color: black;
+    text-transform: uppercase;
+    letter-spacing: .1px;
+
+    user-select: none;
+    pointer-events: none;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list {
+	position: relative;
+	display: block;
+	
+	width: 100%;
+	min-height: 100px;
+	box-sizing: border-box;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list:empty::before {
+	content: "TRỐNG";
+
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+	color: rgb(182, 182, 182);
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	width: 100%;
+	margin: 10px 0;
+	counter-increment: testNth;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell::before {
+    content: "Câu " counter(testNth);
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 20px;
+    width: 60px;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell > .circleCheckbox {
+    margin: 0 5px;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell > .delete {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-grow: 0;
+
+	width: 60px;
+	height: 30px;
+	margin-left: 20px;
+	background-color: rgba(245, 245, 245, 0.8);
+	border-radius: 4px;
+
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell > .delete:hover {
+	background-color: rgba(202, 202, 202, 0.5);
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell > .delete::before {
+	content: "\f146";
+	position: relative;
+	font-family: "Font Awesome 5 Free";
+	font-size: 18px;
+	font-weight: 600;
+	color: #95a5a6;
+	transition: 0.2s;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .list > .cell > .delete:hover::before {
+	color: #e74c3c;
+}
+
+.problemEditor > .main > div[key="top"] > span[key="right"] > .test > .add {
+	margin-top: 10px;
+	width: 100%;
+	min-width: 320px;
+}
+
 /** =================== FOOTER =================== **/
 
 footer {

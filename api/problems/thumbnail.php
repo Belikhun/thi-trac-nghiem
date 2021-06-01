@@ -25,7 +25,7 @@
             // SET PAGE TYPE
             define("PAGE_TYPE", "NORMAL");
 
-            $id = preg_replace("/[.\/\\\\]/m", "", reqQuery("id"));
+            $id = preg_replace("/[.\/\\\\]/m", "", getQuery("id"));
 
             require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/config.php";
             require_once $_SERVER["DOCUMENT_ROOT"] ."/modules/problem.php";

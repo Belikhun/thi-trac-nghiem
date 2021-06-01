@@ -192,7 +192,7 @@
 								<t class="title">Sắp tới</t>
 							</span>
 
-							<button id="problemsListReload" class="sq-btn blue right sound" data-soundhover data-soundselect>Làm mới</button>
+							<span id="problemListButtons"></span>
 						</div>
 						<div class="list" id="problemListUpComming"></div>
 
@@ -243,7 +243,7 @@
 	
 									<div id="problemMarkBox" class="markBox"></div>
 	
-									<span class="footer">
+									<span id="problemFooter" class="footer">
 										<button type="button" id="problemQuit" class="sq-btn red sound" data-soundhover data-soundselect>🏳 Thoát</button>
 										<button type="button" id="problemSubmit" class="sq-btn sound" data-soundhover data-soundselect>📄 Nộp Bài</button>
 									</span>
