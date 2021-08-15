@@ -2115,8 +2115,7 @@ function createSelectInput({
 
 	if (typeof Scrollable === "function")
 		new Scrollable(container.select, {
-			content: container.select.list,
-			scrollbar: false
+			content: container.select.list
 		});
 
 	/** @type {HTMLDivElement} */
@@ -2132,7 +2131,7 @@ function createSelectInput({
 
 		showing = true;
 		container.classList.add("show");
-		container.select.style.height = `${container.select.list.offsetHeight}px`;
+		container.select.style.height = `${Math.min(150, container.select.list.scrollHeight)}px`;
 	}
 
 	const hide = (isSelected = false) => {
