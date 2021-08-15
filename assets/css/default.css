@@ -37,7 +37,7 @@
 	--osc-color-darkBlue:		#032b3d;
 	--osc-color-darkYellow:		#444304;
 	--osc-color-darkRed:		#440505;
-	--osc-color-lightBlue:		#eaf8ff;
+	--osc-color-lightBlue:		#daf3ff;
 	--osc-color-navyBlue:		#333D79;
 }
 
@@ -308,7 +308,11 @@ body.dark tag {
 	transition: unset;
 }
 
-.lazyload > :first-child:not(div[spinner]) {
+.lazyload.noTransition {
+	transition: unset;
+}
+
+.lazyload > :first-child:not([spinner]) {
 	position: relative;
 	display: block;
 	width: 100%;
@@ -320,14 +324,18 @@ body.dark tag {
 		opacity 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19);
 }
 
-.lazyload > div[spinner] {
+.lazyload.noTransition > :first-child:not([spinner]) {
+	transition: unset;
+}
+
+.lazyload > [spinner] {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
 
-.lazyload.light > div[spinner] {
+.lazyload.light > [spinner] {
 	border-color: rgb(214, 214, 214);
 	border-right-color: transparent;
 }
@@ -336,12 +344,12 @@ body.dark tag {
 	background-color: transparent;
 }
 
-.lazyload[data-loaded] > :first-child:not(div[spinner]) {
+.lazyload[data-loaded] > :first-child:not([spinner]) {
 	opacity: 1;
 }
 
-.lazyload[data-loaded] > div[spinner],
-.lazyload[data-errored] > div[spinner] {
+.lazyload[data-loaded] > [spinner],
+.lazyload[data-errored] > [spinner] {
 	display: none;
 }
 
@@ -668,6 +676,14 @@ icon[data-icon="user"]::after {
 	content: "\f2bd";
 }
 
+icon[data-icon="userSlash"]::after {
+	content: "\f4fa";
+}
+
+icon[data-icon="userLock"]::after {
+	content: "\f502";
+}
+
 icon[data-icon="logout"]::after {
 	content: "\f2f5";
 }
@@ -745,6 +761,10 @@ icon[data-icon="list"]::after {
 	content: "\f00b";
 }
 
+icon[data-icon="listC"]::after {
+	content: "\f03a";
+}
+
 icon[data-icon="search"]::after {
 	content: "\f002";
 }
@@ -811,6 +831,34 @@ icon[data-icon="shoppingCart"]::after {
 	content: "\f07a";
 }
 
+icon[data-icon="eye"]::after {
+	content: "\f06e";
+}
+
+icon[data-icon="eyeSlash"]::after {
+	content: "\f070";
+}
+
+icon[data-icon="hand"]::after {
+	content: "\f256";
+}
+
+icon[data-icon="lock"]::after {
+	content: "\f023";
+}
+
+icon[data-icon="play"]::after {
+	content: "\f04b";
+}
+
+icon[data-icon="note"]::after {
+	content: "\f249";
+}
+
+icon[data-icon="print"]::after {
+	content: "\f02f";
+}
+
 /** ======================== NOTE ======================== **/
 
 .note {
@@ -846,7 +894,7 @@ icon[data-icon="shoppingCart"]::after {
 .note > .inner.inner,
 .note > .inner.inner > t,
 .note > .inner.inner > pre {
-    font-size: 13px;
+    font-size: 14px;
 	color: #343434;
 }
 

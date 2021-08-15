@@ -18,7 +18,7 @@
 
 	background-color: #ffffff;
 	user-select: none;
-	z-index: 99;
+	z-index: 100;
 
 	box-shadow: 0 20px 120px 20px transparent;
 	
@@ -255,6 +255,12 @@
 	font-weight: 800;
 }
 
+@media only screen and (max-width: 500px) {
+	.navigationBar > .group > .component.title > .title {
+		display: none;
+	}
+}
+
 /** COMPONENTS: ICONBUTTON */
 
 .navigationBar > .group > .component.iconBtn > icon {
@@ -374,6 +380,13 @@
 	background-color: transparent;
 }
 
+@media only screen and (max-width: 500px) {
+	.navigationBar > .group > .component.switch > .indicator,
+	.navigationBar > .group > .component.switch > icon {
+		width: 50px;
+	}
+}
+
 /** COMPONENTS: ACCOUNT */
 
 .navigationBar > .group > .component.account {
@@ -479,8 +492,7 @@
 
 .navigationBar > .group > .component.account > .subWindow > .content > .accountSettings > .header > .avatar[data-state="load"] > .simpleSpinner {
 	display: block;
-	border-color: white;
-	border-right-color: transparent;
+	--color: white;
 
 	z-index: 2;
 }

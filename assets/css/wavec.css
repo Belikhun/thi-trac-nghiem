@@ -158,7 +158,7 @@
 	width: 100%;
 	height: 100%;
 	transform: translateY(100%);
-	background-color: rgb(238, 238, 238);
+	background-color: rgb(255, 255, 255);
 
 	transition:
 		transform 0.5s ease-in;
@@ -291,6 +291,10 @@
 
 body.dark .waveContainer > .container > .contentBox {
 	background-color: rgb(22, 22, 22);
+}
+
+body.dark .waveContainer > .container > .contentBox > .wrapper {
+	background-color: rgba(24, 24, 24, 0.85);
 }
 
 body.dark .waveContainer > .container > .contentBox > .header {

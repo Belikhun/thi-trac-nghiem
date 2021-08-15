@@ -81,7 +81,7 @@ function myajax({
 
 		xhr.addEventListener("readystatechange", async function() {
 			if (this.readyState === this.DONE) {
-				if (this.status === 0) {
+				if (this.status === 0 && this.responseText === "") {
 					if (changeState === true)
 						__connection__.stateChange("offline");
 
@@ -646,6 +646,20 @@ function parseTime(t = 0, {
 	}
 }
 
+/**
+ * Date to human readable time
+ * @param {Date} date 
+ */
+function humanReadableTime(date) {
+	let timeString = `${date.getHours()}:${pleft(date.getMinutes(), 2)}`;
+
+	if (date.getSeconds() > 0)
+		timeString += `:${pleft(date.getSeconds(), 2)}`;
+
+	let dateString = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+	return `${timeString} ${dateString}`;
+}
+
 function formatTime(seconds, {
 	ended = "Đã kết thúc",
 	surfix = "",
@@ -753,6 +767,16 @@ function setDateTimeValue(dateNode, timeNode, value = time()) {
 
 function getDateTimeValue(dateNode, timeNode) {
 	return time(new Date(`${dateNode.value}T${timeNode.value}`));
+}
+
+/**
+ * Return number of days between two dates
+ * @param	{Date}	start	Start date
+ * @param	{Date}	end		End date
+ * @returns {Number}
+ */
+function daysBetween(start, end) {
+	return (start.getTime() - end.getTime()) / (1000 * 3600 * 24);
 }
 
 function convertSize(bytes) {
@@ -1034,8 +1058,8 @@ class lazyload {
 		source,
 		classes,
 		tagName = "div",
-		doLoad = true,
-		spinner = "simpleSpinner"
+		spinner = "simpleSpinner",
+		doLoad = true
 	} = {}) {
 		/** @type {HTMLElement} */
 		this.container
@@ -1070,8 +1094,8 @@ class lazyload {
 
 		this.source = source;
 		this.spinner = document.createElement("div");
-		this.spinner.setAttribute("spinner", "true");
 		this.spinner.classList.add(spinner);
+		this.spinner.setAttribute("spinner", "true");
 		this.container.append(this.spinner);
 
 		if (doLoad)
@@ -1502,6 +1526,12 @@ function triBg(element, {
 	const DARKCOLOR = ["brown", "dark", "darkRed", "darkGreen", "darkBlue"]
 	const LIGHTCOLOR = ["lightBlue"]
 
+	let getRandBright = (color) => DARKCOLOR.includes(color)
+		? randBetween(1.1, 1.3, false)
+		: (LIGHTCOLOR.includes(color)
+			? randBetween(0.96, 1.05, false)
+			: randBetween(0.9, 1.2, false))
+
 	let current = element.querySelector(":scope > .triBgContainer");
 
 	if (current)
@@ -1533,13 +1563,7 @@ function triBg(element, {
 		let randScale = randBetween(0.4, 2.0, false) * scale;
 		let width = 15 * randScale;
 		let height = 0.866 * (30 * randScale);
-
-		let randBright = DARKCOLOR.includes(color)
-			? randBetween(1.1, 1.3, false)
-			: LIGHTCOLOR.includes(color)
-				? randBetween(0.95, 1.05, false)
-				: randBetween(0.9, 1.2, false)
-
+		let randBright = getRandBright(color);
 		let randLeftPos = randBetween(0, 98, false);
 		let delay = randBetween(-speed / 2, speed / 2, false);
 
@@ -1560,10 +1584,7 @@ function triBg(element, {
 			element.dataset.triColor = color;
 
 			for (let triangle of container.childNodes) {
-				let randBright = DARKCOLOR.includes(color)
-					? randBetween(1.1, 1.3, false)
-					: randBetween(0.9, 1.2, false)
-
+				let randBright = getRandBright(color);
 				triangle.style.filter = `brightness(${randBright})`;
 			}
 		}
@@ -1860,7 +1881,7 @@ function createInput({
 	// Some types are not included because there are api to create that specific input
 	//
 	// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types
-	if (!["text", "textarea", "datetime", "email", "password", "color", "number", "date", "time", "select", "file", "datetime-local", "month", "week", "tel", "url"].includes(type))
+	if (!["text", "textarea", "email", "password", "color", "number", "date", "time", "select", "file", "datetime-local", "month", "week", "tel", "url"].includes(type))
 		throw { code: -1, description: `createInput(${type}): Invalid type: ${type}` }
 
 	let container = makeTree("span", "sq-input", {
@@ -2309,7 +2330,7 @@ function createButton(text, {
 	color = "blue",
 	element = "button",
 	type = "button",
-	style = "flat",
+	style = "default",
 	classes,
 	icon = null,
 	align = "left",
@@ -2355,7 +2376,21 @@ function createButton(text, {
 			button.insertBefore(textNode, button.firstChild);
 	}
 
-	if (complex)
+	let spinner = document.createElement("div");
+	spinner.classList.add("simpleSpinner");
+	button.appendChild(spinner);
+
+	button.loading = (loading) => {
+		if (loading) {
+			button.disabled = true;
+			button.dataset.loading = true;
+		} else {
+			button.disabled = false;
+			button.removeAttribute("data-loading");
+		}
+	}
+
+	if (complex && style !== "flat")
 		triBg(button, {
 			scale: 1.6,
 			speed: 8,

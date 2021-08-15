@@ -24,6 +24,7 @@ class Scrollable {
 		maxClamp = 400,
 		horizontal = false,
 		smooth = true,
+		overrideScroll = true,
 		scrollbar = true,
 		scrollout = false,
 		barSize = 10
@@ -87,6 +88,7 @@ class Scrollable {
 		this.vHideTimeout = null;
 		this.hHideTimeout = null;
 		this.smooth = smooth;
+		this.overrideScroll = overrideScroll;
 		this.scrollbar = scrollbar;
 		this.barSize = barSize;
 
@@ -108,7 +110,7 @@ class Scrollable {
 		// Listeners for scrolling events
 		this.content.addEventListener("scroll", (e) => this.updateScrollbar(e));
 		this.content.addEventListener("wheel", (event) => {
-			if (event.ctrlKey)
+			if (event.ctrlKey || !this.overrideScroll)
 				return;
 			
 			let contentScrollable = true;
@@ -116,11 +118,11 @@ class Scrollable {
 			if (!this.scrollout && !this.smooth) {
 				let delta = event.deltaY;
 	
-				let from = (this.horizontal)
+				let from = (horizontal)
 					? this.content.scrollLeft
 					: this.content.scrollTop;
 	
-				let maxScroll = (this.horizontal)
+				let maxScroll = (horizontal)
 					? this.content.scrollWidth - this.content.offsetWidth
 					: this.content.scrollHeight - this.content.offsetHeight;
 	
@@ -405,7 +407,9 @@ class Scrollable {
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = event.deltaY;
+			delta = (horizontal)
+				? event.deltaX
+				: event.deltaY;
 		else
 			delta = value - from;
 		
@@ -438,7 +442,9 @@ class Scrollable {
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = event.deltaY;
+			delta = (horizontal)
+				? event.deltaX
+				: event.deltaY;
 		else
 			delta = value - from;
 		

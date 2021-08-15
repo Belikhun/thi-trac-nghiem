@@ -46,9 +46,9 @@
 				<div class="simpleSpinner"></div>
 			</div>
 			<ul class="footer">
-				<li class="title text-overflow">Chương trình chấm điểm <a href="https://dsapblog.wordpress.com/" target="_blank" rel="noopener">Themis</a></li>
-				<li class="sub text-overflow">Được viết bởi Lê Minh Hoàng & Đỗ Đức Đông</li>
-				<li class="sub2 text-overflow">background image by Belikhun.</li>
+				<li class="title text-overflow">Hệ Thống Làm Bài Trắc Nghiệm Trực Tuyến</li>
+				<li class="sub text-overflow">Được viết bởi Belikhun</li>
+				<li class="sub2 text-overflow">background image on Google</li>
 			</ul>
 		</div>
 
