@@ -564,6 +564,7 @@ body.dark ::-webkit-calendar-picker-indicator {
 .sq-selector {
     position: relative;
     display: inline-block;
+    overflow: visible;
 
     --background: rgb(242, 242, 242);
     --active: var(--osc-color-blue);
@@ -639,6 +640,11 @@ body.dark ::-webkit-calendar-picker-indicator {
     overflow: hidden;
     background-color: var(--background);
     transition: height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.sq-selector.fixed > .select {
+    position: absolute;
+    z-index: 1;
 }
 
 .sq-selector > .select > .list {

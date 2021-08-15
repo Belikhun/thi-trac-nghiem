@@ -1881,6 +1881,80 @@ const ttn = {
 				this.dataChild = new smenu.Child({ label: "Dữ Liệu" }, this.group);
 
 				new smenu.components.Button({
+					label: "Chấm Lại Bài Làm",
+					color: "yellow",
+					icon: "pencil",
+					complex: true,
+					onClick: async () => {
+						let choiceNode = createSelectInput({
+							icon: "book",
+							color: "blue"
+						});
+
+						myajax({
+							url: `/api/problems/list`,
+							method: "GET"
+						}).then((data) => {
+							let choices = {}
+
+							for (let item of data.data)
+								choices[item.id] = `${item.name} (${item.id})`;
+
+							choiceNode.set({ options: choices });
+						});
+
+						let action = await popup.show({
+							icon: "pencil",
+							windowTitle: "Chấm Lại Đề Bài",
+							title: "Chấm Lại",
+							message: "Chọn Đề Bài Cần Chấm Lại",
+							bgColor: "blue",
+							description: "",
+							customNode: choiceNode.group,
+							buttonList: {
+								proceed: { color: "green", text: "Xác Nhận" },
+								cancel: { color: "pink", text: "Hủy Bỏ" }
+							}
+						});
+
+						if (action !== "proceed")
+							return;
+
+						let targetID = choiceNode.value();
+
+						if (!targetID || targetID === "") {
+							this.log("WARN", `No ID Specified!`);
+							return;
+						}
+						
+						try {
+							let response = await myajax({
+								url: "/api/problems/rejudge",
+								method: "POST",
+								form: {
+									id: targetID,
+									token: API_TOKEN
+								}
+							});
+
+							await popup.show({
+								level: "okay",
+								windowTitle: "Thành Công",
+								title: "Chấm Lại",
+								message: "Thành Công",
+								description: `Đã chấm lại tổng cộng ${response.data.rejudged} bài làm`,
+								buttonList: {
+									close: { color: "blue", text: "OK" }
+								}
+							});
+						} catch(e) {
+							errorHandler(e);
+							return;
+						}
+					}
+				}, this.dataChild);
+
+				new smenu.components.Button({
 					label: "Xóa Cache",
 					color: "red",
 					icon: "trash",

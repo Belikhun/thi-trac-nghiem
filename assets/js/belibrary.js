@@ -2092,6 +2092,7 @@ function createCheckbox({
 function createSelectInput({
 	icon,
 	color = "blue",
+	fixed = false,
 	options = {},
 	value
 } = {}) {
@@ -2154,6 +2155,7 @@ function createSelectInput({
 		icon,
 		color,
 		options,
+		fixed,
 		value
 	} = {}) => {
 		if (typeof color === "string")
@@ -2186,6 +2188,7 @@ function createSelectInput({
 						activeNode.classList.remove("active");
 					
 					activeNode = item;
+					activeValue = item.dataset.value;
 					item.classList.add("active");
 					container.current.value.innerText = item.innerText;
 					changeHandlers.forEach(f => f(item.dataset.value));
@@ -2202,6 +2205,10 @@ function createSelectInput({
 			currentOptions = options;
 		}
 
+		if (typeof fixed === "boolean") {
+			container.classList[fixed ? "add" : "remove"]("fixed");
+		}
+
 		if (typeof value === "string" && currentOptions[value]) {
 			if (activeNode)
 				activeNode.classList.remove("active");
@@ -2214,14 +2221,14 @@ function createSelectInput({
 		}
 	}
 
-	set({ icon, color, options, value });
+	set({ icon, color, options, fixed, value });
 
 	container.current.addEventListener("click", () => toggle());
 
 	return {
 		group: container,
 		showing,
-		value: activeValue,
+		value: () => activeValue,
 		show,
 		hide,
 		set,
@@ -2802,8 +2809,8 @@ const popup = {
 				button.returnValue = key;
 
 				if (!(typeof item.resolve === "boolean") || item.resolve !== false)
-					button.addEventListener("mouseup", e => {
-						resolve(e.target.returnValue);
+					button.addEventListener("mouseup", () => {
+						resolve(key);
 						this.hide();
 					});
 
