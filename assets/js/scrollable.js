@@ -400,7 +400,9 @@ class Scrollable {
 		horizontal = this.horizontal
 	} = {}) {
 		// Calculate the point where the user start scrolling
-		let from = this.content.scrollTop;
+		let from = (horizontal)
+			? this.content.scrollLeft
+			: this.content.scrollTop;
 	
 		// Amount of scroll in pixel
 		let delta;
@@ -431,7 +433,9 @@ class Scrollable {
 		clamping = true
 	} = {}) {
 		// Calculate the point where the user start scrolling
-		let from = this.content.scrollTop;
+		let from = (horizontal)
+			? this.content.scrollLeft
+			: this.content.scrollTop;
 
 		// Amount of scroll in pixel
 		let delta;
