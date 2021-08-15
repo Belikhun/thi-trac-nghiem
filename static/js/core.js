@@ -2187,6 +2187,12 @@ const ttn = {
 										required: true
 									}),
 
+									attachmentNote: createNote({
+										level: "info",
+										message: `Tệp tài liệu có thể là hình ảnh, file pdf hoặc file html, hoạt động tốt nhất với file html.
+											Nếu bạn đang có tệp tài liệu là pdf, hãy thử <a target="_blank" href="https://convertio.co/vn/pdf-html/">chuyển đổi pdf sang html</a> để có được trải nghiệm tốt nhất.`
+									}),
+
 									attachment: createInput({
 										type: "file",
 										label: "Tệp Tài Liệu",
