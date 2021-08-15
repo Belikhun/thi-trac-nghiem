@@ -263,6 +263,10 @@ const navbar = {
 	},
 
 	Clickable: class {
+		/**
+		 * Navbar Clickable
+		 * @param {HTMLElement} container
+		 */
 		constructor(container, { onlyActive = false } = {}) {
 			if (typeof container !== "object" || !container.appendChild)
 				throw { code: -1, description: `navbar.Clickable(): container is not a valid node` }
@@ -326,6 +330,13 @@ const navbar = {
 					if (typeof item === "function")
 						item(active);
 			});
+		}
+
+		/**
+		 * @returns {Boolean}
+		 */
+		get active() {
+			return this.container.classList.contains("active");
 		}
 
 		show() {

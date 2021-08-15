@@ -396,7 +396,7 @@ const ttn = {
 			new Scrollable(this.container.parentElement, { content: this.container });
 
 			await this.updater();
-			this.update();
+			this.update(true);
 		},
 
 		beat({ color = "green", beat = true } = {}) {
@@ -426,6 +426,9 @@ const ttn = {
 		},
 
 		async update(hard = false) {
+			if (!hard && !ttn.navbar.switch.ranking.click.active)
+				return;
+
 			let response = await myajax({
 				url: "/api/problems/rank",
 				method: "GET",
