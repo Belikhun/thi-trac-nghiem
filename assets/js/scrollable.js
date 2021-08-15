@@ -118,11 +118,11 @@ class Scrollable {
 			if (!this.scrollout && !this.smooth) {
 				let delta = event.deltaY;
 	
-				let from = (horizontal)
+				let from = (this.horizontal)
 					? this.content.scrollLeft
 					: this.content.scrollTop;
 	
-				let maxScroll = (horizontal)
+				let maxScroll = (this.horizontal)
 					? this.content.scrollWidth - this.content.offsetWidth
 					: this.content.scrollHeight - this.content.offsetHeight;
 	
@@ -400,16 +400,12 @@ class Scrollable {
 		horizontal = this.horizontal
 	} = {}) {
 		// Calculate the point where the user start scrolling
-		let from = (horizontal)
-			? this.content.scrollLeft
-			: this.content.scrollTop;
+		let from = this.content.scrollTop;
 	
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = (horizontal)
-				? event.deltaX
-				: event.deltaY;
+			delta = event.deltaY;
 		else
 			delta = value - from;
 		
@@ -435,16 +431,12 @@ class Scrollable {
 		clamping = true
 	} = {}) {
 		// Calculate the point where the user start scrolling
-		let from = (horizontal)
-			? this.content.scrollLeft
-			: this.content.scrollTop;
+		let from = this.content.scrollTop;
 
 		// Amount of scroll in pixel
 		let delta;
 		if (event)
-			delta = (horizontal)
-				? event.deltaX
-				: event.deltaY;
+			delta = event.deltaY;
 		else
 			delta = value - from;
 		
