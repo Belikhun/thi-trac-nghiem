@@ -25,9 +25,18 @@
 	switch ($type) {
 		case "submission":
 			$counter = 0;
-			rmrf($_SERVER["DOCUMENT_ROOT"] ."/data/problems", $counter);
+			$files = glob($_SERVER["DOCUMENT_ROOT"] ."/data/problems/*/*.{submit,result}", GLOB_BRACE);
+			
+			foreach ($files as $file) {
+				try {
+					unlink($file);
+					$counter++;
+				} catch (Exception $e) {
+					continue;
+				}
+			}
 
-			stop(0, "Đã xóa Dữ Liệu Bài Làm!", 200, Array( "amount" => $counter ));
+			stop(0, "Đã xóa Dữ Liệu Bài Làm!", 200, Array( "amount" => $counter, "total" => count($files) ));
 			break;
 		
 		default:

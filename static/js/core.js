@@ -1987,7 +1987,7 @@ const ttn = {
 							windowTitle: "Xác Nhận",
 							title: "Xóa Dữ Liệu Bài Làm",
 							message: "Xác Nhận",
-							description: "Bạn có chắc muốn xóa toàn bộ dữ liệu bài làm không? Những dữ liệu này bao gồm kết quả chấm, code và nhật ký chấm của toàn bộ tài khoản.",
+							description: "Bạn có chắc muốn xóa toàn bộ dữ liệu bài làm không? Những dữ liệu này bao gồm bài làm, kết quả chấm của toàn bộ đề bài.",
 							note: "Hành động này <b>không thể hoàn tác</b> một khi đã thực hiện!",
 							noteLevel: "warning",
 							buttonList: {
@@ -2012,7 +2012,7 @@ const ttn = {
 								windowTitle: "Thành Công",
 								title: "Xóa Dữ Liệu Bài Làm",
 								message: "Thành Công",
-								description: `Đã xóa tổng cộng ${response.data.amount} tệp`,
+								description: `Đã xóa tổng cộng ${response.data.amount}/${response.data.total} tệp`,
 								buttonList: {
 									close: { color: "blue", text: "OK" }
 								}
