@@ -1925,7 +1925,7 @@ const ttn = {
 
 						try {
 							let response = await myajax({
-								url: "/api/contest/delete",
+								url: "/api/problems/delete",
 								method: "POST",
 								form: {
 									type: "submission",
@@ -1942,7 +1942,7 @@ const ttn = {
 								buttonList: {
 									close: { color: "blue", text: "OK" }
 								}
-							})
+							});
 						} catch(e) {
 							errorHandler(e);
 							return;

@@ -25,7 +25,7 @@
 	switch ($type) {
 		case "submission":
 			$counter = 0;
-			rmrf(getConfig("folders.submissions"), $counter);
+			rmrf($_SERVER["DOCUMENT_ROOT"] ."/data/problems", $counter);
 
 			stop(0, "Đã xóa Dữ Liệu Bài Làm!", 200, Array( "amount" => $counter ));
 			break;
