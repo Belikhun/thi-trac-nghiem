@@ -55,14 +55,6 @@
 	// Set new config into current config
 	$rawConfig = $defConfig;
 
-	if ($rawConfig["contest"]["result"]["publish"] !== true) {
-		$rawConfig["contest"]["ranking"]["enabled"] = false;
-		$rawConfig["contest"]["log"]["enabled"] = false;
-	}
-
-	if ($rawConfig["contest"]["ranking"]["viewTask"] !== true)
-		$rawConfig["contest"]["log"]["viewOther"] = false;
-
 	if ($changed === 0)
 		// Stop executing if no change applied
 		stop(102, "Woah nothing happened", 200);
