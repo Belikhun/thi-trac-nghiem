@@ -2838,7 +2838,7 @@ const ttn = {
 					}
 				});
 
-				this.home.click.setHandler((a) => (a) ? ttn.container.dataset.layout = 1 : "");
+				this.home.click.setHandler((a) => (a) ? this.switchLayout(1) : "");
 
 				this.ranking = this.component.button({
 					icon: "table",
@@ -2848,12 +2848,21 @@ const ttn = {
 					}
 				});
 
-				this.ranking.click.setHandler((a) => (a) ? ttn.container.dataset.layout = 2 : "");
+				this.ranking.click.setHandler((a) => (a) ? this.switchLayout(2) : "");
 
 				if (SESSION && SESSION.username)
 					this.home.click.active = true;
 				else
 					this.ranking.click.active = true;
+			},
+
+			async switchLayout(layout) {
+				ttn.container.classList.remove("hide");
+				await nextFrameAsync();
+				ttn.container.dataset.layout = layout;
+
+				await delayAsync(600);
+				ttn.container.classList.add("hide");
 			}
 		},
 

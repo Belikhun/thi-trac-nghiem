@@ -184,7 +184,7 @@
 			<div id="userSettings"></div>
 			<div id="waveContainer"></div>
 
-			<div id="mainContainer">
+			<div id="mainContainer" class="hide">
 				<span class="panel problems">
 					<div class="problemsList" id="problemsListContainer">
 						<div class="header">

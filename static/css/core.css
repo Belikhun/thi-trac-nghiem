@@ -317,50 +317,6 @@ input:-webkit-autofill {
 	transform: translateX(-20px);
 }
 
-#mainContainer > div {
-	position: relative;
-	display: none;
-
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
-
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-#mainContainer[data-layout = "1"] > div:nth-child(1),
-#mainContainer[data-layout = "2"] > div:nth-child(2) {
-	display: flex;
-}
-
-#mainContainer > div:empty::before,
-#mainContainer > div .showEmpty:empty::before {
-	content: "\f51b";
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	transform: translate(-50%, calc(-50% - 22px));
-	font-family: "Font Awesome 5 Free";
-	font-weight: 900;
-	font-size: 72px;
-	color: rgb(192, 192, 192);
-}
-
-#mainContainer > div:empty::after,
-#mainContainer > div .showEmpty:empty::after {
-	content: "Không có dữ liệu";
-	position: absolute;
-	display: block;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, calc(-50% + 38px));
-	font-weight: 600;
-	font-size: 14px;
-	text-align: center;
-	color: rgb(192, 192, 192);
-}
-
 #mainContainer > .panel {
     position: absolute;
     display: block;
@@ -394,6 +350,38 @@ input:-webkit-autofill {
     opacity: 1;
 
     animation: unset;
+}
+
+#mainContainer.hide[data-layout="2"] > .problems,
+#mainContainer.hide[data-layout="1"] > .rankingContainer {
+	display: none;
+}
+
+#mainContainer > span:empty::before,
+#mainContainer > span .showEmpty:empty::before {
+	content: "\f51b";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, calc(-50% - 22px));
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	font-size: 72px;
+	color: rgb(192, 192, 192);
+}
+
+#mainContainer > span:empty::after,
+#mainContainer > span .showEmpty:empty::after {
+	content: "Không có dữ liệu";
+	position: absolute;
+	display: block;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, calc(-50% + 38px));
+	font-weight: 600;
+	font-size: 14px;
+	text-align: center;
+	color: rgb(192, 192, 192);
 }
 
 /** ============================ MAIN STYLE ============================ */
