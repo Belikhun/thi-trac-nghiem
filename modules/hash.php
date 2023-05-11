@@ -15,12 +15,6 @@
 			getConfig("contest.name"),
 			getConfig("contest.description")
 		)));
-		
-		(new Hash("config.timer")) -> update(implode(Array(
-			getConfig("time.contest.begin"),
-			getConfig("time.contest.during"),
-			getConfig("time.contest.offset")
-		)));
 
 		(new Hash("config.announcement")) -> update(implode(Array(
 			getConfig("announcement.enabled"),
